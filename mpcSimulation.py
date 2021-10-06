@@ -13,21 +13,22 @@ m.time = np.linspace(0,40,201)
 
 # Parameters
 mass = 500
-# massPlanet = 0
+massPlanet = 50
 planetR = 20
 G = 1
 planetX = 40
 planetY = 40
+defaultVal = 1e-10
 
 # Manipulated variable
 ax = m.MV(value=0, lb=-100, ub=100)
 ax.STATUS = 1  # allow optimizer to change
-ax.DCOST = 0 # smooth out gas pedal movement
+ax.DCOST = 1 # smooth out gas pedal movement
 ax.DMAX = 20   # slow down change of gas pedal
 
 ay = m.MV(value=0, lb=-100, ub=100)
 ay.STATUS = 1
-ay.DCOST = 0
+ay.DCOST = 1
 ay.DMAX = 20
 
 # Controlled Variable
@@ -37,28 +38,49 @@ m.options.CV_TYPE = 2 # squared error
 #v.SP = 40     # set point
 #v.TR_INIT = 0 # set point trajectory
 #v.TAU = 2     # time constant of trajectory
-vx = m.Var(value=-15)
+vx = m.Var(value=-10)
 vy = m.Var(value=0)
 
 
 # Position
 px = m.CV(value=0)
 px.STATUS = 1
+px.SPHI = 105
 px.SP = 100
-px.TR_INIT = 1
-#px.TAU = 20
+px.SPLO = 95
+px.TR_INIT = 2
+px.TR_OPEN = 1
+px.TAU = 5
 
 py = m.CV(value=0)
 py.STATUS = 1
+py.SPHI = 105
 py.SP = 100
-py.TR_INIT = 1
-#py.TAU = 20
+py.SPLO = 95
+py.TR_INIT = 2
+py.TR_OPEN = 1
+py.TAU = 5
+
+gx = m.Intermediate(G * massPlanet * (planetX - px))
+gy = m.Intermediate(G * massPlanet * (planetY - py))
+
+dist = m.Intermediate(((planetX - px)**2 + (planetY - py)**2)**(3/2))
 
 # Process model
-m.Equation([vx.dt() == ax, px.dt() == vx, vy.dt() == ay, py.dt() == vy, ax**2 + ay**2 < 100**2, ((px - planetX)**2 + (py - planetY)**2) > planetR**2])
+m.Equation([
+    #gx == G * massPlanet * (planetX - px) / ((planetX - px)**2 + (planetY - py)**2)**(3/2),
+    #gy == G * massPlanet * (planetY - py) / ((planetX - px)**2 + (planetY - py)**2)**(3/2),
+    vx.dt() * dist == ax * dist + gx, 
+    vy.dt() * dist == ay * dist + gy, 
+    px.dt() == vx, 
+    py.dt() == vy,
+    ax**2 + ay**2 < 100**2, 
+    ((px - planetX)**2 + (py - planetY)**2) > planetR**2
+])
 
 m.options.IMODE = 6 # control
-m.solve(disp=True)
+print(m._objectives)
+m.solve(disp=False)
 
 # get additional solution information
 import json
@@ -68,21 +90,25 @@ print(results.keys())
 def plot2DGraphs():
     plt.figure()
     plt.subplot(3,1,1)
-    plt.plot(m.time,ax.value,'b-',label='MV Optimized')
-    plt.plot(m.time,ay.value,'b-',color="red", label='MV Optimized')
+    plt.plot(m.time,ax.value,color="blue",label='MV Optimized')
+    plt.plot(m.time,ay.value,color="red", label='MV Optimized')
     plt.legend()
     plt.ylabel('Input')
     plt.subplot(3,1,2)
     plt.plot(m.time,results['v3.tr'],'k-',label='Reference Trajectory')
     plt.plot(m.time,px.value,'r--',label='CV Response')
-    plt.plot(m.time,results['v4.tr'],'k-',color="blue" ,label='Reference Trajectory')
+    plt.plot(m.time,results['v4.tr'],'b-',label='Reference Trajectory')
     plt.plot(m.time,py.value,'r--',label='CV Response')
     plt.ylabel('Output')
     plt.xlabel('Time')
     plt.legend()
     plt.subplot(3,1,3)
     #plt.plot(m.time, [math.sqrt(ax.value[i]**2 + ay.value[i]**2) for i in range(len(ax.value))], 'b-', label='Total acceleration')
-    plt.plot(m.time, [math.sqrt((px.value[i] - planetX)**2 + (py.value[i] - planetY)**2) for i in range(len(px.value))], 'b-', label='Total acceleration')
+    #plt.plot(m.time, [math.sqrt((px.value[i] - planetX)**2 + (py.value[i] - planetY)**2) for i in range(len(px.value))], 'b-', label='Total acceleration')
+    # G * massPlanet * (planetX - px) / ((planetX - px)**2 + (planetY - py)**2)**(3/2)
+    plt.plot(m.time, [gx.value[i] / dist.value[i] for i in range(len(gx.value))], color="blue", label='Total acceleration')
+    plt.plot(m.time, [gy.value[i] / dist.value[i] for i in range(len(gy.value))], color="red", label='Total acceleration')
+
 
 plot2DGraphs()
 
@@ -96,7 +122,7 @@ def plot3DGraph():
     axe = fig.gca(projection='3d')
 
     axe.plot(px.value, py.value, m.time, label='parametric curve')
-    #axe.plot(planetX, planetY, m.time, "-o", label="planet")
+    axe.plot([planetX for i in range(len(m.time))], [planetY for i in range(len(m.time))], m.time, "-o", label="planet")
     axe.legend()
 
 plot3DGraph()
