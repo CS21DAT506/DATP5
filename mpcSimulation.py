@@ -8,16 +8,16 @@ import matplotlib.pyplot as plt
 #from collections import deque
 
 m = GEKKO(remote=False)
-m.options.MAX_ITER = 1000
-m.time = np.linspace(0,40,201)
+m.options.MAX_ITER = 100000
+m.time = np.linspace(0,60,401)
 
 # Parameters
 mass = 500
-massPlanet = 50
-planetR = 20
+massPlanet = 100000
+planetR = 5
 G = 1
-planetX = 40
-planetY = 40
+planetX = 30
+planetY = 20
 defaultVal = 1e-10
 
 # Manipulated variable
@@ -121,7 +121,7 @@ def plot3DGraph():
     fig = plt.figure()
     axe = fig.gca(projection='3d')
 
-    axe.plot(px.value, py.value, m.time, label='parametric curve')
+    axe.plot(px.value, py.value, m.time, "o", label='parametric curve')
     axe.plot([planetX for i in range(len(m.time))], [planetY for i in range(len(m.time))], m.time, "-o", label="planet")
     axe.legend()
 
