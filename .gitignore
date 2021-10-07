@@ -1,5 +1,8 @@
+# vscode 
+launch.json
+
 # gekko data save paths
-data.txt
+*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

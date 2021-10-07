@@ -13,7 +13,7 @@ class GekkoPlotter:
         }
 
         x_min = np.min(results["time"])
-        x_max = np.max(results["time"])/10
+        x_max = np.max(results["time"])/5
 
 
         plt.figure()
@@ -49,7 +49,7 @@ class GekkoPlotter:
 
         plt.subplot(4, 2, 7)
         plt.xlim(x_min, x_max)
-        plt.plot(results["time"], self.vector_length(results["agent_vx"], results["agent_vy"]), color="green", label="gravity length")
+        plt.plot(results["time"], self.vector_length(results["agent_vx"], results["agent_vy"]), color="green", label="speed length")
         plt.legend(**legend_settings)
 
         plt.show()
