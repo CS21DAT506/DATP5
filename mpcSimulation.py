@@ -45,21 +45,21 @@ vy = m.Var(value=0)
 # Position
 px = m.CV(value=0)
 px.STATUS = 1
-px.SPHI = 105
+#px.SPHI = 105
 px.SP = 100
-px.SPLO = 95
-px.TR_INIT = 2
-px.TR_OPEN = 1
-px.TAU = 5
+#px.SPLO = 95
+px.TR_INIT = 0
+#px.TR_OPEN = 1
+#px.TAU = 5
 
 py = m.CV(value=0)
 py.STATUS = 1
-py.SPHI = 105
+#py.SPHI = 105
 py.SP = 100
-py.SPLO = 95
-py.TR_INIT = 2
-py.TR_OPEN = 1
-py.TAU = 5
+#py.SPLO = 95
+py.TR_INIT = 0
+#py.TR_OPEN = 1
+#py.TAU = 5
 
 gx = m.Intermediate(G * massPlanet * (planetX - px))
 gy = m.Intermediate(G * massPlanet * (planetY - py))
@@ -122,7 +122,7 @@ def plot3DGraph():
     axe = fig.gca(projection='3d')
 
     axe.plot(px.value, py.value, m.time, "o", label='parametric curve')
-    axe.plot([planetX for i in range(len(m.time))], [planetY for i in range(len(m.time))], m.time, "-o", label="planet")
+    axe.plot([planetX for i in range(len(m.time))], [planetY for i in range(len(m.time))], m.time, "o", label="planet")
     axe.legend()
 
 plot3DGraph()
