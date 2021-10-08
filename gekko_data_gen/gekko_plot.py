@@ -46,7 +46,6 @@ class GekkoPlotter:
         GekkoPlotter.plotGravityEffect(results, x_min, x_max, plot_settings, legend_settings)
         GekkoPlotter.plotSpeed(results, x_min, x_max, plot_settings, legend_settings)
         
-        plt.show()
 
     def vector_length(vector_x, vector_y):
         return [math.sqrt(e1**2 + e2**2) for e1, e2 in zip(vector_x, vector_y)]
@@ -100,5 +99,6 @@ class GekkoPlotter:
         for planet in planets:
             axe.plot([planet["initial_pos"][0] for i in range(len(results["time"]))], [planet["initial_pos"][1] for i in range(len(results["time"]))], results["time"], "o", label="planet")
         axe.legend()
-        plt.show()
 
+    def showPlots():
+        plt.show()

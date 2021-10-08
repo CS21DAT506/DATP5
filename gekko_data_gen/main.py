@@ -95,4 +95,6 @@ if __name__ == "__main__":
         results = json.load(f)
 
     GekkoPlotter(results)
+    GekkoPlotter.plot3DGraph(results, planets, target_pos)
+    GekkoPlotter.showPlots()
 
