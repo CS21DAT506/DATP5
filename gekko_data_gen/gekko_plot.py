@@ -75,7 +75,7 @@ class GekkoPlotter:
         plt.legend(**legend_settings)
 
     def plotSpeed(results, xaxis_min, xaxis_max, plot_settings, legend_settings):
-        plt.subplot(plot_settings["speed"]["rows"], plot_settings["speed"]["columns"], plot_settings["speed"]["number"])
+        plt.subplot(*plot_settings["speed"]["placement"])
         plt.xlim(xaxis_min, xaxis_max)
         plt.plot(results["time"], GekkoPlotter.vector_length(results["agent_vx"], results["agent_vy"]), color="green", label="speed length")
         plt.legend(**legend_settings)
