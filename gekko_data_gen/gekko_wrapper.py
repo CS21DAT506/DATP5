@@ -63,7 +63,7 @@ class Gekko:
         ])
 
     def solve(self, *args, **kwargs):
-        with open(f"{datetime.datetime.now().strftime('%Y_%m_%d')}.txt", "a") as f:
+        with open("data.txt", "a") as f:
             f.write(self.m.path + "\n")
 
         self.m.solve(*args, **kwargs)
