@@ -15,24 +15,16 @@ class GekkoPlotter:
 
         plot_settings = {
             "mv_out": {
-                "rows": 4,
-                "columns": 2,
-                "number": 1
+                "placement": (4,2,1),   # placement (rows, columns, grid number to be placed in)
             },
             "sp": {
-                "rows": 4,
-                "columns": 2,
-                "number": 3
+                "placement": (4,2,3),
             },
             "gravity": {
-                "rows": 4,
-                "columns": 2,
-                "number": 5
+                "placement": (4,2,5),
             },
             "speed": {
-                "rows": 4,
-                "columns": 2,
-                "number": 7
+                "placement": (4,2,7),
             }
         }
 
@@ -51,7 +43,7 @@ class GekkoPlotter:
         return [math.sqrt(e1**2 + e2**2) for e1, e2 in zip(vector_x, vector_y)]
 
     def plotMVOutput(results, xaxis_min, xaxis_max, plot_settings, legend_settings):
-        plt.subplot(plot_settings["mv_out"]["rows"], plot_settings["mv_out"]["columns"], plot_settings["mv_out"]["number"])
+        plt.subplot(*plot_settings["mv_out"]["placement"])
         plt.xlim(xaxis_min, xaxis_max)
         plt.plot(results["time"],results["agent_ax"],color="blue",label="MV Optimized")
         plt.plot(results["time"],results["agent_ay"],color="red", label="MV Optimized")
@@ -59,7 +51,7 @@ class GekkoPlotter:
         plt.ylabel("Input")
 
     def plotSPGraph(results, xaxis_min, xaxis_max, plot_settings, legend_settings):
-        plt.subplot(plot_settings["sp"]["rows"], plot_settings["sp"]["columns"], plot_settings["sp"]["number"])
+        plt.subplot(*plot_settings["sp"]["placement"])
         plt.xlim(xaxis_min, xaxis_max)
         plt.plot(results["time"],results["agent_px.tr"],"k-",label="Reference px Trajectory")
         plt.plot(results["time"],results["agent_px"],"g--",label="CV px Response")
@@ -70,7 +62,7 @@ class GekkoPlotter:
         plt.legend(**legend_settings)
 
     def plotGravityEffect(results, xaxis_min, xaxis_max, plot_settings, legend_settings):
-        plt.subplot(plot_settings["gravity"]["rows"], plot_settings["gravity"]["columns"], plot_settings["gravity"]["number"])
+        plt.subplot(*plot_settings["gravity"]["placement"])
         plt.xlim(xaxis_min, xaxis_max)
         #plt.plot(results["time"], [math.sqrt((px[i] - planetX)**2 + (py[i] - planetY)**2) for i in range(len(px))], "b-", label="Total acceleration")
         # G * massPlanet * (planetX - px) / ((planetX - px)**2 + (planetY - py)**2)**(3/2)
@@ -83,7 +75,7 @@ class GekkoPlotter:
         plt.legend(**legend_settings)
 
     def plotSpeed(results, xaxis_min, xaxis_max, plot_settings, legend_settings):
-        plt.subplot(plot_settings["speed"]["rows"], plot_settings["speed"]["columns"], plot_settings["speed"]["number"])
+        plt.subplot(*plot_settings["speed"]["placement"])
         plt.xlim(xaxis_min, xaxis_max)
         plt.plot(results["time"], GekkoPlotter.vector_length(results["agent_vx"], results["agent_vy"]), color="green", label="speed length")
         plt.legend(**legend_settings)
@@ -95,9 +87,9 @@ class GekkoPlotter:
         axe = fig.gca(projection='3d')
 
         axe.plot(results["agent_px"], results["agent_py"], results["time"], "o", label='parametric curve')
-        axe.plot([target_pos[0] for i in range(len(results["time"]))], [target_pos[1] for i in range(len(results["time"]))], results["time"], "o", label='target')
+        axe.plot([target_pos[0] for _ in range(len(results["time"]))], [target_pos[1] for _ in range(len(results["time"]))], results["time"], "o", label='target')
         for planet in planets:
-            axe.plot([planet["initial_pos"][0] for i in range(len(results["time"]))], [planet["initial_pos"][1] for i in range(len(results["time"]))], results["time"], "o", label="planet")
+            axe.plot([planet["initial_pos"][0] for _ in range(len(results["time"]))], [planet["initial_pos"][1] for _ in range(len(results["time"]))], results["time"], "o", label="planet")
         axe.legend()
 
     def showPlots():
