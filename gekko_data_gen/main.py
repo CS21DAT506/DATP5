@@ -3,6 +3,7 @@ import numpy as np
 import math
 import random
 import json
+import time
 
 from gekko_wrapper import Gekko
 from gekko_plot import GekkoPlotter
@@ -53,7 +54,7 @@ planets = [
 
 if __name__ == "__main__":
 
-    DATA_SIZE = 1
+    DATA_SIZE = 100
     MAX_POS_RADIUS = 1000
     MAX_V_RADIUS = 50
 
@@ -61,7 +62,8 @@ if __name__ == "__main__":
     m = None
 
     for iteration in range(DATA_SIZE):
-
+        start_time = time.time()
+        didFail = False
         valid_configuration_found = False
 
         while not valid_configuration_found:
@@ -84,8 +86,9 @@ if __name__ == "__main__":
             m.solve(disp=False)
         except Exception as e:
             failed += 1
+            didFail = True
 
-        print(iteration+1)
+        print(f"{iteration + 1}: {'Failed' if didFail else 'Succeed'} (took: {time.time() - start_time} seconds)")
 
     print(f"failed: {failed}")
 

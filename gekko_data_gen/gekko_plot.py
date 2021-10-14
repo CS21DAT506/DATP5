@@ -29,7 +29,7 @@ class GekkoPlotter:
         }
 
         x_min = np.min(results["time"])
-        x_max = np.max(results["time"])/5
+        x_max = np.max(results["time"])
 
         plt.figure()
 
@@ -42,11 +42,12 @@ class GekkoPlotter:
     def vector_length(vector_x, vector_y):
         return [math.sqrt(e1**2 + e2**2) for e1, e2 in zip(vector_x, vector_y)]
 
+    @staticmethod
     def plotMVOutput(results, xaxis_min, xaxis_max, plot_settings, legend_settings):
         plt.subplot(*plot_settings["mv_out"]["placement"])
         plt.xlim(xaxis_min, xaxis_max)
-        plt.plot(results["time"],results["agent_ax"],color="blue",label="MV Optimized")
-        plt.plot(results["time"],results["agent_ay"],color="red", label="MV Optimized")
+        plt.plot(results["time"],results["agent_ax"],color="blue",label=r"Agent acc (x)")
+        plt.plot(results["time"],results["agent_ay"],color="red", label=r"Agent acc (y)")
         plt.legend(**legend_settings)
         plt.ylabel("Input")
 

@@ -6,14 +6,13 @@ class Gekko:
 
     def __init__(self, remote=False):
         self.m = GEKKO(remote)
-        self.m.options.MAX_ITER = 100000
-        self.m.time = np.linspace(0,60,401)
+        self.m.options.MAX_ITER = 1000
+        self.m.time = np.linspace(0,40,201)
         self.m.G = 1
         self.m.precision = 5
         self.m.options.IMODE = 6  # control
 
-
-    def setup(self, agent, planets, target_pos=[100,100], acceleration_bound=100):
+    def setup(self, agent, planets, target_pos=[100,100], acceleration_bound=10):
         planet = planets[0]
 
         # Manipulated variable
@@ -37,11 +36,15 @@ class Gekko:
         px = self.m.CV(value=agent["initial_pos"][0], name="agent_px")
         px.STATUS = 1
         px.SP = target_pos[0]
+        px.SPHI = target_pos[0] + 5
+        px.SPLO = target_pos[0] - 5
         px.TR_INIT = 0
 
         py = self.m.CV(value=agent["initial_pos"][1], name="agent_py")
         py.STATUS = 1
         py.SP = target_pos[1]
+        py.SPHI = target_pos[1] + 5
+        py.SPLO = target_pos[1] - 5
         py.TR_INIT = 0
 
         gx = self.m.Intermediate(self.m.G * planet["mass"] * (planet["initial_pos"][0] - px), name="gravity_x")
@@ -61,6 +64,8 @@ class Gekko:
             ax**2 + ay**2 < acceleration_bound**2, 
             ((px - planet["initial_pos"][0])**2 + (py - planet["initial_pos"][1])**2) > planet["radius"]**2
         ])
+
+        self.m.Obj((ax**2 + ay**2) * self.m.time[-1] / len(self.m.time))
 
     def solve(self, *args, **kwargs):
         with open(f"{datetime.datetime.now().strftime('%Y_%m_%d')}.txt", "a") as f:
