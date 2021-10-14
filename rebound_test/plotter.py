@@ -3,7 +3,6 @@ import numpy as np
 import math
 import matplotlib as mpl
 import matplotlib.cm as cm
-from constants import TARGET_POS
 
 class Plotter():
 
@@ -20,7 +19,7 @@ class Plotter():
             plt.plot(x, y, color=COLOR[i])
 
 
-    def plot_3d(self, particle_plot, time):
+    def plot_3d(self, particle_plot, time, target_pos):
         mpl.rcParams['legend.fontsize'] = 10
 
         fig = plt.figure()
@@ -34,10 +33,10 @@ class Plotter():
 
             # if(i == 0):
             #     axe.set_box_aspect( (np.ptp(x), np.ptp(y), np.ptp(time)) )
-            obj_label = "planet" if i > 0 else "agent"
+            obj_label = "Planet" if i > 0 else "Agent"
             axe.plot(x, y, time[:len(x)], "o", label=obj_label)
 
-        axe.plot([ TARGET_POS[0] for _ in range(len(time)) ], [ TARGET_POS[1] for _ in range(len(time)) ], time, "o", label="Target")
+        axe.plot([ target_pos[0] for _ in range(len(time)) ], [ target_pos[1] for _ in range(len(time)) ], time, "o", label="Target")
 
         axe.legend()
 
