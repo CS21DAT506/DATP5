@@ -11,19 +11,22 @@ class Gekko:
         self.m.G = 1
         self.m.precision = 5
         self.m.options.IMODE = 6  # control
+        self.m.options.MV_STEP_HOR = 5  # how often the MVs can change values
+        self.m.options.PRED_TIME = 100.0
+        self.m.options.WEB = 0
 
-    def setup(self, agent, planets, target_pos=[100,100], acceleration_bound=10):
+    def setup(self, agent, planets, target_pos=[100,100], acceleration_bound=100):
         planet = planets[0]
 
         # Manipulated variable
         ax = self.m.MV(value=0, lb=-acceleration_bound, ub=acceleration_bound, name="agent_ax")
         ax.STATUS = 1  # allow optimizer to change
-        ax.DCOST = 1 # smooth out gas pedal movement
+        ax.DCOST = 0.001 # smooth out gas pedal movement
         ax.DMAX = acceleration_bound/5   # slow down change of gas pedal
 
         ay = self.m.MV(value=0, lb=-acceleration_bound, ub=acceleration_bound, name="agent_ay")
         ay.STATUS = 1
-        ay.DCOST = 1
+        ay.DCOST = 0.001
         ay.DMAX = acceleration_bound/5
 
         # Controlled Variable
