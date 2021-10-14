@@ -1,12 +1,9 @@
-from numpy import linalg
 import rebound
 import random
 import math
 
-import numpy as np
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
-
+from constants import *
+from analytical_agent import *
 from plotter import Plotter
 
 def get_distribution(max_radius, three_dimension=True):
@@ -46,9 +43,10 @@ def setup(particle_list=[], amount_of_particles=None):
     sim.integrator = "SABA(10,6,4)"
     sim.collision = "direct"
     sim.collision_resolve = "merge"  # "hardsphere"
-    sim.dt = 0.001
+    sim.dt = 0.01
     sim.units = ("kg", "km", "yr")
     sim.additional_forces = add_thrust
+    sim.force_is_velocity_dependent = 1
 
     for i in range(amount_of_particles):
         if i <= len(particle_list)-1:
@@ -63,46 +61,7 @@ def setup(particle_list=[], amount_of_particles=None):
     
     return sim
 
-def normalize(vec):
-    return  vec / np.linalg.norm(vec)
 
-def get_agent_gravity(agent_pos, sim):
-    agent_acc =  np.array( (0, 0, 0) )
-
-    for i in range(1, len(sim.particles)):
-        particle = sim.particles[i]
-        distance = np.array( (particle.x, particle.y, particle.z) ) - agent_pos 
-        agent_acc = agent_acc + particle.m * distance / np.linalg.norm(distance)**3
-    
-    return agent_acc * sim.G
-
-def get_acceleration(agent_pos, agent_gravity):
-    dist_to_target = normalize( np.array(TARGET_POS) - agent_pos ) 
-
-    # agent_acc =  np.array( (agent.ax, agent.ay, agent.az) )
-    # print(f"ACCELERATION: {agent_gravity}")
-
-    dot = np.dot( agent_gravity , dist_to_target )
-    cross = np.linalg.norm( np.cross( agent_gravity , dist_to_target ) )
-
-    num = MAX_ACCELERATION**2 - cross**2
-    # print(f"NUM: {num}")
-
-    if num < 0:
-        return agent_gravity
-
-    return (dot + math.sqrt( num )) * dist_to_target - agent_gravity
-
-def add_thrust(simulation):
-    sim = simulation.contents
-    agent = sim.particles[0]
-
-    agent_pos = np.array( (agent.x, agent.y, agent.z) )
-    agent_gravity = get_agent_gravity(agent_pos, sim)
-    agent_acc = get_acceleration(agent_pos, agent_gravity)
-    agent.ax += agent_acc[0]
-    agent.ay += agent_acc[1]
-    agent.az += agent_acc[2]
 
 
 #######################################################################################################
@@ -125,9 +84,6 @@ if __name__ == "__main__":
         },
     ]
 
-    TARGET_POS = (100, 100, 0)
-    MAX_ACCELERATION = 100
-
     particles = [
         # {"pos":(0,0,0),"vel": (0,0,0), "mass": 0, "radius":0.1},    #Origo
         # {"pos":(1,1.5,0),"vel": (-0.1,0,0), "mass":10, "radius":0.1}, #body1
@@ -146,7 +102,7 @@ if __name__ == "__main__":
     particle_plot = [[] for _ in sim.particles]    
     time = []
 
-    for i in range(1000):
+    for i in range(SIM_TIME):
 
         for j in [i for i in range(len(sim.particles))]:
             particle_plot[j].append((sim.particles[j].x, sim.particles[j].y))
