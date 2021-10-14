@@ -15,9 +15,6 @@ def get_agent_gravity(agent_pos, sim):
     
     return agent_acc * sim.G
 
-PREFERRED_VALUE = 0.5
-INVALID_VALUE = -1
-
 def scale_policy(velocity_scale_min, velocity_scale_max):
     if (velocity_scale_max >= PREFERRED_VALUE and velocity_scale_min <= PREFERRED_VALUE):
         return PREFERRED_VALUE

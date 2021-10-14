@@ -7,7 +7,7 @@ from analytical_agent import *
 from plotter import Plotter
 
 def get_distribution(max_radius, three_dimension=True):
-    return (get_spherical(max_radius) if three_dimension else (*get_circular(max_radius), 0))
+    return (get_spherical(max_radius) if three_dimension else get_vector_with_circular_bound(max_radius))
 
 def get_spherical(max_radius):
     r = math.pow(random.random(), 1/3) * max_radius
@@ -19,12 +19,12 @@ def get_spherical(max_radius):
     z = h * r
     return x, y, z
 
-def get_circular(max_radius):
+def get_vector_with_circular_bound(max_radius):
     r = math.sqrt(random.random()) * max_radius
     a = (2 * random.random() * math.pi)
     x = math.cos(a) * r
     y = math.sin(a) * r
-    return x, y
+    return x, y, 0
 
 def add_particle(sim, pos=None, vel=None, mass=None, radius=None, three_dimension=True):
     pos = pos or get_distribution(10, three_dimension)
@@ -72,32 +72,27 @@ if __name__ == "__main__":
         "mass": 500,
         "pos": (0, 0, 0),
         "radius": 0.01,
-        "vel": (-10, 30, 0), #x, y, z
+        # "vel": (-10, 30, 0), 
+        "vel": get_vector_with_circular_bound(MAX_V_RADIUS), 
     }
 
     planets = [
         {
-            "mass": 100000000,
-            "pos": (30, 20, 0),
+            "mass": 1e8,
+            # "pos": (30, 20, 0),
+            "pos": get_vector_with_circular_bound(MAX_POS_RADIUS),
             "radius": 5,
-            "vel": (0, 0, 0),
+            # "vel": (0, 0, 0),
+            "vel": get_vector_with_circular_bound(MAX_V_RADIUS),
         },
     ]
 
     particles = [
-        # {"pos":(0,0,0),"vel": (0,0,0), "mass": 0, "radius":0.1},    #Origo
-        # {"pos":(1,1.5,0),"vel": (-0.1,0,0), "mass":10, "radius":0.1}, #body1
-        # {"pos":(-1,1.7,0),"vel": (0.1,0,0), "mass":10, "radius":0.1}, #body2
         agent,
         planets[0]
     ]
 
     sim = setup(particle_list=particles)
-    # sim = setup(amount_of_particles=10)
-    # sim = rebound.SimulationArchive("archive.bin")[0]
-
-    # print all particles 
-    # [print(particle) for particle in sim.particles]
 
     particle_plot = [[] for _ in sim.particles]    
     time = []
