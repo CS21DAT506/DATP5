@@ -14,6 +14,7 @@ class Gekko:
         self.m.options.PRED_TIME = 100.0
         self.m.options.WEB = 0
         self.m.options.MAX_TIME = 40.0
+        self.m.options.CV_TYPE = 2 # squared error
 
     def setup(self, agent, planets, target_pos=[100,100], acceleration_bound=100):
         planet = planets[0]
@@ -28,11 +29,6 @@ class Gekko:
         ay.STATUS = 1
         ay.DCOST = 0.001
         ay.DMAX = acceleration_bound/5
-
-        self.m.options.CV_TYPE = 2 # squared error
-        vx = self.m.Var(value=agent["initial_velocity"][0], name="agent_vx")
-        vy = self.m.Var(value=agent["initial_velocity"][1], name="agent_vy")
-
 
         # Controlled Variable (position of agent)
         px = self.m.CV(value=agent["initial_pos"][0], name="agent_px")
@@ -49,24 +45,43 @@ class Gekko:
         py.SPLO = target_pos[1] - 5
         py.TR_INIT = 0
 
-        gx = self.m.Intermediate(self.m.G * planet["mass"] * (planet["initial_pos"][0] - px), name="gravity_x")
-        gy = self.m.Intermediate(self.m.G * planet["mass"] * (planet["initial_pos"][1] - py), name="gravity_y")
+        # Other model variables
+        vx = self.m.Var(value=agent["initial_velocity"][0], name="agent_vx")
+        vy = self.m.Var(value=agent["initial_velocity"][1], name="agent_vy")
 
-        dist = self.m.Intermediate(((planet["initial_pos"][0] - px)**2 + (
-            planet["initial_pos"][1] - py)**2)**(3/2), name="dist")
+        planet_vx = self.m.Const(value=planet["initial_velocity"][0], name="planet_vx")
+        planet_vy = self.m.Const(value=planet["initial_velocity"][1], name="planet_vy")
+
+        planet_x = self.m.Var(value=planet["initial_pos"][0], name="planet_px")
+        planet_y = self.m.Var(value=planet["initial_pos"][1], name="planet_py")
+
+        # Planet position calculations
+        
+
+        # Intermediate calculations
+        gx = self.m.Intermediate(self.m.G * planet["mass"] * (planet_x - px), name="gravity_x")
+        gy = self.m.Intermediate(self.m.G * planet["mass"] * (planet_y - py), name="gravity_y")
+
+        dist = self.m.Intermediate(((planet_x - px)**2 + (planet_y - py)**2)**(3/2), name="dist")
 
         # Process model
         self.m.Equation([
             #gx == G * massPlanet * (planetX - px) / ((planetX - px)**2 + (planetY - py)**2)**(3/2),
             #gy == G * massPlanet * (planetY - py) / ((planetX - px)**2 + (planetY - py)**2)**(3/2),
+            planet_x.dt() == planet_vx,
+            planet_y.dt() == planet_vy,
             vx.dt() * dist == ax * dist + gx, 
             vy.dt() * dist == ay * dist + gy, 
             px.dt() == vx, 
             py.dt() == vy,
+            #planet_vx.dt() == 0,
+            #planet_vy.dt() == 0,
+
             ax**2 + ay**2 < acceleration_bound**2, 
-            ((px - planet["initial_pos"][0])**2 + (py - planet["initial_pos"][1])**2) > planet["radius"]**2
+            ((px - planet_x)**2 + (py - planet_y)**2) > planet["radius"]**2
         ])
 
+        self.m.Maximize(dist)
         self.m.Obj((ax**2 + ay**2) * self.m.time[-1] / len(self.m.time))
 
     def solve(self, *args, **kwargs):

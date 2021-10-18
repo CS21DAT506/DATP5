@@ -108,7 +108,7 @@ if __name__ == "__main__":
         
     results = None
 
-    with open(m.m.path + "//results.json") as f:
+    with open(m.m.path + r"\results.json") as f:
         results = json.load(f)
 
     GekkoPlotter(results)

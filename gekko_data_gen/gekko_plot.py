@@ -90,7 +90,8 @@ class GekkoPlotter:
         axe.plot(results["agent_px"], results["agent_py"], results["time"], "o", label='parametric curve')
         axe.plot([target_pos[0] for _ in range(len(results["time"]))], [target_pos[1] for _ in range(len(results["time"]))], results["time"], "o", label='target')
         for planet in planets:
-            axe.plot([planet["initial_pos"][0] for _ in range(len(results["time"]))], [planet["initial_pos"][1] for _ in range(len(results["time"]))], results["time"], "o", label="planet")
+            axe.plot(results["planet_px"], results["planet_py"], results["time"], "o", label="planet")
+            #axe.plot([planet["initial_pos"][0] for _ in range(len(results["time"]))], [planet["initial_pos"][1] for _ in range(len(results["time"]))], results["time"], "o", label="planet")
         axe.legend()
 
     def showPlots():
