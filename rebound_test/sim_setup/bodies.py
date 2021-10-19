@@ -22,30 +22,31 @@ def is_valid_configuration(agent, planets, target, min_dist_to_target):
 
 relative_pos = get_vector_with_circular_bound(MAX_POS_RADIUS)
 
-agent = {
-    "mass": 500,
-    "pos": np.array( (0, 0, 0) ),
-    "radius": 0.01,
-    # "vel": (-10, 30, 0), 
-    "vel": get_vector_with_circular_bound(MAX_V_RADIUS), 
-}
+def get_agent():
+    return {
+        "mass": 500,
+        "pos": np.array( (0, 0, 0) ),
+        "radius": 0.01,
+        # "vel": (-10, 30, 0), 
+        "vel": get_vector_with_circular_bound(MAX_V_RADIUS), 
+    }
 
-planets = [
-    {
-        "mass": 1e10,
-        # "pos": (30, 20, 0),
-        "pos": get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos,
-        "radius": 5,
-        # "vel": (0, 0, 0),
-        "vel": get_vector_with_circular_bound(MAX_V_RADIUS),
-    },
-    {
-        "mass": 1e10,
-        "pos": get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos,
-        "radius": 5,
-        "vel": get_vector_with_circular_bound(MAX_V_RADIUS),
-    },
-]
+def get_planet():
+    return {
+            "mass": 1e10,
+            "pos": get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos,
+            "radius": 5,
+            "vel": get_vector_with_circular_bound(MAX_V_RADIUS),
+    }
 
-target_pos = get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos
+def get_particles(num_of_planets):
+    particles = [get_agent()]
+
+    for _ in range(num_of_planets):
+        particles.append( get_planet() )
+
+    return particles
+
+def get_target_pos():
+    return get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos
 

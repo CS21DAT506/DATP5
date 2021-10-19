@@ -7,14 +7,11 @@ from sim_setup.bodies import *
 from utils.data_saving import *
 
 def run():
-    particles = [
-        agent,
-        planets[0]
-    ]
-
-    is_valid_conf = is_valid_configuration(agent, planets, target_pos, MIN_DIST_TO_TARGET)
-    if (not is_valid_conf):
-        raise Exception("Invalid configuration.")
+    is_valid_conf = False
+    while (not is_valid_conf):
+        particles = get_particles(NUM_OF_PLANETS)
+        target_pos = get_target_pos()
+        is_valid_conf = is_valid_configuration(particles[AGENT_INDEX], particles[AGENT_INDEX+1:], target_pos, MIN_DIST_TO_TARGET)
 
     analytical_agent = AnalyticalAgent(target_pos)
 
@@ -24,15 +21,12 @@ def run():
     sim.integrate(SIM_TIME)
 
     archive = rebound.SimulationArchive(archive_fname)
-    return archive
+    return target_pos, archive
 
 if __name__ == "__main__":
-    current_iteration = 1
     for i in range(NUM_OF_ITERATIONS):
         print(f"Iteration: {i}.")
-        archive_data = run()
-
-
+        target_pos, archive_data = run()
 
     plotter = Plotter()
     # plotter.plot_2d(particle_plot, sim)
