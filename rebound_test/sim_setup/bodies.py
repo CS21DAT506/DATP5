@@ -27,7 +27,6 @@ def get_agent():
         "mass": 500,
         "pos": np.array( (0, 0, 0) ),
         "radius": 0.01,
-        # "vel": (-10, 30, 0), 
         "vel": get_vector_with_circular_bound(MAX_V_RADIUS), 
     }
 

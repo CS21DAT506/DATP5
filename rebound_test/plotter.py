@@ -54,14 +54,15 @@ class Plotter():
 
         time = get_time(archive)
 
-        for i in range(len(archive[0].particles)):
+        num_of_particles = len(archive[0].particles)
+        for i in range(num_of_particles):
             x = []
             y = []
             for a in archive:
-                particle = a.particles[i]
-
-                x.append(particle.x)
-                y.append(particle.y)
+                if i < len(a.particles):
+                    particle = a.particles[i]
+                    x.append(particle.x)
+                    y.append(particle.y)
 
             # if(i == 0):
             #     axe.set_box_aspect( (np.ptp(x), np.ptp(y), np.ptp(time)) )

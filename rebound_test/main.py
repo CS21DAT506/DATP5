@@ -5,6 +5,8 @@ from plotter import Plotter
 from sim_setup.setup import *
 from sim_setup.bodies import *
 from utils.data_saving import *
+from utils.data_transformation import *
+from constants import *
 
 def run():
     is_valid_conf = False
@@ -15,12 +17,15 @@ def run():
 
     analytical_agent = AnalyticalAgent(target_pos)
 
-    archive_fname = get_data_path_with_file()
+    file_name = get_timestamp_str()
+    archive_fname = get_abs_path_of_file(file_name, BIN_FILE_EXT)
     sim = setup(analytical_agent, archive_fname, particle_list=particles)
 
     sim.integrate(SIM_TIME)
 
     archive = rebound.SimulationArchive(archive_fname)
+    archive_as_json = get_archive_as_json_str(archive, analytical_agent, target_pos)
+    write_to_file(file_name, JSON_FILE_EXT, archive_as_json)
     return target_pos, archive
 
 if __name__ == "__main__":

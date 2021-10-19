@@ -78,3 +78,12 @@ class AnalyticalAgent():
         agent.ay += agent_acc[1]
         agent.az += agent_acc[2]
 
+    def get_thrust(self, archive):
+        sim = archive
+        agent = sim.particles[0]
+
+        agent_pos = np.array( (agent.x, agent.y, agent.z) )
+        agent_velocity = np.array( (agent.vx, agent.vy, agent.vz) )
+        agent_velocity = agent_velocity * 1
+        agent_gravity = self.get_agent_gravity(agent_pos, sim)
+        return self.get_acceleration(agent_pos, agent_velocity, agent_gravity)
