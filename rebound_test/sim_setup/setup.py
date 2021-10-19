@@ -28,10 +28,9 @@ def add_particle(sim, pos=None, vel=None, mass=None, radius=None, three_dimensio
     vel = vel if vel is not None else get_distribution(0.1, three_dimension)
     mass = mass or random.random() * 50 + 0.5
     radius = radius or mass / 10000
-    print(radius)
     sim.add(m = mass, r = radius, x = pos[0], y = pos[1], z = pos[2], vx = vel[0], vy = vel[1], vz = vel[2])
 
-def setup(agent, particle_list=[], amount_of_particles=None):
+def setup(agent, archive_fname, particle_list=[], amount_of_particles=None):
     """
         sets up a sim based on either a list of particles or randomised based on amount
     """
@@ -44,6 +43,7 @@ def setup(agent, particle_list=[], amount_of_particles=None):
     sim.units = ("kg", "km", "yr")
     sim.additional_forces = agent.add_thrust
     sim.force_is_velocity_dependent = 1
+    sim.automateSimulationArchive(archive_fname, interval=1)
 
     for i in range(amount_of_particles):
         if i <= len(particle_list)-1:

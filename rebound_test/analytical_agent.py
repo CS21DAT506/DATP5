@@ -1,6 +1,8 @@
 import math
 import numpy as np
 from constants import *
+from settings.settings import *
+
 
 from utils.vectors import normalize
 

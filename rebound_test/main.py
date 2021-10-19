@@ -1,16 +1,12 @@
 import rebound
-import random
-import math
-
-from constants import *
+from settings.settings import *
 from analytical_agent import AnalyticalAgent
 from plotter import Plotter
+from sim_setup.setup import *
+from sim_setup.bodies import *
+from utils.data_saving import *
 
-from setup.setup import *
-from setup.bodies import *
-
-
-def main():
+def run():
     particles = [
         agent,
         planets[0]
@@ -21,26 +17,24 @@ def main():
         raise Exception("Invalid configuration.")
 
     analytical_agent = AnalyticalAgent(target_pos)
-    sim = setup(analytical_agent, particle_list=particles)
 
-    particle_plot = [[] for _ in sim.particles]    
-    time = []
+    archive_fname = get_data_path_with_file()
+    sim = setup(analytical_agent, archive_fname, particle_list=particles)
 
-    for i in range(SIM_TIME*10):
+    sim.integrate(SIM_TIME)
 
-        for j in [i for i in range(len(sim.particles))]:
-            particle_plot[j].append((sim.particles[j].x, sim.particles[j].y))
-        time.append(sim.t)
-        sim.integrate(i*0.1)
-
-    plotter = Plotter()
-    # plotter.plot_2d(particle_plot, sim)
-    plotter.plot_3d(particle_plot, time, target_pos)
-    plotter.show_plots()
+    archive = rebound.SimulationArchive(archive_fname)
+    return archive
 
 if __name__ == "__main__":
     current_iteration = 1
     for i in range(NUM_OF_ITERATIONS):
         print(f"Iteration: {i}.")
-        main()
+        archive_data = run()
 
+
+
+    plotter = Plotter()
+    # plotter.plot_2d(particle_plot, sim)
+    plotter.plot_3d(archive_data, target_pos)
+    plotter.show_plots()

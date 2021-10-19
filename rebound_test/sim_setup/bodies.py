@@ -1,7 +1,7 @@
 import numpy as np
 
-from constants import MAX_V_RADIUS, MAX_POS_RADIUS
-from setup.setup import get_vector_with_circular_bound 
+from settings.settings import MAX_V_RADIUS, MAX_POS_RADIUS
+from sim_setup.setup import get_vector_with_circular_bound 
 
 from utils.vectors import vector_dist
 
