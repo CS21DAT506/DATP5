@@ -7,7 +7,7 @@ import time
 from gekko_wrapper import Gekko
 from gekko_plot import GekkoPlotter
 
-debug = True
+debug = False
 
 def get_vector_with_circular_bound(max_radius):
     r = math.sqrt(random.random()) * max_radius
@@ -37,15 +37,17 @@ def is_valid_configuration(agent, planets, target, min_dist_to_target):
     
     return vector_dist(agent["initial_pos"], target) >= min_dist_to_target
 
-def automatedRun(model, agent, planets):
+def automatedRun(model, agent, num_of_planets):
     valid_configuration_found = False
+    planets = [{} for _ in range(num_of_planets)]
     while not valid_configuration_found:
+        for planet in planets:
+            planet["initial_pos"] = get_vector_with_circular_bound(MAX_POS_RADIUS)
+            planet["initial_velocity"] = get_vector_with_circular_bound(MAX_V_RADIUS / 10)
+            planet["mass"] = get_mass(4,6)
+            planet["radius"] = planet["mass"] / 20000
         agent["initial_pos"] = get_vector_with_circular_bound(MAX_POS_RADIUS)
         agent["initial_velocity"] = get_vector_with_circular_bound(MAX_V_RADIUS)
-        planets[0]["initial_pos"] = get_vector_with_circular_bound(MAX_POS_RADIUS)
-        # planets[0]["initial_velocity"] = get_vector_with_circular_bound(max_v_radius)
-        planets[0]["mass"] = get_mass(4,6)
-        planets[0]["radius"] = planets[0]["mass"] / 20000
         target_pos = get_vector_with_circular_bound(MAX_POS_RADIUS)
         valid_configuration_found = is_valid_configuration(agent, planets, target_pos, 200)
 
@@ -76,11 +78,17 @@ agent = {
 
 planets = [
     {
-        "mass": 1000000,
-        "initial_pos": np.array([320,420]),
+        "mass": 100000,
+        "initial_pos": np.array([920,420]),
         "radius": 20,
-        "initial_velocity": np.array([0,0]),
+        "initial_velocity": np.array([10,0]),
     },
+    {
+        "mass": 10000,
+        "initial_pos": np.array([120,420]),
+        "radius": 5,
+        "initial_velocity": np.array([0,2]),
+    }
 ]
 
 if __name__ == "__main__":
@@ -88,14 +96,15 @@ if __name__ == "__main__":
     target_pos = [100,100]
     m = None
     if (not debug):
-        DATA_SIZE = 1
+        DATA_SIZE = 10
         MAX_POS_RADIUS = 1000
         MAX_V_RADIUS = 50
+        NUM_OF_PLANETS = 2
         
         for iteration in range(DATA_SIZE):
             start_time = time.time()
             m = Gekko()
-            (target_pos, didSucceed) = automatedRun(m, agent, planets)
+            (target_pos, didSucceed) = automatedRun(m, agent, NUM_OF_PLANETS)
             if (not didSucceed):
                 failed += 1
             print(f"{iteration + 1}: {'Succeed' if didSucceed else 'Failed'} (took: {time.time() - start_time} seconds)")
