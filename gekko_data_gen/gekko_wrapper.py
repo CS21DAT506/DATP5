@@ -49,8 +49,8 @@ class Gekko:
         vx = self.m.Var(value=agent["initial_velocity"][0], name="agent_vx")
         vy = self.m.Var(value=agent["initial_velocity"][1], name="agent_vy")
 
-        planet_vx = self.m.Const(value=planet["initial_velocity"][0], name="planet_vx")
-        planet_vy = self.m.Const(value=planet["initial_velocity"][1], name="planet_vy")
+        planet_vx = self.m.Var(value=planet["initial_velocity"][0], name="planet_vx")
+        planet_vy = self.m.Var(value=planet["initial_velocity"][1], name="planet_vy")
 
         planet_x = self.m.Var(value=planet["initial_pos"][0], name="planet_px")
         planet_y = self.m.Var(value=planet["initial_pos"][1], name="planet_py")
@@ -81,7 +81,7 @@ class Gekko:
             ((px - planet_x)**2 + (py - planet_y)**2) > planet["radius"]**2
         ])
 
-        self.m.Maximize(dist)
+        self.m.Maximize(dist**(1/3))
         self.m.Obj((ax**2 + ay**2) * self.m.time[-1] / len(self.m.time))
 
     def solve(self, *args, **kwargs):
