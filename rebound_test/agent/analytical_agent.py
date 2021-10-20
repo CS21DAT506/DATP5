@@ -1,4 +1,4 @@
-from agent.agent_base import AgentBase
+from agent_base import AgentBase
 import math
 import numpy as np
 from constants import *
