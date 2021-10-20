@@ -1,4 +1,4 @@
-from agent_base import AgentBase
+from agent.agent_base import AgentBase
 import math
 import numpy as np
 from settings.SettingsAccess import settings
