@@ -1,0 +1,31 @@
+sim: 
+    sim_time: 30
+    num_of_data_points: 30
+    num_of_iterations: 1
+
+    # For randomly generating positions, velocities, etc. of bodies   
+    config_generation: 
+        max_pos_radius: 1000
+        max_vel_radius: 50
+        min_dist_to_target: 200
+
+    bodies: 
+        use_fixed_setup: False
+        agent: 
+            index: 0
+            target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 
+            max_acceleration: 10
+            scale_policy:
+                preferred_value: 1
+                invalid_value: -1
+        num_of_planets: 2
+        
+data:
+    dir_name: data
+    file_extensions:
+        bin: ".bin"
+        json: ".json"
+
+logging:
+    info_str:
+        separator: ','

@@ -1,11 +1,10 @@
+from settings.SettingsAccess import settings
 import datetime
 import pathlib
 from pathlib import Path
 
-from settings.settings import DATA_DIRECTORY
-
 cwd_path = pathlib.Path().resolve()
-path_to_data_dir = Path.joinpath(cwd_path, DATA_DIRECTORY )
+path_to_data_dir = Path.joinpath(cwd_path, settings.data_dir_name )
 
 def get_timestamp_str():
     return datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")

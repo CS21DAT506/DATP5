@@ -1,8 +1,9 @@
 import math
 import numpy as np
-from constants import *
-from settings.settings import *
-
+from settings.SettingsAccess import settings
+PREFERRED_VALUE = settings.preferred_value
+INVALID_VALUE = settings.invalid_value
+MAX_ACCELERATION = settings.max_acceleration
 
 from utils.vectors import normalize
 

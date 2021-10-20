@@ -1,9 +1,7 @@
-import numpy as np
-
-from settings.settings import MAX_V_RADIUS, MAX_POS_RADIUS
 from sim_setup.setup import get_vector_with_circular_bound 
-
 from utils.vectors import vector_dist
+from settings.SettingsAccess import settings
+import numpy as np
 
 def is_valid_configuration(agent, planets, target, min_dist_to_target):
     for p1 in planets:
@@ -20,22 +18,22 @@ def is_valid_configuration(agent, planets, target, min_dist_to_target):
     
     return vector_dist(agent["pos"], target) >= min_dist_to_target
 
-relative_pos = get_vector_with_circular_bound(MAX_POS_RADIUS)
+relative_pos = get_vector_with_circular_bound(settings.max_pos_radius)
 
 def get_agent():
     return {
         "mass": 500,
         "pos": np.array( (0, 0, 0) ),
         "radius": 0.01,
-        "vel": get_vector_with_circular_bound(MAX_V_RADIUS), 
+        "vel": get_vector_with_circular_bound(settings.max_vel_radius), 
     }
 
 def get_planet():
     return {
             "mass": 1e10,
-            "pos": get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos,
+            "pos": get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos,
             "radius": 5,
-            "vel": get_vector_with_circular_bound(MAX_V_RADIUS),
+            "vel": get_vector_with_circular_bound(settings.max_vel_radius),
     }
 
 def get_particles(num_of_planets):
@@ -62,5 +60,5 @@ def get_colliding_particles():
     return [agent, planet_1, planet_2]
 
 def get_target_pos():
-    return get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos
+    return get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos
 
