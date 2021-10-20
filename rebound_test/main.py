@@ -7,6 +7,7 @@ from sim_setup.bodies import *
 from utils.data_saving import *
 from utils.data_transformation import *
 from constants import *
+import time
 
 def run():
     is_valid_conf = False
@@ -30,8 +31,9 @@ def run():
 
 if __name__ == "__main__":
     for i in range(NUM_OF_ITERATIONS):
-        print(f"Iteration: {i}.")
+        start_time = time.time()
         target_pos, archive_data = run()
+        print(f"Iteration: {i}, Time spent: {time.time() - start_time} seconds)")
 
     plotter = Plotter()
     # plotter.plot_2d(particle_plot, sim)
