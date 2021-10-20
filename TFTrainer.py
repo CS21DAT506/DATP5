@@ -5,6 +5,8 @@ from pathlib import Path
 import os
 import datetime
 
+from tensorflow.python.ops.gen_batch_ops import batch
+
 class TFTrainer:
     def __init__(self, model, check_point_path, save_name, save_path="saved_models", batch_size=32):
         self.check_point_path = str(Path().resolve()) + "\\" + check_point_path
@@ -19,13 +21,17 @@ class TFTrainer:
     #     pass
 
     def predict(self, *args, **kwargs):
-        return self.model.predict(args, kwargs)
+        return self.model.predict(*args, **kwargs)
 
-    def fit(self, x, y, verbose=1, *args, **kwargs):
-        return self.model.fit(x, y, args, kwargs, verbose=verbose)
+    def fit(self, x, y, *args, **kwargs):
+        # return self.model.train_on_batch(x, y)
+        return self.model.fit(x, y, *args, **kwargs)
+        # return self.model.fit(x, y, verbose=verbose, steps_per_epoch=len(x), epochs=5)
+        # return self.model.fit(x, y, verbose=verbose, batch_size=self.batch_size)
+        # return self.model.fit(x, y, args, kwargs, verbose=verbose)
 
     def evaluate(self, *args, **kwargs):
-        return self.model.evaluate(args, **kwargs)
+        return self.model.evaluate(*args, **kwargs)
 
 
 

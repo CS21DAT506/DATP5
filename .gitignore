@@ -7,6 +7,9 @@ Pipfile.lock
 # folder for saved models
 saved_models/*
 
+# data
+*json
+
 # gekko data save paths
 *.txt
 
