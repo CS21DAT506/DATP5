@@ -9,6 +9,8 @@ from utils.data_transformation import *
 from constants import *
 import time
 
+from utils.performance_tracker import calculate_run_performance
+
 def run():
     is_valid_conf = False
     while (not is_valid_conf):
@@ -25,6 +27,7 @@ def run():
     sim.integrate(SIM_TIME)
 
     archive = rebound.SimulationArchive(archive_fname)
+    performance = calculate_run_performance(archive, target_pos)
     archive_as_json = get_archive_as_json_str(archive, analytical_agent, target_pos)
     write_to_file(file_name, JSON_FILE_EXT, archive_as_json)
     return target_pos, archive
