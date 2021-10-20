@@ -67,9 +67,12 @@ class GekkoPlotter:
         plt.xlim(xaxis_min, xaxis_max)
         #plt.plot(results["time"], [math.sqrt((px[i] - planetX)**2 + (py[i] - planetY)**2) for i in range(len(px))], "b-", label="Total acceleration")
         # G * massPlanet * (planetX - px) / ((planetX - px)**2 + (planetY - py)**2)**(3/2)
-        gravity_x = [results["gravity_x"][i] / results["dist"][i] for i in range(len(results["gravity_x"]))]
-        gravity_y = [results["gravity_y"][i] / results["dist"][i] for i in range(len(results["gravity_y"]))]
+        #gravity_x = [results["gravity_x"][i] / results["dist"][i] for i in range(len(results["gravity_x"]))]
+        #gravity_y = [results["gravity_y"][i] / results["dist"][i] for i in range(len(results["gravity_y"]))]
         
+        gravity_x = results["gravity_x"]
+        gravity_y = results["gravity_y"]
+
         plt.plot(results["time"], gravity_x, color="blue", label="gravity x")
         plt.plot(results["time"], gravity_y, color="red", label="gravity y")
         plt.plot(results["time"], GekkoPlotter.vector_length(gravity_x, gravity_y), color="green", label="gravity length")
@@ -89,8 +92,8 @@ class GekkoPlotter:
 
         axe.plot(results["agent_px"], results["agent_py"], results["time"], "o", label='parametric curve')
         axe.plot([target_pos[0] for _ in range(len(results["time"]))], [target_pos[1] for _ in range(len(results["time"]))], results["time"], "o", label='target')
-        for planet in planets:
-            axe.plot(results["planet_px"], results["planet_py"], results["time"], "o", label="planet")
+        for i in range(len(planets)):
+            axe.plot(results[f"planet{i}_px"], results[f"planet{i}_py"], results["time"], "o", label="planet")
             #axe.plot([planet["initial_pos"][0] for _ in range(len(results["time"]))], [planet["initial_pos"][1] for _ in range(len(results["time"]))], results["time"], "o", label="planet")
         axe.legend()
 

@@ -7,7 +7,7 @@ import time
 from gekko_wrapper import Gekko
 from gekko_plot import GekkoPlotter
 
-debug = False
+debug = True
 
 def get_vector_with_circular_bound(max_radius):
     r = math.sqrt(random.random()) * max_radius
@@ -81,13 +81,13 @@ planets = [
         "mass": 100000,
         "initial_pos": np.array([920,420]),
         "radius": 20,
-        "initial_velocity": np.array([10,0]),
+        "initial_velocity": np.array([2,0]),
     },
     {
-        "mass": 10000,
-        "initial_pos": np.array([120,420]),
+        "mass": 100000,
+        "initial_pos": np.array([120,920]),
         "radius": 5,
-        "initial_velocity": np.array([0,2]),
+        "initial_velocity": np.array([0,1]),
     }
 ]
 
