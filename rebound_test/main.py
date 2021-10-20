@@ -9,6 +9,7 @@ from utils.data_transformation import *
 from constants import *
 from exceptions.CollisionException import CollisionException
 import time
+from utils.performance_tracker import calculate_run_performance
 
 def check_collision(particles, intial_agent_mass):
     agent = particles[AGENT_INDEX]
@@ -46,6 +47,7 @@ def run():
     check_collision(sim.particles, particles[AGENT_INDEX]['mass'])
 
     archive = rebound.SimulationArchive(archive_fname)
+    performance = calculate_run_performance(archive, target_pos)
     archive_as_json = get_archive_as_json_str(archive, analytical_agent, target_pos)
     write_to_file(file_name, JSON_FILE_EXT, archive_as_json)
     return target_pos, archive
