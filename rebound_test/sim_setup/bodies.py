@@ -46,6 +46,21 @@ def get_particles(num_of_planets):
 
     return particles
 
+def get_particle(mass, pos, radius, vel):
+    return {
+        "mass": mass,
+        "pos": pos,
+        "radius": radius,
+        "vel": vel
+    }
+
+def get_colliding_particles():
+    agent = get_particle(1.0, np.array((500, 1000, 0)), 5, np.array((0, 0, 0))  )
+    planet_1 = get_particle(500, np.array((1000, 0, 0)), 5, np.array((-100, 0, 0))  )
+    planet_2 = get_particle(500, np.array((0, 0, 0)), 5, np.array((100, 0, 0))  )
+
+    return [agent, planet_1, planet_2]
+
 def get_target_pos():
     return get_vector_with_circular_bound(MAX_POS_RADIUS) - relative_pos
 

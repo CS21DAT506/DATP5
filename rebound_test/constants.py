@@ -6,3 +6,4 @@ INVALID_VALUE = -1
 BIN_FILE_EXT = ".bin"
 JSON_FILE_EXT = ".json"
 
+SEPARATOR = ","
