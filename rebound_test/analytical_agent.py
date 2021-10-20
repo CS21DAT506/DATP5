@@ -45,7 +45,7 @@ class AnalyticalAgent():
 
         c = self.scale_policy(velocity_scale_min, velocity_scale_max)
         if (c == None):
-            something = "yes"
+            raise ValueError(f"Invalid value: c is {c}")
         return c
 
     def get_acceleration(self, agent_pos, agent_velocity, agent_gravity):
