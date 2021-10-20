@@ -29,10 +29,10 @@ def get_info_str(iteration_num, status):
 def run():
     is_valid_conf = False
     while not is_valid_conf:
-        # particles = get_particles(NUM_OF_PLANETS)
-        particles = get_colliding_particles()
-        # target_pos = get_target_pos()
-        target_pos = np.array( (500, -500, 0) )
+        particles = get_particles(NUM_OF_PLANETS)
+        # particles = get_colliding_particles()
+        target_pos = get_target_pos()
+        # target_pos = np.array( (500, -500, 0) )
         is_valid_conf = is_valid_configuration(particles[AGENT_INDEX], particles[AGENT_INDEX+1:], target_pos, MIN_DIST_TO_TARGET)
 
     analytical_agent = AnalyticalAgent(target_pos)
