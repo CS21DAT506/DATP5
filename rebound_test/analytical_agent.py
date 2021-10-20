@@ -1,3 +1,4 @@
+from agent.agent_base import AgentBase
 import math
 import numpy as np
 from constants import *
@@ -6,7 +7,7 @@ from settings.settings import *
 
 from utils.vectors import normalize
 
-class AnalyticalAgent():
+class AnalyticalAgent(AgentBase):
     def __init__(self, target_pos) -> None:
         self.target_pos = target_pos
 
@@ -64,19 +65,6 @@ class AnalyticalAgent():
             return np.array( [0, 0, 0] )
 
         return (dot + math.sqrt( num )) * dist_to_target - c
-
-    def add_thrust(self, simulation):
-        sim = simulation.contents
-        agent = sim.particles[0]
-
-        agent_pos = np.array( (agent.x, agent.y, agent.z) )
-        agent_velocity = np.array( (agent.vx, agent.vy, agent.vz) )
-        agent_velocity = agent_velocity * 1
-        agent_gravity = self.get_agent_gravity(agent_pos, sim)
-        agent_acc = self.get_acceleration(agent_pos, agent_velocity, agent_gravity)
-        agent.ax += agent_acc[0]
-        agent.ay += agent_acc[1]
-        agent.az += agent_acc[2]
 
     def get_thrust(self, archive):
         sim = archive
