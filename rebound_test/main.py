@@ -1,6 +1,6 @@
 import rebound
 from settings.settings import *
-from analytical_agent import AnalyticalAgent
+from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
 from sim_setup.setup import *
 from sim_setup.bodies import *
