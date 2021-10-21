@@ -28,8 +28,10 @@ sim:
 
 data:
     dir_name: data
-    analytical_agent_dir: analytical_agent
-    gcpd_agent_dir: gcpd_agent
+    dir_analytical_agent: analytical_agent
+    dir_gcpd_agent: gcpd_agent
+    dir_bin: bin
+    dir_json: json
     file_extensions:
         bin: ".bin"
         json: ".json"

@@ -49,11 +49,17 @@ class Settings():
     def get_data_dir_name(self):
         return self._get_data_entry("dir_name")
 
-    def get_analytical_agent_dir(self):
-        return self._get_data_entry("analytical_agent_dir")
+    def get_dir_analytical_agent(self):
+        return self._get_data_entry("dir_analytical_agent")
 
-    def get_gcpd_agent_dir(self):
-        return self._get_data_entry("gcpd_agent_dir")
+    def get_dir_gcpd_agent(self):
+        return self._get_data_entry("dir_gcpd_agent")
+
+    def get_dir_bin(self):
+        return self._get_data_entry("dir_bin")
+
+    def get_dir_json(self):
+        return self._get_data_entry("dir_json")
 
     def get_max_pos_radius(self):
         return self._get_config_generation_entry("max_pos_radius")

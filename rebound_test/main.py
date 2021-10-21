@@ -36,8 +36,7 @@ def run():
     agent = agent_type[settings.agent_type](target_pos)
 
     file_handler = FileHandler(settings.agent_type)
-    file_name = file_handler.get_timestamp_str()
-    archive_fname = file_handler.get_abs_path_of_file(file_name, settings.bin_file_ext)
+    archive_fname = file_handler.get_abs_path_of_file(settings.bin_file_ext)
     sim = setup(agent, archive_fname, particle_list=particles)
 
     sim.integrate(settings.sim_time)
@@ -47,7 +46,7 @@ def run():
     archive = rebound.SimulationArchive(archive_fname)
     performance = calculate_run_performance(archive, target_pos)
     archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
-    file_handler.write_to_file(file_name, settings.json_file_ext, archive_as_json)
+    file_handler.write_to_file(settings.json_file_ext, archive_as_json)
     return target_pos, archive
 
 if __name__ == "__main__":
