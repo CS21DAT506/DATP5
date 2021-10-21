@@ -1,6 +1,7 @@
 import rebound
 from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
+from rebound_test.agent.gcpd_agent import GCPDAgent
 from sim_setup.setup import *
 from sim_setup.bodies import *
 from utils.data_saving import *
@@ -10,7 +11,6 @@ from utils.performance_tracker import calculate_run_performance
 from log.info_str import get_info_str
 from settings.SettingsAccess import settings
 import time
-import rebound
 
 def check_collision(particles, intial_agent_mass):
     agent = particles[settings.agent_index]
@@ -26,11 +26,11 @@ def run():
         # target_pos = np.array( (500, -500, 0) )
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
 
-    analytical_agent = AnalyticalAgent(target_pos)
+    agent = GCPDAgent(target_pos)
 
     file_name = get_timestamp_str()
     archive_fname = get_abs_path_of_file(file_name, settings.bin_file_ext)
-    sim = setup(analytical_agent, archive_fname, particle_list=particles)
+    sim = setup(agent, archive_fname, particle_list=particles)
 
     sim.integrate(settings.sim_time)
     sim.particles[0].m 
@@ -38,7 +38,7 @@ def run():
 
     archive = rebound.SimulationArchive(archive_fname)
     performance = calculate_run_performance(archive, target_pos)
-    archive_as_json = get_archive_as_json_str(archive, analytical_agent, target_pos)
+    archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
     write_to_file(file_name, settings.json_file_ext, archive_as_json)
     return target_pos, archive
 
