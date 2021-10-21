@@ -1,7 +1,7 @@
 import rebound
 from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
-from rebound_test.agent.gcpd_agent import GCPDAgent
+from agent.gcpd_agent import GCPDAgent
 from sim_setup.setup import *
 from sim_setup.bodies import *
 from utils.data_saving import *
