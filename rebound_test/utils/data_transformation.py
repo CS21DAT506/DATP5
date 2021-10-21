@@ -11,7 +11,7 @@ def get_archive_as_json_str(archive, agent, target_pos):
         inputs.append( [data_point] )
 
         agent_acc = agent.get_thrust(a)
-        outputs.append( [ float(agent_acc[0]), float(agent_acc[1]) ] )
+        outputs.append( [[ float(agent_acc[0]), float(agent_acc[1]) ]] )
 
     data_points = { 'input': inputs, 'output': outputs }
 
