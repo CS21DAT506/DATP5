@@ -3,13 +3,21 @@ from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
 from sim_setup.setup import *
 from sim_setup.bodies import *
-from utils.data_saving import *
+from utils.FileHandler import FileHandler
 from utils.data_transformation import *
 from exceptions.CollisionException import CollisionException
 from utils.performance_tracker import calculate_run_performance
 from log.info_str import get_info_str
 from settings.SettingsAccess import settings
 import time
+
+from agent.AgentType import AgentType
+
+agent_type = {
+    AgentType.ANALYTICAL.value: lambda target_pos : AnalyticalAgent(target_pos),
+    AgentType.GCDP.value: lambda target_pos : GCPDAgent(target_pos),
+    # AgentType.NN.value: ...,
+}
 
 def check_collision(particles, intial_agent_mass):
     agent = particles[settings.agent_index]
@@ -25,10 +33,11 @@ def run():
         # target_pos = np.array( (500, -500, 0) )
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
 
-    agent = GCPDAgent(target_pos)
+    agent = agent_type[settings.agent_type](target_pos)
 
-    file_name = get_timestamp_str()
-    archive_fname = get_abs_path_of_file(file_name, settings.bin_file_ext)
+    file_handler = FileHandler(settings.agent_type)
+    file_name = file_handler.get_timestamp_str()
+    archive_fname = file_handler.get_abs_path_of_file(file_name, settings.bin_file_ext)
     sim = setup(agent, archive_fname, particle_list=particles)
 
     sim.integrate(settings.sim_time)
@@ -38,7 +47,7 @@ def run():
     archive = rebound.SimulationArchive(archive_fname)
     performance = calculate_run_performance(archive, target_pos)
     archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
-    write_to_file(file_name, settings.json_file_ext, archive_as_json)
+    file_handler.write_to_file(file_name, settings.json_file_ext, archive_as_json)
     return target_pos, archive
 
 if __name__ == "__main__":

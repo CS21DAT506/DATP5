@@ -49,6 +49,12 @@ class Settings():
     def get_data_dir_name(self):
         return self._get_data_entry("dir_name")
 
+    def get_analytical_agent_dir(self):
+        return self._get_data_entry("analytical_agent_dir")
+
+    def get_gcpd_agent_dir(self):
+        return self._get_data_entry("gcpd_agent_dir")
+
     def get_max_pos_radius(self):
         return self._get_config_generation_entry("max_pos_radius")
 
@@ -105,3 +111,6 @@ class Settings():
 
     def get_invalid_value(self):
         return self._get_scale_policy_entry('invalid_value')
+
+    def get_agent_type(self):
+        return self._get_agent_entry('agent_type')

@@ -16,6 +16,7 @@ class SettingsAccess():
         self.min_dist_to_target = settings.get_min_dist_to_target()
 
         self.target_pos = settings.get_target_pos()
+        self.agent_type = settings.get_agent_type()
         self.agent_index = settings.get_agent_index()
         self.max_acceleration = settings.get_max_acceleration()
         self.agent_mass = settings.get_agent_mass()
@@ -27,6 +28,8 @@ class SettingsAccess():
         self.planets_radius = settings.get_radius_for_planets()
 
         self.data_dir_name = settings.get_data_dir_name()
+        self.analytical_agent_dir = settings.get_analytical_agent_dir()
+        self.gcpd_agent_dir = settings.get_gcpd_agent_dir()
         self.bin_file_ext = settings.get_bin_file_ext() 
         self.json_file_ext = settings.get_json_file_ext()
 
