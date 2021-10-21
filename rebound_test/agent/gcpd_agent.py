@@ -5,7 +5,7 @@ from settings.SettingsAccess import settings
 MAX_ACCELERATION = settings.max_acceleration
 
 class GCPDAgent(AgentBase):
-    _progression_const = 0.2
+    _progression_const = 0.1
 
     def _get_agent_gravity(self, agent_pos, sim):
         agent_acc =  np.array( (0, 0, 0) )
