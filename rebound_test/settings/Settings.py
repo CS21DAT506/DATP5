@@ -15,12 +15,15 @@ class Settings():
 
     def _get_sim_entry(self, name):
          return self.config_obj['sim'][name].get()
-    
+
     def _get_data_entry(self, name):
          return self.config_obj['data'][name].get()
 
     def _get_logging_entry(self, name):
          return self.config_obj['logging'][name].get()
+
+    def _get_run_entry(self, name):
+         return self._get_sim_entry('run')[name]
 
     def _get_file_exts_entry(self, name):
          return self._get_data_entry('file_extensions')[name]
@@ -42,6 +45,12 @@ class Settings():
 
     def _get_info_str_entry(self, name):
          return self._get_logging_entry('info_str')[name]
+
+    def get_do_infinite_run(self):
+        return self._get_run_entry('do_infinite_run')
+
+    def get_batch_size(self):
+        return self._get_run_entry('batch_size')
 
     def get_info_str_separator(self):
         return self._get_info_str_entry("separator")

@@ -6,6 +6,9 @@ class SettingsAccess():
         settings = Settings()
         settings.parse_config()
 
+        self.do_infinite_run = settings.get_do_infinite_run()
+        self.batch_size = settings.get_batch_size()
+
         self.sim_time = settings.get_sim_time()
         self.num_of_data_points = settings.get_num_of_data_points()
         self.num_of_iterations = settings.get_num_of_iterations()

@@ -7,7 +7,6 @@ def get_info_str(iteration_num, status):
         info_str += f"{sep}{status['time_spent']}"
     else:
         info_str += f"{sep}Error message: '{status['error_message']}'"
-    info_str += f"{sep}Successful runs: {status['successful_runs']}" 
     info_str += f"{sep}Total runs: {settings.num_of_iterations}"
 
     return info_str

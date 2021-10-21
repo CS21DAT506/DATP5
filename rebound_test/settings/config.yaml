@@ -1,4 +1,8 @@
 sim: 
+    run:
+        do_infinite_run: True 
+        batch_size: 2 # is only used if do_infinite_run is True
+
     sim_time: 30
     num_of_data_points: 30
     num_of_iterations: 1
