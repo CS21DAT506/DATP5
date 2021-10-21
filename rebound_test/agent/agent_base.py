@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class AgentBase(ABC):
+    def __init__(self, target_pos) -> None:
+        self.target_pos = target_pos
+
     @abstractmethod
     def get_thrust(self, archive):
         ...

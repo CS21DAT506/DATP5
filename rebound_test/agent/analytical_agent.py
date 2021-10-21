@@ -9,9 +9,6 @@ MAX_ACCELERATION = settings.max_acceleration
 from utils.vectors import normalize
 
 class AnalyticalAgent(AgentBase):
-    def __init__(self, target_pos) -> None:
-        self.target_pos = target_pos
-
     def get_agent_gravity(self, agent_pos, sim):
         agent_acc =  np.array( (0, 0, 0) )
 
@@ -73,6 +70,5 @@ class AnalyticalAgent(AgentBase):
 
         agent_pos = np.array( (agent.x, agent.y, agent.z) )
         agent_velocity = np.array( (agent.vx, agent.vy, agent.vz) )
-        agent_velocity = agent_velocity * 1
         agent_gravity = self.get_agent_gravity(agent_pos, sim)
         return self.get_acceleration(agent_pos, agent_velocity, agent_gravity)
