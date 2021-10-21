@@ -1,4 +1,3 @@
-import rebound
 from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
 from sim_setup.setup import *
@@ -16,7 +15,7 @@ def check_collision(particles, intial_agent_mass):
     agent = particles[settings.agent_index]
     if agent.m > intial_agent_mass:
         raise CollisionException(f"A collision involving the agent has happened.")
-        
+
 def run():
     is_valid_conf = False
     while not is_valid_conf:

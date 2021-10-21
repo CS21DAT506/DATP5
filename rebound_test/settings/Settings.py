@@ -34,6 +34,9 @@ class Settings():
     def _get_agent_entry(self, name):
         return self._get_bodies_entry('agent')[name]
 
+    def _get_planets_entry(self, name):
+        return self._get_bodies_entry('planets')[name]
+
     def _get_scale_policy_entry(self, name):
         return self._get_agent_entry('scale_policy')[name]
 
@@ -71,13 +74,25 @@ class Settings():
         return self._get_sim_entry("num_of_iterations")
 
     def get_num_of_planets(self):
-        return self._get_bodies_entry("num_of_planets")
+        return self._get_config_generation_entry("num_of_planets")
 
     def get_agent_index(self):
         return self._get_agent_entry("index")
 
+    def get_agent_mass(self):
+        return self._get_agent_entry("mass")
+
+    def get_agent_radius(self):
+        return self._get_agent_entry("radius")
+
     def get_use_fixed_setup_index(self):
         return self._get_bodies_entry("use_fixed_setup")
+
+    def get_mass_for_planets(self):
+        return float( self._get_planets_entry("mass") )
+
+    def get_radius_for_planets(self):
+        return self._get_planets_entry("radius")  
 
     def get_bin_file_ext(self):
         return self._get_file_exts_entry("bin")

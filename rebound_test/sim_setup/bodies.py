@@ -22,17 +22,17 @@ relative_pos = get_vector_with_circular_bound(settings.max_pos_radius)
 
 def get_agent():
     return {
-        "mass": 500,
+        "mass": settings.agent_mass,
         "pos": np.array( (0, 0, 0) ),
-        "radius": 0.01,
+        "radius": settings.agent_radius,
         "vel": get_vector_with_circular_bound(settings.max_vel_radius), 
     }
 
 def get_planet():
     return {
-            "mass": 1e10,
+            "mass": settings.planets_mass,
             "pos": get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos,
-            "radius": 5,
+            "radius": settings.planets_radius,
             "vel": get_vector_with_circular_bound(settings.max_vel_radius),
     }
 
