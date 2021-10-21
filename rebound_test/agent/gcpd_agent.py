@@ -1,7 +1,8 @@
 from agent_base import AgentBase
 import numpy as np
 
-from rebound_test.agent.analytical_agent import MAX_ACCELERATION
+from settings.SettingsAccess import settings
+MAX_ACCELERATION = settings.max_acceleration
 
 class GCPDAgent(AgentBase):
     _progression_const = 0.2
@@ -29,8 +30,8 @@ class GCPDAgent(AgentBase):
             return -1
         return np.sqrt(MAX_ACCELERATION**2 - cross_length**2)
     
-    def _get_inverted_time(self, agent_pos, normalized_velocity_change, agent_gravity):
-        s = self._get_difference(agent_pos, normalized_velocity_change, agent_gravity)
+    def _get_inverted_time(self, normalized_velocity_change, agent_gravity):
+        s = self._get_difference(normalized_velocity_change, agent_gravity)
         if (s < 0):
             return s
         return np.dot(normalized_velocity_change, agent_gravity) + s
@@ -38,7 +39,7 @@ class GCPDAgent(AgentBase):
     def _get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
         velocity_change = self._get_velocity_change(agent_pos, agent_velocity)
         normalized_velocity_change = velocity_change / np.linalg.norm(velocity_change)
-        inverted_time = self._get_inverted_time(agent_pos, normalized_velocity_change, agent_gravity)
+        inverted_time = self._get_inverted_time(normalized_velocity_change, agent_gravity)
         
         if (inverted_time < 0):
             return -agent_gravity / np.linalg.norm(agent_gravity) * MAX_ACCELERATION
@@ -51,5 +52,5 @@ class GCPDAgent(AgentBase):
 
         agent_pos = np.array( (agent.x, agent.y, agent.z) )
         agent_velocity = np.array( (agent.vx, agent.vy, agent.vz) )
-        agent_gravity = self.get_agent_gravity(agent_pos, sim)
-        return self.get_acceleration(agent_pos, agent_velocity, agent_gravity)
+        agent_gravity = self._get_agent_gravity(agent_pos, sim)
+        return self._get_agent_acceleration(agent_pos, agent_velocity, agent_gravity)
