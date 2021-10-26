@@ -1,6 +1,5 @@
 import tensorflow as tf
 import tensorflow.keras.layers as layers
-
 from TFTrainer import TFTrainer
 import nn_util
 from pathlib import Path
@@ -14,7 +13,7 @@ def get_data_files(data_dir):
 
 if __name__ == '__main__':
     model = tf.keras.models.Sequential()
-    model.add(layers.Dense(17, activation="relu"))
+    model.add(layers.Dense(17))
     model.add(layers.Dense(64, activation="relu"))
     model.add(layers.Dense(128, activation="relu"))
     model.add(layers.Dense(256, activation="relu"))
