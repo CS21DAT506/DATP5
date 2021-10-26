@@ -33,7 +33,7 @@ if __name__ == '__main__':
     for file in data:
 
         path_to_json_file = str( Path.joinpath( data_dir, file ) )
-        print(f" data: {path_to_json_file}")
+        print(f"\nReading data from '{path_to_json_file}'")
 
         X, y = nn_util.load_nn_data(path_to_json_file, 17, 2)
 
