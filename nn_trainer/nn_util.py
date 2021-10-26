@@ -2,6 +2,19 @@ import numpy as np
 import json
 from pathlib import Path
 
+def ensure_correct_input_size(nn_input, expected_input_size):
+    incorrect_size_count = 0
+    print(f"Input size: {len(nn_input)}")
+    for entry in nn_input:
+        data_point = entry[0]
+        if len(data_point) != expected_input_size:
+            incorrect_size_count += 1
+            planet_pos_vel = data_point[-5:-1]
+            for num in planet_pos_vel:
+                data_point.append(num)
+            data_point.append(0.0)
+    print(f"Corrected {incorrect_size_count} entries.")
+
 def validate_nn_input_output(nn_input, nn_input_size):
     """
     nn_input is the input to the nn as a list/np.array
@@ -11,7 +24,7 @@ def validate_nn_input_output(nn_input, nn_input_size):
     for entry in nn_input:
         data_point = entry[0]
         if len(data_point) != nn_input_size:
-            raise Exception(f"Invalid datapoint. Data point is: {data_point}")
+            raise Exception(f"Invalid datapoint with length {len(data_point)}. Data point is: {data_point}. ")
 
         for num in data_point:
             if (type(num)) is not float:
@@ -30,6 +43,8 @@ def load_nn_data(json_path, nn_input_size, nn_output_size):
     with open(json_path) as file:
         data = json.load(file)
     # data["input"] = [ [[element]] for element in data["input"][0] ]
+
+    ensure_correct_input_size(data["input"], nn_input_size)
 
     if validate_nn_input_output(data["input"], nn_input_size) and validate_nn_input_output(data["output"], nn_output_size):
         return data["input"], data["output"]
