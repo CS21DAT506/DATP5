@@ -1,15 +1,13 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Dense
 from pathlib import Path
-
 import os
 import datetime
+import numpy as np
 
 class TFTrainer:
     def __init__(self, model, save_name, save_path="saved_models", batch_size=32):
-        self.save_path = str(Path().resolve()) + "\\" + save_path
-        self.model_save_path = self.save_path + "\\" + save_name
-        self.check_point_path = self.model_save_path + "\\checkpoints\\"
+        self._initialize_paths(save_name, save_path)
         # self.save_name = save_name
         self.model_save_path_Exist = False
 
@@ -17,6 +15,13 @@ class TFTrainer:
         self.model = model
         self.cp_callbacks = []
 
+    def _initialize_paths(self, save_name, save_path):
+        save_path = Path.joinpath( Path().resolve(), save_path ) 
+        model_save_path = Path.joinpath( save_path, save_name )
+
+        self.save_path = str(save_path)
+        self.check_point_path = str( Path.joinpath( model_save_path, "checkpoints" ) )
+        self.model_save_path = str( model_save_path )
 
     def setup_checkpoint_save(self, verbose=0):
         self._setup_model_save_path()
@@ -35,11 +40,8 @@ class TFTrainer:
     def fit(self, x, y, *args, **kwargs):
         return self.model.fit(x, y, *args, callbacks=self.cp_callbacks, **kwargs)
 
-
-
     def evaluate(self, *args, **kwargs):
         return self.model.evaluate(*args, **kwargs)
-
 
     def _setup_model_save_path(self):
         if self.model_save_path_Exist:
@@ -55,7 +57,7 @@ class TFTrainer:
     def save_model(self):
         self._setup_model_save_path()
 
-        save_instance_path = self.model_save_path + "\\" + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M")
+        save_instance_path = str( Path.joinpath( self.model_save_path, datetime.datetime.now().strftime("%Y_%m_%d_%H_%M") ) )
 
         if (not os.path.exists(save_instance_path)):
             os.mkdir(save_instance_path)        
@@ -77,7 +79,7 @@ class TFTrainer:
         save_name is of the format {name_of_model}\{timestamp_of_safe}
             timestamp is of format {year_month_data_24HourFormat_minutes}
         """
-        save_path = save_dir + "\\" + save_name
+        save_path = str( Path.joinpath( save_dir, save_name ) )
         model = tf.keras.models.load_model(save_path)
 
         cls = TFTrainer(model,  save_name, save_dir, batch_size)

@@ -3,6 +3,14 @@ import tensorflow.keras.layers as layers
 
 from TFTrainer import TFTrainer
 import nn_util
+from pathlib import Path
+import os
+
+def get_data_dir(): 
+    return Path.joinpath(Path().resolve(), "data")
+
+def get_data_files(data_dir):
+    return os.listdir(data_dir)
 
 if __name__ == '__main__':
     model = tf.keras.models.Sequential()
@@ -19,16 +27,25 @@ if __name__ == '__main__':
                   metrics=['accuracy']
                   )
 
-    X, y = nn_util.load_nn_data("data.json", 17, 2)
 
-    model_name = "model_4"
-    trainer = TFTrainer(model, model_name)
-    trainer.setup_checkpoint_save()
+    data_dir = get_data_dir()
+    data = get_data_files(data_dir)
 
-    trainer.fit(X, y, epochs=5, batch_size=32)
+    for file in data:
 
-    trainer2 = TFTrainer.load_model_from_checkpoint(model, model_name)
-    print(trainer2)
+        path_to_json_file = str( Path.joinpath( data_dir, file ) )
+        print(f" data: {path_to_json_file}")
+
+        X, y = nn_util.load_nn_data(path_to_json_file, 17, 2)
+
+        model_name = "model_4"
+        trainer = TFTrainer(model, model_name)
+        trainer.setup_checkpoint_save()
+
+        trainer.fit(X, y, epochs=5, batch_size=32, verbose=1)
+
+        # trainer2 = TFTrainer.load_model_from_checkpoint(model, model_name)
+        # print(trainer2)
 
     # trainer.save_model()
     # print(predict_y, y[0])
