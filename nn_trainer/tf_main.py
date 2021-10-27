@@ -31,9 +31,16 @@ if __name__ == '__main__':
     data = get_data_files(data_dir)
 
     for file in data:
+    model_name = "full_training_nn_256"
+    trainer = TFTrainer(model, model_name)
+    # trainer.setup_checkpoint_save(verbose=1)
+
+    for file_index in range(len(data)):
+        file = data[file_index]
 
         path_to_json_file = str( Path.joinpath( data_dir, file ) )
         print(f" data: {path_to_json_file}")
+        print(f"Training file: {file_index}/{len(data)}")
 
         X, y = nn_util.load_nn_data(path_to_json_file, 17, 2)
 
@@ -41,7 +48,8 @@ if __name__ == '__main__':
         trainer = TFTrainer(model, model_name)
         trainer.setup_checkpoint_save()
 
-        trainer.fit(X, y, epochs=5, batch_size=32, verbose=1)
+    trainer.fit(X, y, epochs=5, batch_size=32, verbose=1)
+    trainer.save_model()
 
         # trainer2 = TFTrainer.load_model_from_checkpoint(model, model_name)
         # print(trainer2)
