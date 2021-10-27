@@ -17,11 +17,11 @@ class TFTrainer:
 
     def _initialize_paths(self, save_name, save_path):
         save_path = Path.joinpath( Path().resolve(), save_path ) 
-        model_save_path = Path.joinpath( save_path, save_name )
+        self.model_save_path = Path.joinpath( save_path, save_name )
 
         self.save_path = str(save_path)
-        self.check_point_path = str( Path.joinpath( model_save_path, "checkpoints" ) )
-        self.model_save_path = str( model_save_path )
+        self.check_point_path_str = str( Path.joinpath( self.model_save_path, "checkpoints" ) )
+        self.model_save_path_str = str( self.model_save_path )
 
     def setup_checkpoint_save(self, verbose=0):
         self._setup_model_save_path()
@@ -31,7 +31,9 @@ class TFTrainer:
 
         self.cp_callbacks.append(
             # tf.keras.callbacks.ModelCheckpoint(self.check_point_path,save_weights_only=True,verbose=verbose)
-            tf.keras.callbacks.ModelCheckpoint(self.check_point_path,verbose=verbose)
+            tf.keras.callbacks.ModelCheckpoint(self.check_point_path_str, verbose=verbose, monitor='val_loss', save_best_only=False,
+                                               save_weights_only=False, mode='auto', save_freq='epoch',
+                                               options=None, **kwargs)
         )
 
     def predict(self, *args, **kwargs):
@@ -47,7 +49,7 @@ class TFTrainer:
         if self.model_save_path_Exist:
             return
         else:
-            paths = [self.save_path, self.model_save_path]
+            paths = [self.save_path, self.model_save_path_str]
 
         for path in paths:
             if (not os.path.exists(path)):
@@ -65,7 +67,7 @@ class TFTrainer:
         return self.model.save(save_instance_path)
 
     def load_weights(self):
-        self.model.load_weights(self.check_point_path)
+        self.model.load_weights(self.check_point_path_str)
 
     @classmethod
     def load_model_from_checkpoint(cls, model, save_name, save_dir="saved_models", batch_size=32):
