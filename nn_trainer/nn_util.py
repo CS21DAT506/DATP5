@@ -2,18 +2,18 @@ import numpy as np
 import json
 from pathlib import Path
 
-def ensure_correct_input_size(nn_input, expected_input_size):
-    incorrect_size_count = 0
+def ensure_valid_input_size(nn_input, expected_input_size):
+    invalid_entry_count = 0
     print(f"Input size: {len(nn_input)}")
     for entry in nn_input:
         data_point = entry[0]
         if len(data_point) != expected_input_size:
-            incorrect_size_count += 1
+            invalid_entry_count += 1
             planet_pos_vel = data_point[-5:-1]
             for num in planet_pos_vel:
                 data_point.append(num)
             data_point.append(0.0)
-    print(f"Corrected {incorrect_size_count} entries.")
+    print(f"Corrected {invalid_entry_count} entries.")
 
 def validate_nn_input_output(nn_input, nn_input_size):
     """
@@ -44,7 +44,7 @@ def load_nn_data(json_path, nn_input_size, nn_output_size):
         data = json.load(file)
     # data["input"] = [ [[element]] for element in data["input"][0] ]
 
-    ensure_correct_input_size(data["input"], nn_input_size)
+    ensure_valid_input_size(data["input"], nn_input_size)
 
     if validate_nn_input_output(data["input"], nn_input_size) and validate_nn_input_output(data["output"], nn_output_size):
         return data["input"], data["output"]
