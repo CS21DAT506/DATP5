@@ -6,6 +6,7 @@ Pipfile.lock
 
 # folder for saved models
 saved_models/*
+nn_trainer/saved_models/*
 
 # data
 *json
