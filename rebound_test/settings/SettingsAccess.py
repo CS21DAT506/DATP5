@@ -20,6 +20,7 @@ class SettingsAccess():
 
         self.target_pos = settings.get_target_pos()
         self.agent_type = settings.get_agent_type()
+        self.nn_model_path = settings.get_nn_model_path()
         self.agent_index = settings.get_agent_index()
         self.max_acceleration = settings.get_max_acceleration()
         self.agent_mass = settings.get_agent_mass()

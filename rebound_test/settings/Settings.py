@@ -129,3 +129,6 @@ class Settings():
 
     def get_agent_type(self):
         return self._get_agent_entry('agent_type')
+
+    def get_nn_model_path(self):
+        return self._get_agent_entry('nn_model_path')

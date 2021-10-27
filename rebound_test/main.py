@@ -1,6 +1,7 @@
 from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
+from rebound_test.agent.nn_agent import NNAgent
 from sim_setup.setup import *
 from sim_setup.bodies import *
 from utils.FileHandler import FileHandler
@@ -15,8 +16,8 @@ from agent.AgentType import AgentType
 
 agent_type = {
     AgentType.ANALYTICAL.value: lambda target_pos : AnalyticalAgent(target_pos),
-    AgentType.GCDP.value: lambda target_pos : GCPDAgent(target_pos),
-    # AgentType.NN.value: ...,
+    AgentType.GCPD.value: lambda target_pos : GCPDAgent(target_pos),
+    AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path)
 }
 
 def check_collision(particles, intial_agent_mass):
@@ -34,6 +35,7 @@ def run(archive_fname):
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
 
     agent = agent_type[settings.agent_type](target_pos)
+
     sim = setup(agent, archive_fname, particle_list=particles)
     sim.integrate(settings.sim_time)
     check_collision(sim.particles, particles[settings.agent_index]['mass'])

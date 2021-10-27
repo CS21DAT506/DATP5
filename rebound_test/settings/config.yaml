@@ -1,6 +1,6 @@
 sim: 
     run:
-        do_infinite_run: True 
+        do_infinite_run: False 
         batch_size: 2 # is only used if do_infinite_run is True
 
     sim_time: 30
@@ -17,7 +17,8 @@ sim:
     bodies: 
         use_fixed_setup: False # disables config_generation 
         agent: 
-            agent_type: 'gcpd' # provide a value from enum AgentType
+            agent_type: 'nn' # provide a value from enum AgentType
+            nn_model_path: 'saved_models/full_training_nn_256/2021_10_26_15_24'
             index: 0
             target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 
             max_acceleration: 10
