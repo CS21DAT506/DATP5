@@ -58,7 +58,7 @@ if __name__ == '__main__':
         y = [y[i] for i in shuffled_indexes]
 
 
-        trainer.fit(X, y, batch_size=32, epochs=100, verbose=0)
+        trainer.fit(X, y, batch_size=32, epochs=15, verbose=0)
         
         if file_index != 0 and file_index % (len(training_data)//evaluation_size) == 0:
             eval_index = math.floor(evaluation_size*(file_index/len(training_data)))
