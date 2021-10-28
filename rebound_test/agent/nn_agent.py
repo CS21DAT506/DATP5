@@ -1,4 +1,4 @@
-from agent_base import AgentBase
+from agent.agent_base import AgentBase
 import tensorflow.keras as keras
 
 class NNAgent(AgentBase):
