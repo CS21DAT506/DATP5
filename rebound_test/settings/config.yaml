@@ -32,9 +32,11 @@ sim:
             radius: 5
 
 data:
+    write_data_to_files: False # This should be set to False when using nn_agent
     dir_name: data
     dir_analytical_agent: analytical_agent
     dir_gcpd_agent: gcpd_agent
+    dir_nn_agent: nn_agent
     dir_bin: bin
     dir_json: json
     file_extensions:

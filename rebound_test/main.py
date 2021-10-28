@@ -68,13 +68,14 @@ def do_normal_run():
         archive_fname = file_handler.get_abs_path_of_file(settings.bin_file_ext)
         run_data, status = handle_run(archive_fname)
         info_str = get_info_str(i, status)
-        print(info_str)
+        print(f"\n{info_str}\n")
         if status['run_succeeded']:
             successful_runs += 1 
             (target_pos, archive, agent) = run_data
             performance = calculate_run_performance(archive, target_pos)
-            archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
-            file_handler.write_to_file(settings.json_file_ext, archive_as_json)
+            if (settings.write_data_to_files):
+                archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
+                file_handler.write_to_file(settings.json_file_ext, archive_as_json)
 
     if (successful_runs > 0):
         plotter = Plotter()
@@ -97,7 +98,7 @@ def do_infinite_run():
         if status['run_succeeded']:
             successful_runs += 1 
             batch.append(run_data)
-            if len(batch) >= settings.batch_size:
+            if len(batch) >= settings.batch_size and settings.write_data_to_files:
                 archive_as_json = get_batch_as_json_str(batch)
                 file_handler.write_to_file(settings.json_file_ext, archive_as_json)
                 batch = []

@@ -64,6 +64,9 @@ class Settings():
     def get_dir_gcpd_agent(self):
         return self._get_data_entry("dir_gcpd_agent")
 
+    def get_dir_nn_agent(self):
+        return self._get_data_entry("dir_nn_agent")
+
     def get_dir_bin(self):
         return self._get_data_entry("dir_bin")
 
@@ -132,3 +135,6 @@ class Settings():
 
     def get_nn_model_path(self):
         return self._get_agent_entry('nn_model_path')
+    
+    def get_write_data_to_files(self):
+        return self._get_data_entry('write_data_to_files')

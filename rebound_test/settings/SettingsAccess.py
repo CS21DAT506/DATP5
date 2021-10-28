@@ -31,9 +31,11 @@ class SettingsAccess():
         self.planets_mass = settings.get_mass_for_planets()
         self.planets_radius = settings.get_radius_for_planets()
 
+        self.write_data_to_files = settings.get_write_data_to_files()
         self.data_dir_name = settings.get_data_dir_name()
         self.data_dir_analytical_agent = settings.get_dir_analytical_agent()
         self.data_dir_gcpd_agent = settings.get_dir_gcpd_agent()
+        self.data_dir_nn_agent = settings.get_dir_nn_agent()
         self.data_dir_bin = settings.get_dir_bin()
         self.data_dir_json = settings.get_dir_json()
         self.bin_file_ext = settings.get_bin_file_ext() 
