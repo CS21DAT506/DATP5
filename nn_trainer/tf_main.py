@@ -1,9 +1,14 @@
+from numpy.core.arrayprint import format_float_scientific
 import tensorflow as tf
 import tensorflow.keras.layers as layers
+from tensorflow.python.eager.context import graph_mode
 from TFTrainer import TFTrainer
 import nn_util
 from pathlib import Path
 import os
+import numpy as np
+import math
+
 
 def get_data_dir(): 
     return Path.joinpath(Path().resolve(), "data")
@@ -15,35 +20,52 @@ if __name__ == '__main__':
     model = tf.keras.models.Sequential()
     model.add(layers.Dense(17))
     model.add(layers.Dense(64, activation="relu"))
-    model.add(layers.Dense(128, activation="relu"))
-    model.add(layers.Dense(256, activation="relu"))
-    model.add(layers.Dense(128, activation="relu"))
     model.add(layers.Dense(64, activation="relu"))
     model.add(layers.Dense(2))
     
     model.compile(optimizer='adam',
                   loss='mean_squared_error',
-                  metrics=['accuracy']
+                #   metrics=[tf.keras.metrics.Accuracy()]
                   )
 
 
     data_dir = get_data_dir()
     data = get_data_files(data_dir)
-    model_name = "full_training_nn_256"
+    model_name = "full_training_64_64"
     trainer = TFTrainer(model, model_name)
+    # trainer = TFTrainer.load_model("full_training_32_32/2021_10_27_13_43")
 
-    for file_index in range(len(data)):
+    evaluation_size = 30
+    evaluation_data = data[:evaluation_size]
+    training_data = data[evaluation_size:]
+    
+    evaluate_every = np.floor(len(training_data)/evaluation_size)
+
+    for file_index in range(len(training_data)):
         file = data[file_index]
 
         path_to_json_file = str( Path.joinpath( data_dir, file ) )
-        print(f" data: {path_to_json_file}")
-        print(f"Training file: {file_index}/{len(data)}")
+        # print(f" data: {path_to_json_file}")
+        print(f"Training file: {file_index}/{len(training_data)}", end="\r")
 
         X, y = nn_util.load_nn_data(path_to_json_file, 17, 2)
 
-    trainer.fit(X, y, batch_size=32, epochs=5, verbose=0)
-    trainer.save_model()
+        trainer.fit(X, y, batch_size=32, epochs=1, verbose=0)
+        
+        if file_index != 0 and file_index % (len(training_data)//evaluation_size) == 0:
+            eval_index = math.floor(evaluation_size*(file_index/len(training_data)))
+            
+            file = evaluation_data[eval_index]
+            path_to_json_file = str( Path.joinpath( data_dir, file ) )
+            eval_X, eval_y = nn_util.load_nn_data(path_to_json_file, 17, 2)
 
+            print(f"eval {eval_index}/{evaluation_size}:", end="\n")
+            trainer.evaluate(eval_X, eval_y, batch_size=32)
+    
+    print("Done Training!")
+    trainer.evaluate(X, y, batch_size=32)
+    trainer.save_model()
+    
         # trainer2 = TFTrainer.load_model_from_checkpoint(model, model_name)
         # print(trainer2)
 
