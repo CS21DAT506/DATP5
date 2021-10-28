@@ -4,7 +4,7 @@ from pathlib import Path
 
 def ensure_valid_input_size(nn_input, expected_input_size):
     invalid_entry_count = 0
-    print(f"Input size: {len(nn_input)}")
+    # print(f"Input size: {len(nn_input)}")
     for entry in nn_input:
         data_point = entry[0]
         if len(data_point) != expected_input_size:
@@ -13,7 +13,7 @@ def ensure_valid_input_size(nn_input, expected_input_size):
             for num in planet_pos_vel:
                 data_point.append(num)
             data_point.append(0.0)
-    print(f"Corrected {invalid_entry_count} entries.")
+    # print(f"Corrected {invalid_entry_count} entries.")
 
 def validate_nn_input_output(nn_input, nn_input_size):
     """
