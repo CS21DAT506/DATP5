@@ -37,7 +37,7 @@ class TFTrainer:
             # tf.keras.callbacks.ModelCheckpoint(self.check_point_path,save_weights_only=True,verbose=verbose)
             tf.keras.callbacks.ModelCheckpoint(self.check_point_path_str, verbose=verbose, monitor='val_loss', save_best_only=False,
                                                save_weights_only=False, mode='auto', save_freq='epoch',
-                                               options=None)
+                                               options=None)                
         )
 
     def predict(self, *args, **kwargs):
