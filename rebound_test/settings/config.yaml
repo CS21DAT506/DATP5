@@ -5,7 +5,7 @@ sim:
 
     sim_time: 30
     num_of_data_points: 30
-    num_of_iterations: 1
+    num_of_iterations: 100000
 
     # For randomly generating positions, velocities, etc. of bodies   
     config_generation: 
@@ -17,7 +17,7 @@ sim:
     bodies: 
         use_fixed_setup: False # disables config_generation 
         agent: 
-            agent_type: 'nn' # provide a value from enum AgentType
+            agent_type: 'gcpd' # provide a value from enum AgentType
             nn_model_path: 'saved_models/full_training_nn_256/2021_10_26_15_24'
             index: 0
             target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 

@@ -103,8 +103,29 @@ def do_infinite_run():
                 file_handler.write_to_file(settings.json_file_ext, archive_as_json)
                 batch = []
 
+def simple_data_gen():
+    input_data_array = []
+    ouput_data_array = []
+
+    for i in range(settings.num_of_iterations):
+        print(f"Iteration {i}")
+        agent = get_agent(use_random_pos=True)
+        target_pos = get_target_pos()
+        gcpd_agent = GCPDAgent(target_pos)
+
+        input_data_array.append( [ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ] )
+    
+        acc = gcpd_agent._get_agent_acceleration(agent['pos'], agent['vel'], np.array( [0, 0, 0] ))
+        ouput_data_array.append( [ *acc[:2] ] )
+
+    data_points = { 'input': input_data_array, 'output': ouput_data_array }
+    json_str = json.dumps( data_points, indent=4 )
+    f_handler = FileHandler(settings.agent_type)
+    f_handler.write_to_file(settings.json_file_ext, json_str)
+
 if __name__ == "__main__":
-    if settings.do_infinite_run:
-        do_infinite_run()
-    else:
-        do_normal_run()
+    simple_data_gen()
+    # if settings.do_infinite_run:
+    #     do_infinite_run()
+    # else:
+    #     do_normal_run()
