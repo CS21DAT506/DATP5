@@ -8,7 +8,7 @@ from pathlib import Path
 import os
 import numpy as np
 import math
-
+import time
 
 def get_data_dir(): 
     return Path.joinpath(Path().resolve(), "data")
@@ -41,6 +41,7 @@ if __name__ == '__main__':
     
     evaluate_every = np.floor(len(training_data)/evaluation_size)
 
+    start_time = time.time()
     for file_index in range(len(training_data)):
         file = data[file_index]
 
@@ -63,6 +64,7 @@ if __name__ == '__main__':
             trainer.evaluate(eval_X, eval_y, batch_size=32)
     
     print("Done Training!")
+    print(f"Time spent: { str( timedelta( seconds=time.time()-start_time ) ) }")
     trainer.evaluate(X, y, batch_size=32)
     trainer.save_model()
     
