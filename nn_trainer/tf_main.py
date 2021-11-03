@@ -49,19 +49,15 @@ if __name__ == '__main__':
                   #   metrics=[tf.keras.metrics.Accuracy()]
                   )
 
+    trainer = TFTrainer(model, settings["model_save_name"])
 
 
     data_dir = get_data_dir()
-
-    trainer = TFTrainer(model, settings["model_save_name"])
-
+    # start_time = time.time()
 
     if (settings["do_early_stopping"]):
         es = EarlyStopping(monitor='loss', mode='min', verbose=2, patience=settings["early_stopping_patience"])
         trainer.cp_callbacks.append(es)
-
-    start_time = time.time()
-    
 
     if (settings["data_in_single_file"]):
         path_to_json_file = Path.joinpath(data_dir, settings["data_file_name"])
