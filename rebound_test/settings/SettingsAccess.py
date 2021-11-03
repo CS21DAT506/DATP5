@@ -6,7 +6,7 @@ class SettingsAccess():
         settings = Settings()
         settings.parse_config()
 
-        self.do_infinite_run = settings.get_do_infinite_run()
+        self.execution_mode = settings.get_execution_mode()
         self.batch_size = settings.get_batch_size()
 
         self.sim_time = settings.get_sim_time()
