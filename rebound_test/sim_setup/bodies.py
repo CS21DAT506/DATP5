@@ -20,17 +20,26 @@ def is_valid_configuration(agent, planets, target, min_dist_to_target):
 
 relative_pos = get_vector_with_circular_bound(settings.max_pos_radius)
 
-def get_agent():
+def get_agent( use_random_pos=False ):
+    if not use_random_pos:
+        pos = np.array( (0, 0, 0) )
+    else:
+        pos = get_vector_with_circular_bound(settings.max_pos_radius)
+
     return {
         "mass": settings.agent_mass,
-        "pos": np.array( (0, 0, 0) ),
+        "pos": pos,
         "radius": settings.agent_radius,
         "vel": get_vector_with_circular_bound(settings.max_vel_radius), 
     }
 
+def get_mass(average_mass):
+    return max(np.random.normal(average_mass, average_mass / 5), 1)
+
 def get_planet():
     return {
-            "mass": settings.planets_mass,
+            # "mass": settings.planets_mass,
+            "mass": get_mass(settings.planets_mass),
             "pos": get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos,
             "radius": settings.planets_radius,
             "vel": get_vector_with_circular_bound(settings.max_vel_radius),

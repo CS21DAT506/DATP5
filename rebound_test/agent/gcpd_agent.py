@@ -46,8 +46,7 @@ class GCPDAgent(AgentBase):
         
         return inverted_time * normalized_velocity_change - agent_gravity
 
-    def get_thrust(self, archive):
-        sim = archive
+    def get_thrust(self, sim):
         print(f"Get thrust. sim.t: {sim.t}")
         agent = sim.particles[0]
 

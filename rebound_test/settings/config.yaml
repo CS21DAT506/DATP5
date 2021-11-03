@@ -1,6 +1,6 @@
 sim: 
     run:
-        do_infinite_run: False 
+        execution_mode:  'normal' # infinite, normal, simple_data_gen
         batch_size: 2 # is only used if do_infinite_run is True
 
     sim_time: 30
@@ -12,13 +12,13 @@ sim:
         max_pos_radius: 1000
         max_vel_radius: 50
         min_dist_to_target: 200
-        num_of_planets: 2
+        num_of_planets: 3
 
     bodies: 
         use_fixed_setup: False # disables config_generation 
         agent: 
-            agent_type: 'nn' # provide a value from enum AgentType
-            nn_model_path: 'saved_models/full_training_nn_256/2021_10_26_15_24'
+            agent_type: 'nn_nop' # provide a value from enum AgentType
+            nn_model_path: 'saved_models/no_planet_128_32_8/2021_11_02_18_25'
             index: 0
             target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 
             max_acceleration: 10
@@ -28,7 +28,7 @@ sim:
                 preferred_value: 1
                 invalid_value: -1
         planets:
-            mass: 1e10
+            mass: 1e9
             radius: 5
 
 data:
