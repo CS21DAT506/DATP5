@@ -4,7 +4,8 @@ from settings.SettingsAccess import settings
 from math import floor
 
 from progress.bar import IncrementalBar
-bar = IncrementalBar('Elapsed time', max=settings.sim_time)
+UPDATE_CONST = 4
+bar = IncrementalBar('Elapsed time', max=settings.sim_time*UPDATE_CONST, suffix='%(percent)d%%')
 
 class NopAgent(NNAgent):
 
@@ -19,7 +20,7 @@ class NopAgent(NNAgent):
         # print(f"Finished predicting. Time spent: {time.time() - start_t}")
         # print(f"RES: {res}")
 
-        if sim.t - floor(sim.t) < 0.01:
+        if sim.t * UPDATE_CONST - floor(sim.t * UPDATE_CONST) < 0.01 * UPDATE_CONST:
             # print(f"sim.t: {sim.t}")
             bar.next()
         return res
