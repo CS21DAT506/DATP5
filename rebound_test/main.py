@@ -2,6 +2,7 @@ from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
 from agent.nn_agent import NNAgent
+from agent.nn_nop_agent import NopAgent
 from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
@@ -17,7 +18,8 @@ from agent.AgentType import AgentType
 agent_type = {
     AgentType.ANALYTICAL.value: lambda target_pos : AnalyticalAgent(target_pos),
     AgentType.GCPD.value: lambda target_pos : GCPDAgent(target_pos),
-    AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path)
+    AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path),
+    AgentType.NN_NOP.value: lambda target_pos: NopAgent(target_pos, settings.nn_model_path),
 }
 
 def check_collision(particles, intial_agent_mass):
