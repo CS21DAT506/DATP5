@@ -1,6 +1,10 @@
 import numpy as np
 from agent.nn_agent import NNAgent
 from settings.SettingsAccess import settings 
+from math import floor
+
+from progress.bar import IncrementalBar
+bar = IncrementalBar('Elapsed time', max=settings.sim_time)
 
 class NopAgent(NNAgent):
 
@@ -13,4 +17,9 @@ class NopAgent(NNAgent):
         # start_t = time.time()
         res = np.append( self.model.predict([nn_input_data])[0], [0] ) # add 0 as the z-axis
         # print(f"Finished predicting. Time spent: {time.time() - start_t}")
+        # print(f"RES: {res}")
+
+        if sim.t - floor(sim.t) < 0.01:
+            # print(f"sim.t: {sim.t}")
+            bar.next()
         return res
