@@ -48,7 +48,7 @@ def setup(agent, archive_fname, particle_list=[], amount_of_particles=None):
     sim.automateSimulationArchive(archive_fname, interval=settings.sim_time / settings.num_of_data_points)
 
     for i in range(amount_of_particles):
-        if i <= len(particle_list)-1:
+        if i < len(particle_list):
             add_particle(sim,
                         particle_list[i]["pos"],
                         particle_list[i]["vel"],

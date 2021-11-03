@@ -25,8 +25,7 @@ class NNAgent(AgentBase):
         # print(f"Finished predicting. Time spent: {time.time() - start_t}")
         return res / np.linalg.norm(res) * settings.max_acceleration
 
-    def get_thrust(self, archive):
-        sim = archive
+    def get_thrust(self, sim):
         # print(f"Get thrust. sim.t: {sim.t}")
 
         if self.time != sim.t:            
