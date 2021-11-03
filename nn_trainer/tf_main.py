@@ -12,8 +12,8 @@ from tensorflow.keras.callbacks import EarlyStopping
 import numpy as np
 
 
-def get_data_dir(): 
-    return Path.joinpath(Path().resolve(), settings["data_dir_name"])
+def get_data_dir(dir_name): 
+    return Path.joinpath(Path().resolve(), dir_name)
 
 def get_data_files(data_dir):
     return os.listdir(data_dir)
@@ -51,8 +51,7 @@ if __name__ == '__main__':
 
     trainer = TFTrainer(model, settings["model_save_name"])
 
-
-    data_dir = get_data_dir()
+    data_dir = get_data_dir(settings["data_dir_name"])
     # start_time = time.time()
 
     if (settings["do_early_stopping"]):
