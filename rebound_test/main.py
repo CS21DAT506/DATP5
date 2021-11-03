@@ -2,6 +2,7 @@ from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
 from agent.nn_agent import NNAgent
+from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
 from utils.FileHandler import FileHandler
@@ -11,7 +12,6 @@ from utils.performance_tracker import calculate_run_performance
 from log.info_str import get_info_str
 from settings.SettingsAccess import settings
 import time
-
 from agent.AgentType import AgentType
 
 agent_type = {
@@ -123,9 +123,11 @@ def simple_data_gen():
     f_handler = FileHandler(settings.agent_type)
     f_handler.write_to_file(settings.json_file_ext, json_str)
 
+execution_mode = {
+    ExecutionMode.NORMAL.value: do_normal_run,
+    ExecutionMode.INFINITE.value: do_infinite_run,
+    ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen 
+}
+
 if __name__ == "__main__":
-    simple_data_gen()
-    # if settings.do_infinite_run:
-    #     do_infinite_run()
-    # else:
-    #     do_normal_run()
+    execution_mode[settings.execution_mode]()

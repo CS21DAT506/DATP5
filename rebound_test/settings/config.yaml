@@ -1,11 +1,11 @@
 sim: 
     run:
-        do_infinite_run: False 
+        execution_mode:  'normal' # infinite, normal, simple_data_gen
         batch_size: 2 # is only used if do_infinite_run is True
 
     sim_time: 30
     num_of_data_points: 30
-    num_of_iterations: 100000
+    num_of_iterations: 1
 
     # For randomly generating positions, velocities, etc. of bodies   
     config_generation: 

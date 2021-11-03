@@ -46,8 +46,8 @@ class Settings():
     def _get_info_str_entry(self, name):
          return self._get_logging_entry('info_str')[name]
 
-    def get_do_infinite_run(self):
-        return self._get_run_entry('do_infinite_run')
+    def get_execution_mode(self):
+        return self._get_run_entry('execution_mode')
 
     def get_batch_size(self):
         return self._get_run_entry('batch_size')
