@@ -33,9 +33,13 @@ def get_agent( use_random_pos=False ):
         "vel": get_vector_with_circular_bound(settings.max_vel_radius), 
     }
 
+def get_mass(average_mass):
+    return max(np.random.normal(average_mass, average_mass / 5), 1)
+
 def get_planet():
     return {
-            "mass": settings.planets_mass,
+            # "mass": settings.planets_mass,
+            "mass": get_mass(settings.planets_mass),
             "pos": get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos,
             "radius": settings.planets_radius,
             "vel": get_vector_with_circular_bound(settings.max_vel_radius),

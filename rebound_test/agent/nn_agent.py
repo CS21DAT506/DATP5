@@ -1,3 +1,4 @@
+from numpy import linalg
 from agent.agent_base import AgentBase
 import tensorflow.keras as keras
 import tensorflow as tf
@@ -23,14 +24,18 @@ class NNAgent(AgentBase):
         # start_t = time.time()
         res = np.append( self.model.predict([nn_input_data])[0], [0] ) # add 0 as the z-axis
         # print(f"Finished predicting. Time spent: {time.time() - start_t}")
-        return res / np.linalg.norm(res) * settings.max_acceleration
+        return res 
 
     def get_thrust(self, sim):
         # print(f"Get thrust. sim.t: {sim.t}")
 
         if self.time != sim.t:            
             self.time = sim.t
-            self.output = self._get_agent_acceleration(sim)
+            self.output = self._get_agent_acceleration(sim) 
+
+            if np.linalg.norm(self.output) > settings.max_acceleration:
+                self.output = self.output *  settings.max_acceleration / np.linalg.norm(self.output)
+
         return self.output
        
         
