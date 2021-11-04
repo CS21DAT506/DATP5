@@ -22,7 +22,7 @@ if __name__ == '__main__':
     settings = {
         "data_in_single_file": True,
         "data_dir_name": "data",
-        "data_file_name": "02-11-2021_13-20-41.json",
+        "data_file_name": "gravity_vector_data.json",
         "model_save_name": "no_planet_128_32_8",
         "do_evaluation": True,
         "do_early_stopping": True,
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         "shuffle_data_in_batch": False,
     }
     training_settings = {
-        "bacth_size": 32,
+        "bacth_size": 32000,
         "epochs": 10000,
         "verbose": 2,
     }
@@ -60,7 +60,9 @@ if __name__ == '__main__':
 
     if (settings["data_in_single_file"]):
         path_to_json_file = Path.joinpath(data_dir, settings["data_file_name"])
+        print("Loading data from", path_to_json_file, "...")
         X, y = nn_util.load_nn_data(path_to_json_file)
+        print("Data retrieved!")
         trainer.fit(X, y, batch_size=training_settings["bacth_size"], epochs=training_settings["epochs"], verbose=training_settings["verbose"])
     else:
         if (settings["do_evaluation"]):
