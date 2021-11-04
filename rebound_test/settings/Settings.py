@@ -46,8 +46,8 @@ class Settings():
     def _get_info_str_entry(self, name):
          return self._get_logging_entry('info_str')[name]
 
-    def get_do_infinite_run(self):
-        return self._get_run_entry('do_infinite_run')
+    def get_execution_mode(self):
+        return self._get_run_entry('execution_mode')
 
     def get_batch_size(self):
         return self._get_run_entry('batch_size')
@@ -63,6 +63,9 @@ class Settings():
 
     def get_dir_gcpd_agent(self):
         return self._get_data_entry("dir_gcpd_agent")
+
+    def get_dir_nn_agent(self):
+        return self._get_data_entry("dir_nn_agent")
 
     def get_dir_bin(self):
         return self._get_data_entry("dir_bin")
@@ -129,3 +132,9 @@ class Settings():
 
     def get_agent_type(self):
         return self._get_agent_entry('agent_type')
+
+    def get_nn_model_path(self):
+        return self._get_agent_entry('nn_model_path')
+    
+    def get_write_data_to_files(self):
+        return self._get_data_entry('write_data_to_files')

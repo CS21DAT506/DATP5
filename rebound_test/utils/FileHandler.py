@@ -21,6 +21,9 @@ class FileHandler():
         self.path_to_gcpd_bin = Path.joinpath(self.path_to_gcpd, settings.data_dir_bin)
         self.path_to_gcpd_json = Path.joinpath(self.path_to_gcpd, settings.data_dir_json)
 
+        self.path_to_nn = Path.joinpath(self.path_to_data_dir, settings.data_dir_nn_agent)
+        self.path_to_nn_bin = Path.joinpath(self.path_to_nn, settings.data_dir_bin)
+
         self._ensure_data_dir_exists()
         self.file_name = self.get_timestamp_str()
 
@@ -37,13 +40,20 @@ class FileHandler():
         Path(str(self.path_to_gcpd_bin)).mkdir(parents=True, exist_ok=True)
         Path(str(self.path_to_gcpd_json)).mkdir(parents=True, exist_ok=True)
 
+    def _ensure_nn_dir_exists(self):
+        Path(str(self.path_to_nn)).mkdir(parents=True, exist_ok=True)
+        Path(str(self.path_to_nn_bin)).mkdir(parents=True, exist_ok=True)
+
     def _get_path_to_agent_dir(self):
         if (self.agent_type == AgentType.ANALYTICAL.value):
             self._ensure_analytical_dir_exists()
             path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_analytical_agent)
-        elif(self.agent_type == AgentType.GCDP.value):
+        elif(self.agent_type == AgentType.GCPD.value):
             self._ensure_gcpd_dir_exists()
             path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_gcpd_agent)
+        elif(self.agent_type == AgentType.NN.value or self.agent_type == AgentType.NN_NOP.value):
+            self._ensure_nn_dir_exists()
+            path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_nn_agent)
         else:
             raise InvalidAgentType("The given agent type is not recognized. Please provide a valid agent type.")
         return path_to_dir

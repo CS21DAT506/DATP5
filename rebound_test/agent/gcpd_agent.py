@@ -1,6 +1,6 @@
 from agent.agent_base import AgentBase
 import numpy as np
-
+import time
 from settings.SettingsAccess import settings
 MAX_ACCELERATION = settings.max_acceleration
 
@@ -46,11 +46,15 @@ class GCPDAgent(AgentBase):
         
         return inverted_time * normalized_velocity_change - agent_gravity
 
-    def get_thrust(self, archive):
-        sim = archive
+    def get_thrust(self, sim):
+        print(f"Get thrust. sim.t: {sim.t}")
         agent = sim.particles[0]
 
         agent_pos = np.array( (agent.x, agent.y, agent.z) )
         agent_velocity = np.array( (agent.vx, agent.vy, agent.vz) )
         agent_gravity = self._get_agent_gravity(agent_pos, sim)
-        return self._get_agent_acceleration(agent_pos, agent_velocity, agent_gravity)
+
+        start_t = time.time()
+        acc = self._get_agent_acceleration(agent_pos, agent_velocity, agent_gravity)
+        print(f"Finished getting acceleration. Time spent: {time.time() - start_t}")
+        return acc

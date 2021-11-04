@@ -2,5 +2,6 @@ from enum import Enum
 
 class AgentType(Enum):
     ANALYTICAL = "analytical"
-    GCDP = "gcpd"
+    GCPD = "gcpd"
     NN = "nn"
+    NN_NOP = "nn_nop"

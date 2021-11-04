@@ -1,6 +1,9 @@
 from agent.analytical_agent import AnalyticalAgent
 from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
+from agent.nn_agent import NNAgent
+from agent.nn_nop_agent import NopAgent
+from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
 from utils.FileHandler import FileHandler
@@ -10,13 +13,13 @@ from utils.performance_tracker import calculate_run_performance
 from log.info_str import get_info_str
 from settings.SettingsAccess import settings
 import time
-
 from agent.AgentType import AgentType
 
 agent_type = {
     AgentType.ANALYTICAL.value: lambda target_pos : AnalyticalAgent(target_pos),
-    AgentType.GCDP.value: lambda target_pos : GCPDAgent(target_pos),
-    # AgentType.NN.value: ...,
+    AgentType.GCPD.value: lambda target_pos : GCPDAgent(target_pos),
+    AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path),
+    AgentType.NN_NOP.value: lambda target_pos: NopAgent(target_pos, settings.nn_model_path),
 }
 
 def check_collision(particles, intial_agent_mass):
@@ -34,6 +37,7 @@ def run(archive_fname):
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
 
     agent = agent_type[settings.agent_type](target_pos)
+
     sim = setup(agent, archive_fname, particle_list=particles)
     sim.integrate(settings.sim_time)
     check_collision(sim.particles, particles[settings.agent_index]['mass'])
@@ -66,13 +70,14 @@ def do_normal_run():
         archive_fname = file_handler.get_abs_path_of_file(settings.bin_file_ext)
         run_data, status = handle_run(archive_fname)
         info_str = get_info_str(i, status)
-        print(info_str)
+        print(f"\n{info_str}\n")
         if status['run_succeeded']:
             successful_runs += 1 
             (target_pos, archive, agent) = run_data
             performance = calculate_run_performance(archive, target_pos)
-            archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
-            file_handler.write_to_file(settings.json_file_ext, archive_as_json)
+            if (settings.write_data_to_files):
+                archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
+                file_handler.write_to_file(settings.json_file_ext, archive_as_json)
 
     if (successful_runs > 0):
         plotter = Plotter()
@@ -95,13 +100,36 @@ def do_infinite_run():
         if status['run_succeeded']:
             successful_runs += 1 
             batch.append(run_data)
-            if len(batch) >= settings.batch_size:
+            if len(batch) >= settings.batch_size and settings.write_data_to_files:
                 archive_as_json = get_batch_as_json_str(batch)
                 file_handler.write_to_file(settings.json_file_ext, archive_as_json)
                 batch = []
 
+def simple_data_gen():
+    input_data_array = []
+    ouput_data_array = []
+
+    for i in range(settings.num_of_iterations):
+        print(f"Iteration {i}")
+        agent = get_agent(use_random_pos=True)
+        target_pos = get_target_pos()
+        gcpd_agent = GCPDAgent(target_pos)
+
+        input_data_array.append( [ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ] )
+    
+        acc = gcpd_agent._get_agent_acceleration(agent['pos'], agent['vel'], np.array( [0, 0, 0] ))
+        ouput_data_array.append( [ *acc[:2] ] )
+
+    data_points = { 'input': input_data_array, 'output': ouput_data_array }
+    json_str = json.dumps( data_points, indent=4 )
+    f_handler = FileHandler(settings.agent_type)
+    f_handler.write_to_file(settings.json_file_ext, json_str)
+
+execution_mode = {
+    ExecutionMode.NORMAL.value: do_normal_run,
+    ExecutionMode.INFINITE.value: do_infinite_run,
+    ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen 
+}
+
 if __name__ == "__main__":
-    if settings.do_infinite_run:
-        do_infinite_run()
-    else:
-        do_normal_run()
+    execution_mode[settings.execution_mode]()
