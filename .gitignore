@@ -1,5 +1,6 @@
 # vscode 
 launch.json
+
 # Pipenv files
 Pipfile
 Pipfile.lock
@@ -11,7 +12,7 @@ Pipfile.lock
 *json
 
 # gekko data save paths
-*.txt
+gekko_data_gen/*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
