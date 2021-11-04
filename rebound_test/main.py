@@ -3,6 +3,7 @@ from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
 from agent.nn_agent import NNAgent
 from agent.nn_nop_agent import NopAgent
+from agent.actor_critic_agent import ActorCriticAgent
 from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
@@ -20,6 +21,7 @@ agent_type = {
     AgentType.GCPD.value: lambda target_pos : GCPDAgent(target_pos),
     AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path),
     AgentType.NN_NOP.value: lambda target_pos: NopAgent(target_pos, settings.nn_model_path),
+    AgentType.NN_AC.value: ActorCriticAgent() # the call function of ACAgent takes targetpos as 
 }
 
 def check_collision(particles, intial_agent_mass):
@@ -27,14 +29,19 @@ def check_collision(particles, intial_agent_mass):
     if agent.m > intial_agent_mass:
         raise CollisionException(f"A collision involving the agent has happened.")
 
-def run(archive_fname):
+def run(archive_fname, config=None):
     is_valid_conf = False
-    while not is_valid_conf:
+    while not is_valid_conf and config is None:
         particles = get_particles(settings.num_of_planets)
         # particles = get_colliding_particles()
         target_pos = get_target_pos()
         # target_pos = np.array( (500, -500, 0) )
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
+    
+    if not config is None:
+        # is_valid_conf = True
+        particles = config["particles"]
+        target_pos = config["target_pos"]
 
     agent = agent_type[settings.agent_type](target_pos)
 
@@ -43,7 +50,7 @@ def run(archive_fname):
     check_collision(sim.particles, particles[settings.agent_index]['mass'])
 
     archive = rebound.SimulationArchive(archive_fname)
-    return target_pos, archive, agent
+    return target_pos, archive, agent, particles
 
 def handle_run(archive_fname):
     run_succeeded = True
@@ -51,6 +58,7 @@ def handle_run(archive_fname):
     try:
         start_time = time.time()
         run_data = run(archive_fname)
+        run_data = run_data[:-1]
         time_spent = f"Time spent: {time.time() - start_time} seconds"
     except CollisionException as e:
         run_succeeded = False
@@ -62,6 +70,22 @@ def handle_run(archive_fname):
         'error_message': error_message if not run_succeeded else None
     }
     return run_data, status
+
+def handle_specific_run(archive_fname):
+    """
+    Specific run to try for an actor-critic agent
+    """
+    config = None
+    while True:
+        target_pos, archive, agent = None,None,None
+        try:
+            target_pos, archive, agent, particles = run(archive_fname, config=config)
+            config = {
+                "particles": particles,
+                "target_pos": target_pos,
+            }
+        except CollisionException:
+            agent.done = True
 
 def do_normal_run():
     successful_runs = 0
@@ -129,7 +153,9 @@ execution_mode = {
     ExecutionMode.NORMAL.value: do_normal_run,
     ExecutionMode.INFINITE.value: do_infinite_run,
     ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen 
+
 }
 
 if __name__ == "__main__":
-    execution_mode[settings.execution_mode]()
+    handle_specific_run()
+    # execution_mode[settings.execution_mode]()
