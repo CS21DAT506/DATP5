@@ -4,6 +4,7 @@ from agent.gcpd_agent import GCPDAgent
 from agent.nn_agent import NNAgent
 from agent.nn_nop_agent import NopAgent
 from agent.actor_critic_agent import ActorCriticAgent
+from agent.actor_critic_action import Agent as ACAgent2
 from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
@@ -21,7 +22,8 @@ agent_type = {
     AgentType.GCPD.value: lambda target_pos : GCPDAgent(target_pos),
     AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path),
     AgentType.NN_NOP.value: lambda target_pos: NopAgent(target_pos, settings.nn_model_path),
-    AgentType.NN_AC.value: ActorCriticAgent() # the call function of ACAgent takes targetpos as 
+    # AgentType.NN_AC.value: ActorCriticAgent() # the call function of ACAgent takes targetpos as 
+    AgentType.NN_AC.value: ACAgent2() # the call function of ACAgent takes targetpos as 
 }
 
 def check_collision(particles, intial_agent_mass):
@@ -38,10 +40,14 @@ def run(archive_fname, config=None):
         # target_pos = np.array( (500, -500, 0) )
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
     
+    # print(particles)
     if not config is None:
         # is_valid_conf = True
         particles = config["particles"]
         target_pos = config["target_pos"]
+    
+    # print(particles)
+    # input("Press enter to continue...")
 
     agent = agent_type[settings.agent_type](target_pos)
 
@@ -63,6 +69,7 @@ def handle_run(archive_fname):
     except CollisionException as e:
         run_succeeded = False
         error_message = e.args[0]
+    
 
     status = {
         'run_succeeded': run_succeeded,
@@ -76,16 +83,30 @@ def handle_specific_run(archive_fname):
     Specific run to try for an actor-critic agent
     """
     config = None
+    episode_counter = 0
+
     while True:
         target_pos, archive, agent = None,None,None
         try:
+            episode_counter += 1
+            print("episode:", episode_counter, "in progress...", end="\r")
+            
             target_pos, archive, agent, particles = run(archive_fname, config=config)
-            config = {
-                "particles": particles,
-                "target_pos": target_pos,
-            }
+            if config is None:
+                config = {
+                    "particles": particles,
+                    "target_pos": target_pos,
+                }
+
+            # plotter = Plotter()
+            # # plotter.plot_2d(particle_plot, sim)
+            # plotter.plot_3d(archive, target_pos)
+            # plotter.show_plots()
         except CollisionException:
-            agent.done = True
+            if agent: 
+                agent.done = True
+                
+        print(""*30, "\repisode:", episode_counter, "score:", agent.score)
 
 def do_normal_run():
     successful_runs = 0
@@ -157,5 +178,5 @@ execution_mode = {
 }
 
 if __name__ == "__main__":
-    handle_specific_run()
+    handle_specific_run("a.bin")
     # execution_mode[settings.execution_mode]()

@@ -17,7 +17,7 @@ sim:
     bodies: 
         use_fixed_setup: False # disables config_generation 
         agent: 
-            agent_type: 'nn_nop' # provide a value from enum AgentType
+            agent_type: 'nn_ac' # provide a value from enum AgentType
             nn_model_path: 'saved_models/no_planet_128_32_8/2021_11_02_18_25'
             index: 0
             target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 

@@ -1,49 +1,67 @@
-from math import sqrt
-import numpy as np
 import tensorflow as tf
-from actor_critic_network import ActorCriticNetwork
-import tensorflow_probability.python as tfp
 from tensorflow.keras.optimizers import Adam
+import tensorflow_probability.python as tfp
+from agent.actor_critic_network import ActorCriticNetwork
+import numpy as np
+from agent.agent_base import AgentBase
+
 
 from settings.SettingsAccess import settings
 
 
-class ActorCriticAgent:
-    def __init__(self, alpha=0.0003, gamma=0.99):#, n_actions=2):
+
+class Agent(AgentBase):
+    def __init__(self, alpha=0.0003, gamma=0.99, n_actions=2):
         max_acceleration = settings.max_acceleration
-        actions = [
+
+        self.gamma = gamma
+        self.n_actions = n_actions
+        self.action = None
+        self.actions = [
             [max_acceleration,0],[-max_acceleration,0],
             [0,max_acceleration],[0,-max_acceleration],
             [max_acceleration/2, max_acceleration/2], [max_acceleration/2, -max_acceleration/2],
             [-max_acceleration/2, max_acceleration/2], [-max_acceleration/2, -max_acceleration/2],
         ]
 
-        n_actions = len(actions)
-
-        self.gamma = gamma
-        self.n_actions = n_actions
-        self.action = None
-        self.action_space = [i for i in range(self.n_actions)]
-
         self.actor_critic = ActorCriticNetwork(n_actions=n_actions)
-
         self.actor_critic.compile(optimizer=Adam(learning_rate=alpha))
 
-    def call(self, target_point):
-        self.target_point = target_point
+    def __call__(self, target_pos):
+        self.target_pos = target_pos
         self.state = None
         self.new_state = None
         self.reward = None
+        self.done = False
+
+        self.score = 0
+
+        self.time = -1
+        self.output = self.actions[0]
+
+        return self
+
+
+    def _get_agent_gravity(self, agent_pos, sim):
+        agent_acc =  np.array( (0, 0) )
+
+        for i in range(1, len(sim.particles)):
+            particle = sim.particles[i]
+            distance = np.array( (particle.x, particle.y) ) - agent_pos 
+            agent_acc = agent_acc + particle.m * distance / np.linalg.norm(distance)**3
+        
+        return agent_acc * sim.G
 
     def choose_action(self, observation):
+        state = tf.convert_to_tensor([observation])
         self.state = observation
         self.new_state = self.state
 
-        state = tf.convert_to_tensor([observation])
         _, probs = self.actor_critic(state)
 
         action_probabilities = tfp.distributions.Categorical(probs=probs)
         action = action_probabilities.sample()
+
         self.action = action
 
         return action.numpy()[0]
@@ -56,19 +74,29 @@ class ActorCriticAgent:
 
     def cal_reward(self, sim):
         agent = sim.particles[0]
-        agent_pos = np.array( (agent.x, agent.y, agent.z) )
+        agent_pos = np.array((agent.x, agent.y, agent.z))
 
-        dist = np.sqrt((self.target_point[0] - agent.x)**2 + (self.target_point[1] - agent.y)**2) 
-        if (dist < 5):
-            self.reward = 5
+        dist = np.sqrt((self.target_pos[0] - agent.x)
+                       ** 2 + (self.target_pos[1] - agent.y)**2)
+        if (dist < 50):
+            self.reward = 3000.0
+            self.done = True
+            print(""*20, "\rSUCCES", end="")
         else:
-            self.reward = -1
+            if sim.t > 29.99:
+                self.done = True
+            else:
+                self.done = False
+            self.reward = -1.0
+            # self.reward = -dist
+
+        self.score += self.reward
         return self.reward
 
-    def learn(self, done):
+    def learn(self, reward):
         state = tf.convert_to_tensor([self.state])
         new_state = tf.convert_to_tensor([self.new_state])
-        reward = tf.convert_to_tensor(self.reward)
+        reward = tf.convert_to_tensor(reward)
 
         with tf.GradientTape(persistent=True) as tape:
             state_value, probs = self.actor_critic(state)
@@ -78,42 +106,47 @@ class ActorCriticAgent:
             new_state_value = tf.squeeze(new_state_value)
 
             action_probs = tfp.distributions.Categorical(probs=probs)
-            log_prob = action_probs.log_prob(self.action)
 
-            delta = reward + self.gamma * \
-                new_state_value*(1-int(done)) - state_value
+            log_prob = action_probs.log_prob(self.action)
+            action_probs = np.array(probs[0])
+
+            delta = reward + self.gamma * new_state_value*(1-int(self.done)) - state_value
             actor_loss = -log_prob * delta
             critic_loss = delta**2
 
             total_loss = actor_loss + critic_loss
 
-        gradient = tape.gradient(
-            total_loss, self.actor_critic.trainable_variables)
-        self.actor_critic.optimizer.apply_gradients(
-            zip(gradient, self.actor_critic.trainable_variables))
+        gradient = tape.gradient(total_loss, self.actor_critic.trainable_variables)
+        self.actor_critic.optimizer.apply_gradients(zip(gradient, self.actor_critic.trainable_variables))
 
-    def _get_agent_acceleration(self, sim):
-        nn_input_data = [self.target_pos[0], self.target_pos[1]]
+    def get_thrust(self, sim):
+        if self.done:
+            return np.zeros(3)
 
-        for particle in sim.particles:
-            nn_input_data.extend([particle.x, particle.y, particle.vx, particle.vy, particle.m])
+        agent = sim.particles[0]
 
-        # start_t = time.time()
-        res = np.append( self.choose_action([nn_input_data])[0], [0] ) # add 0 as the z-axis
-        # print(f"Finished predicting. Time spent: {time.time() - start_t}")
-        return res
+        agent_pos = np.array([agent.x, agent.y])
+        agent_vel = np.array([agent.vx, agent.vy])
+        gravity = self._get_agent_gravity(agent_pos, sim)
 
-    def get_thrust(self, archive):
-        sim = archive
+        observation = [*self.target_pos, *agent_pos, *agent_vel, *gravity]
+
+        if self.state is None:
+            self.state = observation
+        
         # print(f"Get thrust. sim.t: {sim.t}")
 
         if self.time != sim.t:
             self.time = sim.t
-            self.output = self._get_agent_acceleration(sim)
+            print("time:", self.time)
+            action = self.choose_action(observation)
+            self.output = action
+            self.output = self.actions[self.output]
 
-        self.cal_reward(sim)
-        self.learn()
 
-        return self.output
+            reward = self.cal_reward(sim)
+            self.learn(reward=reward)
 
-        
+        # print("action_space ", self.action_space)
+        # print("action ", self.output)
+        return np.array([*self.output, 0])

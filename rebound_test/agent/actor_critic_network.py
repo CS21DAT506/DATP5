@@ -19,6 +19,9 @@ class ActorCriticNetwork(keras.Model):
         self.v = Dense(1, activation=None)
         self.pi = Dense(n_actions, activation="softmax")
 
+    def __call__(self, state):
+        return self.call(state)
+
     def call(self, state):
         value = self.fc1(state)
         value = self.fc2(value)
