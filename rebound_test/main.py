@@ -15,6 +15,8 @@ from log.info_str import get_info_str
 from settings.settings_access import settings
 import time
 from agent.AgentType import AgentType
+from pathlib import Path
+import os
 
 agent_type = {
     AgentType.ANALYTICAL.value: lambda target_pos : AnalyticalAgent(target_pos),
@@ -127,10 +129,40 @@ def simple_data_gen():
     f_handler = FileHandler(settings.agent_type)
     f_handler.write_to_file(settings.json_file_ext, json_str)
 
+def get_data_dir(dir_name): 
+    return Path.joinpath(Path().resolve(), dir_name)
+
+def get_data_files(data_dir):
+    return os.listdir(data_dir)
+
+def sanity_check_data():
+    data = None
+    sample_size = 10000
+
+    data_dir = get_data_dir(settings.data_dir_name)
+    path_to_json_file = Path.joinpath(data_dir, "gravity_vector_data.json")
+    with open(path_to_json_file) as file:
+        data = json.load(file)
+
+    for _ in range(sample_size):
+        index = random.randrange(0, len(data["input"]))
+        target = np.array(data["input"][index][0:2])
+        agent_pos = np.array(data["input"][index][2:4])
+        agent_vel = np.array(data["input"][index][4:6])
+        agent_grav = np.array(data["input"][index][6:8])
+        actual_acc = np.array(data["output"][index])
+        agent = GCPDAgent(target)
+        agent_out = agent._get_agent_acceleration(agent_pos, agent_vel, agent_grav)
+        if np.linalg.norm(actual_acc - agent_out) > 0.001:
+            raise Exception("data not within accepted values")
+
+
+
 execution_mode = {
     ExecutionMode.NORMAL.value: do_normal_run,
     ExecutionMode.INFINITE.value: do_infinite_run,
-    ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen 
+    ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen ,
+    ExecutionMode.DATA_SANITY_CHECK.value: sanity_check_data
 }
 
 if __name__ == "__main__":
