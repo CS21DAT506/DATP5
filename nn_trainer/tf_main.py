@@ -75,8 +75,11 @@ def add_layer(layers):
     else:
         return np.insert(layers, 1 + len(layers) // 2, np.max(layers) // 2)
 
+def add_decreasing_layer(layers):
+    return np.insert(layers * 2, len(layers), 8)
+
 if __name__ == '__main__':
-    layer_nums = np.array([19, 76, 19])
+    layer_nums = np.array([32, 16, 8])
     counter = 1
     factor = 1
     settings = {
@@ -88,13 +91,13 @@ if __name__ == '__main__':
             "do_early_stopping": True,
             "do_save_model": True,
             "evaluation_size": 30,
-            "early_stopping_patience": 200,
+            "early_stopping_patience": 500,
             "shuffle_data_in_batch": False,
     }
     training_settings = {
         "bacth_size": 32000,
         "epochs": 10000,
-        "verbose": 2,
+        "verbose": 0,
     }
 
     data_dir = get_data_dir(settings["data_dir_name"])
@@ -106,18 +109,18 @@ if __name__ == '__main__':
     y = np.array(y)
     print("Ready!")
 
-    #while len(layer_nums) < 10:
-    actual_layers = np.floor(layer_nums * factor)
-    settings["model_save_name"] = file_name_from_layers(actual_layers)
-    print(f"Run {counter}/{70} in progress...", end="\r")
-    train_nn_from_layers(settings, training_settings, actual_layers, X, y)
-    print(" "*30, f"\rRuns trained: {counter}/{70}")
-    counter += 1
-    if (factor >= 4):
-        layer_nums = add_layer(layer_nums)
-        factor = 1
-    else:
-        factor *= 2 ** (1/4)
+    while len(layer_nums) < 10:
+        actual_layers = np.floor(layer_nums * factor)
+        settings["model_save_name"] = file_name_from_layers(actual_layers)
+        print(f"Run {counter}/{70} in progress...", end="\r")
+        train_nn_from_layers(settings, training_settings, actual_layers, X, y)
+        print(" "*30, f"\rRuns trained: {counter}/{70}")
+        counter += 1
+        if (factor >= 4):
+            layer_nums = add_decreasing_layer(layer_nums)
+            factor = 1
+        else:
+            factor *= 2 ** (1/4)
         
 
 

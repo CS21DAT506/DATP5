@@ -65,10 +65,10 @@ def format(string):
 
 
 if __name__ == '__main__':
-    loss_plot()
-    # jsonstr = None
-    # with open("model_metrics.json", "rb") as file:
-    #     json_file = file.read()
-    #     jsonstr = json.loads(json_file)
-    # ...
-    # plot(jsonstr, "layer_count", "max_layer_size") #"max_layer_size" layer_count
+    #loss_plot()
+    jsonstr = None
+    with open("model_metrics.json", "rb") as file:
+        json_file = file.read()
+        jsonstr = json.loads(json_file)
+    ...
+    plot(jsonstr, "layer_count", "epochs") #"max_layer_size" layer_count

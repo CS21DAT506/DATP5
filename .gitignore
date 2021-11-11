@@ -147,3 +147,5 @@ dmypy.json
 
 
 *.zip
+nn_trainer/nn_grav_vec_rhombus_models/**/*
+nn_trainer/finalists/**/*
