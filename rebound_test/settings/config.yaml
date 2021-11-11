@@ -17,8 +17,8 @@ sim:
     bodies: 
         use_fixed_setup: False # disables config_generation 
         agent: 
-            agent_type: 'nn_nop' # provide a value from enum AgentType
-            nn_model_path: 'saved_models/no_planet_128_32_8/2021_11_02_18_25'
+            agent_type: 'nn_grav' # provide a value from enum AgentType
+            nn_model_path: 'saved_models/nn_grav_vec_22_90_181_90_22/2021_11_10_04_15'
             index: 0
             target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 
             max_acceleration: 10
@@ -28,7 +28,7 @@ sim:
                 preferred_value: 1
                 invalid_value: -1
         planets:
-            mass: 1e9
+            mass: 1e10
             radius: 5
 
 data:

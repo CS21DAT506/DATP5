@@ -1,4 +1,5 @@
 from agent.analytical_agent import AnalyticalAgent
+from agent.nn_grav_agent import NNGravityAgent
 from plotter import Plotter
 from agent.gcpd_agent import GCPDAgent
 from agent.nn_agent import NNAgent
@@ -20,6 +21,7 @@ agent_type = {
     AgentType.GCPD.value: lambda target_pos : GCPDAgent(target_pos),
     AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path),
     AgentType.NN_NOP.value: lambda target_pos: NopAgent(target_pos, settings.nn_model_path),
+    AgentType.NN_GRAV.value: lambda target_pos: NNGravityAgent(target_pos, settings.nn_model_path),
 }
 
 def check_collision(particles, intial_agent_mass):
