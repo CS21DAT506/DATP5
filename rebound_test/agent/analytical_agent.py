@@ -1,7 +1,7 @@
 from agent.agent_base import AgentBase
 import math
 import numpy as np
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 PREFERRED_VALUE = settings.preferred_value
 INVALID_VALUE = settings.invalid_value
 MAX_ACCELERATION = settings.max_acceleration

@@ -1,4 +1,4 @@
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 
 def get_info_str(iteration_num, status):
     sep = f"{settings.info_str_separator} "

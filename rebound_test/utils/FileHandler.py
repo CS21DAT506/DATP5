@@ -1,6 +1,6 @@
 from agent.AgentType import AgentType
 from exceptions.InvalidAgentType import InvalidAgentType
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 import datetime
 import pathlib
 from pathlib import Path

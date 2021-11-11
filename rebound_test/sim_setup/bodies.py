@@ -1,6 +1,6 @@
 from sim_setup.setup import get_vector_with_circular_bound 
 from utils.vectors import vector_dist
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 import numpy as np
 
 def is_valid_configuration(agent, planets, target, min_dist_to_target):

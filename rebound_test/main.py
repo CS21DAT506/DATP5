@@ -11,7 +11,7 @@ from utils.data_transformation import *
 from exceptions.CollisionException import CollisionException
 from utils.performance_tracker import calculate_run_performance
 from log.info_str import get_info_str
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 import time
 from agent.AgentType import AgentType
 
