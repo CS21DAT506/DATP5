@@ -28,7 +28,7 @@ sim:
                 preferred_value: 1
                 invalid_value: -1
         planets:
-            mass: 1e9
+            mass: 1e11
             radius: 5
 
 data:

@@ -7,7 +7,11 @@ import json
 import matplotlib.cm as cm
 
 
-def plot(metrics, first_axis, second_axis):
+def plot(file_name, first_axis, second_axis):
+    metrics = None
+    with open(file_name, "rb") as file:
+        json_file = file.read()
+        metrics = json.loads(json_file)
     mpl.rcParams['legend.fontsize'] = 10
 
     fig = plt.figure()
@@ -33,12 +37,12 @@ def loss_plot():
     fig = plt.figure()
     axe = fig.gca(projection='3d')
 
-    files = fu.get_data_files("finalists")
+    files = fu.get_data_files("dec_finalists")
 
     dicts = []
 
     for loss_file in files:
-        with open("finalists\\" + loss_file, "rb") as file:
+        with open("dec_finalists\\" + loss_file, "rb") as file:
             json_file = file.read()
             dicts.append(json.loads(json_file))
 
@@ -65,10 +69,5 @@ def format(string):
 
 
 if __name__ == '__main__':
-    #loss_plot()
-    jsonstr = None
-    with open("model_metrics.json", "rb") as file:
-        json_file = file.read()
-        jsonstr = json.loads(json_file)
-    ...
-    plot(jsonstr, "layer_count", "epochs") #"max_layer_size" layer_count
+    loss_plot()
+    #plot("dec_model_metrics.json", "max_layer_size", "layer_count") #"max_layer_size" layer_count

@@ -43,7 +43,7 @@ def extract():
                 "loss": all_losses[i]
             }
 
-            with open(config + ".json", "w") as file:
+            with open("dec_finalists\\" + config + ".json", "w") as file:
                 jsonstr = json.dumps(losses, indent=4)
                 file.write(jsonstr)
 
@@ -54,6 +54,10 @@ def extract():
     #     "min_loss": min_loss,
     #     "epochs": epochs
     # }
+
+    # with open("dec_model_metrics.json", "w") as file:
+    #     jsonstr = json.dumps(metrics, indent=4)
+    #     file.write(jsonstr)
 
     
 
