@@ -7,6 +7,7 @@ Pipfile.lock
 
 # folder for saved models
 */saved_models/*
+*/dec_saved_models/*
 
 # data
 *json

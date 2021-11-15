@@ -49,7 +49,7 @@ def train_nn_from_layers(settings, training_settings, layer_nums, X, y):
     # hist = None
     # hist_folder = None
     # if (settings["data_in_single_file"]):
-    hist = trainer.fit(X, y, batch_size=training_settings["bacth_size"], epochs=training_settings["epochs"], verbose=training_settings["verbose"])
+    hist = trainer.fit(X, y, batch_size=training_settings["bacth_size"], epochs=training_settings["epochs"], verbose=training_settings["verbose"], validation_split=0.3)
     hist_folder = trainer.save_path + "\\" + settings["model_save_name"] + "\\history"
 
     #print("Done Training!")
@@ -88,7 +88,7 @@ if __name__ == '__main__':
             "data_file_name": "gravity_vector_data.json",
             "model_save_name": file_name_from_layers(layer_nums),
             "do_evaluation": True,
-            "do_early_stopping": True,
+            "do_early_stopping": False,
             "do_save_model": True,
             "evaluation_size": 30,
             "early_stopping_patience": 500,
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     }
     training_settings = {
         "bacth_size": 32000,
-        "epochs": 10000,
+        "epochs": 6000,
         "verbose": 0,
     }
 
