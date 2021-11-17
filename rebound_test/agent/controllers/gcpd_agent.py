@@ -36,7 +36,7 @@ class GCPDAgent(AgentBase):
             return s
         return np.dot(normalized_velocity_change, agent_gravity) + s
 
-    def _get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
+    def get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
         velocity_change = self._get_velocity_change(agent_pos, agent_velocity)
         normalized_velocity_change = velocity_change / np.linalg.norm(velocity_change)
         inverted_time = self._get_inverted_time(normalized_velocity_change, agent_gravity)

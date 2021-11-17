@@ -8,8 +8,8 @@ from settings.settings_access import settings
 
 class NNAgent(AgentBase):
 
-    def __init__(self, target_pos, save_path):
-        super().__init__(target_pos)
+    def __init__(self, target_pos, save_path, data_storage=None):
+        super().__init__(target_pos, data_storage)
         self.model = keras.models.load_model(save_path, compile=False)
         # tf.compat.v1.disable_eager_execution()
         self.time = -1
