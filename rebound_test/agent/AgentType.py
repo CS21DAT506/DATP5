@@ -5,3 +5,4 @@ class AgentType(Enum):
     GCPD = "gcpd"
     NN = "nn"
     NN_NOP = "nn_nop"
+    NN_GRAV = "nn_grav"

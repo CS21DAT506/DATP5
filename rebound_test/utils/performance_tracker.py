@@ -1,6 +1,6 @@
 import numpy as np
 
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 
 def calculate_run_performance(archives, target_pos):
     min_dist = np.inf

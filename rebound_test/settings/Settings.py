@@ -1,6 +1,4 @@
 import confuse
-import os 
-import pathlib
 from pathlib import Path
 
 dir_path = Path(__file__).resolve().parent
@@ -9,18 +7,18 @@ app_name = dir_path.parent.name
 class Settings():
 
     def parse_config(self):
-        self.config_obj = confuse.Configuration(app_name, __name__)
+        self._config_obj = confuse.Configuration(app_name, __name__)
         abs_path_to_file = str ( Path.joinpath(dir_path, "config.yaml" ) )
-        self.config_obj.set_file( abs_path_to_file )
+        self._config_obj.set_file( abs_path_to_file )
 
     def _get_sim_entry(self, name):
-         return self.config_obj['sim'][name].get()
+         return self._config_obj['sim'][name].get()
 
     def _get_data_entry(self, name):
-         return self.config_obj['data'][name].get()
+         return self._config_obj['data'][name].get()
 
     def _get_logging_entry(self, name):
-         return self.config_obj['logging'][name].get()
+         return self._config_obj['logging'][name].get()
 
     def _get_run_entry(self, name):
          return self._get_sim_entry('run')[name]
@@ -46,95 +44,126 @@ class Settings():
     def _get_info_str_entry(self, name):
          return self._get_logging_entry('info_str')[name]
 
-    def get_execution_mode(self):
+    @property
+    def execution_mode(self):
         return self._get_run_entry('execution_mode')
 
-    def get_batch_size(self):
+    @property
+    def batch_size(self):
         return self._get_run_entry('batch_size')
 
-    def get_info_str_separator(self):
+    @property
+    def info_str_separator(self):
         return self._get_info_str_entry("separator")
 
-    def get_data_dir_name(self):
+    @property
+    def data_dir_name(self):
         return self._get_data_entry("dir_name")
 
-    def get_dir_analytical_agent(self):
+    @property
+    def data_dir_analytical_agent(self):
         return self._get_data_entry("dir_analytical_agent")
 
-    def get_dir_gcpd_agent(self):
+    @property
+    def data_dir_gcpd_agent(self):
         return self._get_data_entry("dir_gcpd_agent")
 
-    def get_dir_nn_agent(self):
+    @property
+    def data_dir_nn_agent(self):
         return self._get_data_entry("dir_nn_agent")
 
-    def get_dir_bin(self):
+    @property
+    def data_dir_bin(self):
         return self._get_data_entry("dir_bin")
 
-    def get_dir_json(self):
+    @property
+    def data_dir_json(self):
         return self._get_data_entry("dir_json")
 
-    def get_max_pos_radius(self):
+    @property
+    def max_pos_radius(self):
         return self._get_config_generation_entry("max_pos_radius")
 
-    def get_max_vel_radius(self):
+    @property
+    def max_vel_radius(self):
         return self._get_config_generation_entry("max_vel_radius")
 
-    def get_min_dist_to_target(self):
+    @property
+    def min_dist_to_target(self):
         return self._get_config_generation_entry("min_dist_to_target")
 
-    def get_target_pos(self):
+    @property
+    def target_pos(self):
         return self._get_agent_entry("target_pos")
 
-    def get_max_acceleration(self):
+    @property
+    def max_acceleration(self):
         return self._get_agent_entry("max_acceleration")
 
-    def get_sim_time(self):
+    @property
+    def sim_time(self):
         return self._get_sim_entry("sim_time")
 
-    def get_num_of_data_points(self):
+    @property
+    def num_of_data_points(self):
         return self._get_sim_entry("num_of_data_points")
 
-    def get_num_of_iterations(self):
+    @property
+    def num_of_iterations(self):
         return self._get_sim_entry("num_of_iterations")
 
-    def get_num_of_planets(self):
+    @property
+    def num_of_planets(self):
         return self._get_config_generation_entry("num_of_planets")
 
-    def get_agent_index(self):
+    @property
+    def agent_index(self):
         return self._get_agent_entry("index")
 
-    def get_agent_mass(self):
+    @property
+    def agent_mass(self):
         return self._get_agent_entry("mass")
 
-    def get_agent_radius(self):
+    @property
+    def agent_radius(self):
         return self._get_agent_entry("radius")
 
-    def get_use_fixed_setup_index(self):
+    @property
+    def use_fixed_setup_index(self):
         return self._get_bodies_entry("use_fixed_setup")
 
-    def get_mass_for_planets(self):
+    @property
+    def planets_mass(self):
         return float( self._get_planets_entry("mass") )
 
-    def get_radius_for_planets(self):
+    @property
+    def planets_radius(self):
         return self._get_planets_entry("radius")  
 
-    def get_bin_file_ext(self):
+    @property
+    def bin_file_ext(self):
         return self._get_file_exts_entry("bin")
 
-    def get_json_file_ext(self):
+    @property
+    def json_file_ext(self):
         return self._get_file_exts_entry("json")
 
-    def get_preferred_value(self):
+    @property
+    def preferred_value(self):
         return self._get_scale_policy_entry('preferred_value')
 
-    def get_invalid_value(self):
+    @property
+    def invalid_value(self):
         return self._get_scale_policy_entry('invalid_value')
 
-    def get_agent_type(self):
+    @property
+    def agent_type(self):
         return self._get_agent_entry('agent_type')
 
-    def get_nn_model_path(self):
+    @property
+    def nn_model_path(self):
         return self._get_agent_entry('nn_model_path')
     
-    def get_write_data_to_files(self):
+    @property
+    def write_data_to_files(self):
         return self._get_data_entry('write_data_to_files')

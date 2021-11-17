@@ -4,7 +4,7 @@ import tensorflow.keras as keras
 import tensorflow as tf
 import numpy as np
 import time
-from settings.SettingsAccess import settings 
+from settings.settings_access import settings 
 
 class NNAgent(AgentBase):
 

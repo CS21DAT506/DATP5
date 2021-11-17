@@ -3,7 +3,7 @@ import random
 import math
 import numpy as np
 
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 
 def get_distribution(max_radius, three_dimension=True):
     return (get_spherical(max_radius) if three_dimension else get_vector_with_circular_bound(max_radius))

@@ -1,7 +1,7 @@
 from agent.agent_base import AgentBase
 import numpy as np
 import time
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 MAX_ACCELERATION = settings.max_acceleration
 
 class GCPDAgent(AgentBase):

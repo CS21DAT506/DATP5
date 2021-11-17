@@ -1,6 +1,6 @@
 from agent.AgentType import AgentType
 from exceptions.InvalidAgentType import InvalidAgentType
-from settings.SettingsAccess import settings
+from settings.settings_access import settings
 import datetime
 import pathlib
 from pathlib import Path
@@ -51,7 +51,9 @@ class FileHandler():
         elif(self.agent_type == AgentType.GCPD.value):
             self._ensure_gcpd_dir_exists()
             path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_gcpd_agent)
-        elif(self.agent_type == AgentType.NN.value or self.agent_type == AgentType.NN_NOP.value):
+        elif(self.agent_type == AgentType.NN.value 
+          or self.agent_type == AgentType.NN_NOP.value 
+          or self.agent_type == AgentType.NN_GRAV.value):
             self._ensure_nn_dir_exists()
             path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_nn_agent)
         else:
