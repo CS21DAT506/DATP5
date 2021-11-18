@@ -4,6 +4,7 @@ from settings.settings_access import settings
 import datetime
 import pathlib
 from pathlib import Path
+import os
 
 
 class FileHandler():
@@ -29,6 +30,10 @@ class FileHandler():
 
     def _ensure_data_dir_exists(self):
         Path(str(self.path_to_data_dir)).mkdir(parents=True, exist_ok=True)
+
+    @staticmethod
+    def ensure_dir_exists(path):
+        Path(str(path)).mkdir(parents=True, exist_ok=True)
 
     def _ensure_analytical_dir_exists(self):
         Path(str(self.path_to_analytical)).mkdir(parents=True, exist_ok=True)
@@ -92,3 +97,12 @@ class FileHandler():
 
     def write_to_file(self, file_extension, json):
         self._write_to_file(self.file_name, file_extension, json)
+
+    
+    @staticmethod
+    def get_data_dir(dir_name): 
+        return Path.joinpath(Path().resolve(), dir_name)
+
+    @staticmethod
+    def get_data_files(data_dir):
+        return os.listdir(data_dir)

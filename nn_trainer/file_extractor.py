@@ -18,6 +18,8 @@ def extract():
     min_loss = []
     epochs = []
     all_losses = []
+    all_val_losses = []
+    last_val_loss = []
 
     for model in data:
         hist_files = fu.get_data_files(Path.joinpath(data_dir, model + "\\history"))
@@ -26,28 +28,33 @@ def extract():
             hist = None
             with open(Path.joinpath(data_dir, model + "\\history\\" + file), "rb") as filename:
                 hist = pickle.load(filename)
-            hist = hist["loss"]
-            all_losses.append(hist)
-            last_loss.append(hist[-1])
-            min_loss.append(min(hist))
-            epochs.append(len(hist))
+            losses = hist["loss"]
+            val_losses = hist["val_loss"]
+            last_val_loss.append(val_losses[-1])
+            all_losses.append(losses)
+            all_val_losses.append(val_losses)
+            last_loss.append(losses[-1])
+            min_loss.append(min(losses))
+            epochs.append(len(losses))
 
 
     for i in range(len(epochs)):
-        if last_loss[i] < 1.0:
+        if last_val_loss[i] < 0.4:
             config = ""
             for size in layer_sizes[i]:
                config = config + str(size) + "_"
         
             losses = {
-                "loss": all_losses[i]
+                "loss": all_losses[i],
+                "val_loss": all_val_losses[i]
             }
 
-            with open("dec_finalists\\" + config + ".json", "w") as file:
+            with open("fun_w_val_finalists\\" + config + ".json", "w") as file:
                 jsonstr = json.dumps(losses, indent=4)
                 file.write(jsonstr)
 
     # metrics = {
+    #     "last_val_loss": last_val_loss,
     #     "layer_count": layer_count,
     #     "max_layer_size": max_layer_size,
     #     "last_loss": last_loss,
@@ -55,7 +62,7 @@ def extract():
     #     "epochs": epochs
     # }
 
-    # with open("dec_model_metrics.json", "w") as file:
+    # with open("val_fun_model_metrics.json", "w") as file:
     #     jsonstr = json.dumps(metrics, indent=4)
     #     file.write(jsonstr)
 

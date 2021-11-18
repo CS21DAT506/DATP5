@@ -1,6 +1,6 @@
 sim: 
     run:
-        execution_mode:  'data_sanity_check' # infinite, normal, simple_data_gen, data_sanity_check
+        execution_mode:  'testing' # infinite, normal, simple_data_gen, data_sanity_check
         batch_size: 2 # is only used if do_infinite_run is True
 
     sim_time: 30

@@ -20,6 +20,7 @@ def plot(file_name, first_axis, second_axis):
     #for i in range(metric_length):
     axe.plot(metrics[first_axis], metrics[second_axis], metrics["last_loss"], "o", color=np.array((1,0,0,1)), label="last")
     axe.plot(metrics[first_axis], metrics[second_axis], metrics["min_loss"], "o", color=np.array((0,0,1,1)), label="min")
+    axe.plot(metrics[first_axis], metrics[second_axis], metrics["last_val_loss"], "o", color=np.array((0,1,0,1)), label="val")
 
     axe.set_xlabel(format(first_axis))
     axe.set_ylabel(format(second_axis))
@@ -37,20 +38,26 @@ def loss_plot():
     fig = plt.figure()
     axe = fig.gca(projection='3d')
 
-    files = fu.get_data_files("dec_finalists")
+    files = fu.get_data_files("fun_w_val_finalists")
 
     dicts = []
 
     for loss_file in files:
-        with open("dec_finalists\\" + loss_file, "rb") as file:
+        with open("fun_w_val_finalists\\" + loss_file, "rb") as file:
             json_file = file.read()
             dicts.append(json.loads(json_file))
 
-    COLOR = cm.rainbow(np.linspace(0, 1, len(dicts)))
-    for i in range(len(dicts)):
+    dicts_len = len(dicts)
+    COLOR = cm.rainbow(np.linspace(0, 1, dicts_len * 2))
+    for i in range(dicts_len):
         loss = dicts[i]["loss"]
-        indices = range(len(loss))
-        axe.plot([i for _ in loss], indices, loss, "o", label=files[i], color=COLOR[i], markersize = 1)
+        val_loss = dicts[i]["val_loss"]
+        loss_indices = range(len(loss))
+        val_loss_indices = range(len(val_loss))
+        smooth_loss = [(loss[i] + loss[(i - 1) if i != 0 else i]) / 2 for i in loss_indices]
+        smooth_val_loss = [(val_loss[i] + val_loss[(i - 1) if i != 0 else i]) / 2 for i in val_loss_indices]
+        axe.plot([2 * i for _ in loss], loss_indices , smooth_loss, "o", label=files[i], color=COLOR[i], markersize = 1)
+        axe.plot([2 * i + 0.5 for _ in val_loss], val_loss_indices, smooth_val_loss, "o", label=files[i], color=COLOR[i + dicts_len], markersize = 1)
 
     axe.set_xlabel("Model")
     axe.set_ylabel("Epoch")
@@ -70,4 +77,4 @@ def format(string):
 
 if __name__ == '__main__':
     loss_plot()
-    #plot("dec_model_metrics.json", "max_layer_size", "layer_count") #"max_layer_size" layer_count
+    #plot("val_fun_model_metrics.json", "layer_count", "max_layer_size") #"max_layer_size" layer_count epochs
