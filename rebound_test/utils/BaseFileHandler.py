@@ -17,7 +17,7 @@ class BaseFileHandler():
 
     def join(self, abs_path, file_path):
         """
-        Gets absolute path to 'relative_path_to_dir/file_name.extension'
+        Gets absolute path to 'relative_path_to_dir/file_name.extension'. See Path.joinpath for more.
 
         Parameters
         ----------
