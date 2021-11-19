@@ -1,3 +1,4 @@
+from operator import is_
 from agent.controllers.analytical_agent import AnalyticalAgent
 from agent.nn_agents.nn_grav_agent import NNGravityAgent
 from plotter import Plotter
@@ -17,6 +18,7 @@ import time
 from agent.AgentType import AgentType
 from pathlib import Path
 import os
+from utils.progresbar import resetBar
 
 agent_type = {
     AgentType.ANALYTICAL.value: lambda target_pos, model_path : AnalyticalAgent(target_pos),
@@ -31,14 +33,23 @@ def check_collision(particles, intial_agent_mass):
     if agent.m > intial_agent_mass:
         raise CollisionException(f"A collision involving the agent has happened.")
 
-def run(archive_fname, model_path):
+def get_valid_environment():
+    particles = None
+    target_pos = None
     is_valid_conf = False
+   
     while not is_valid_conf:
-        particles = get_particles(settings.num_of_planets)
-        # particles = get_colliding_particles()
-        target_pos = get_target_pos()
-        # target_pos = np.array( (500, -500, 0) )
+        particles, target_pos = get_environment(settings.num_of_planets)
         is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
+   
+    return {"target_pos": target_pos, "particles": particles}
+
+def run(archive_fname, model_path, config=None):
+    if config is None :
+        config = get_valid_environment()
+
+    target_pos = config["target_pos"]
+    particles = config["particles"]
 
     agent = agent_type[settings.agent_type](target_pos, model_path)
 
@@ -49,12 +60,12 @@ def run(archive_fname, model_path):
     archive = rebound.SimulationArchive(archive_fname)
     return target_pos, archive, agent
 
-def handle_run(archive_fname, model_path):
+def handle_run(archive_fname, model_path, config = None):
     run_succeeded = True
     run_data = None
     try:
         start_time = time.time()
-        run_data = run(archive_fname, model_path)
+        run_data = run(archive_fname, model_path, config)
         time_spent = f"Time spent: {time.time() - start_time} seconds"
     except CollisionException as e:
         run_succeeded = False
@@ -79,24 +90,37 @@ def do_testing_run():
         model_path = "saved_models/" + model + "/" + [dir for dir in model_folders if "2021" in dir ][0]
       
         for i in range(settings.num_of_iterations):
-            folder = Path.joinpath(data_dir, "testing_data/" + model)
+            folder = Path.joinpath(FileHandler.get_data_dir("testing_data"), model)
             FileHandler.ensure_dir_exists(folder)
 
-            win_folder_path = str(folder)[4:]
-
+            win_folder_path = str(folder)
+            
             archive_fname = win_folder_path + "/archive_" + str(i) + ".bin"
             run_data, status = handle_run(archive_fname, model_path)
+
+            target_pos, archive, agent = run_data
+
+            storage = agent.data_storage
+
+            with open(win_folder_path + "/archive_" + str(i) + ".json", "w") as file:
+                jsonstr = json.dumps(storage, indent=4)
+                file.write(jsonstr)
+
             info_str = get_info_str(i, status)
-            print(f"\n{info_str}\n")        
+            print(f"\n{info_str}\n")
+            resetBar()
 
 def do_normal_run():
     successful_runs = 0
     for i in range(settings.num_of_iterations):
         file_handler = FileHandler(settings.agent_type)
         archive_fname = file_handler.get_abs_path_of_file(settings.bin_file_ext)
+
         run_data, status = handle_run(archive_fname, settings.nn_model_path)
         info_str = get_info_str(i, status)
+
         print(f"\n{info_str}\n")
+
         if status['run_succeeded']:
             successful_runs += 1 
             (target_pos, archive, agent) = run_data
@@ -151,6 +175,21 @@ def simple_data_gen():
     f_handler = FileHandler(settings.agent_type)
     f_handler.write_to_file(settings.json_file_ext, json_str)
 
+def environment_gen():
+
+    environments = []
+    num_of_environments = 1000
+    for i in range(num_of_environments):
+        environments.append(get_valid_environment())
+
+    data_dir = FileHandler.get_data_dir("environments")
+
+    with open(str(data_dir) + "/environments.json", "w") as file:
+        jsonstr = json.dumps(environments, indent=4)
+        file.write(jsonstr)
+
+    ...
+
 def get_data_dir(dir_name): 
     return Path.joinpath(Path().resolve(), dir_name)
 
@@ -184,8 +223,9 @@ execution_mode = {
     ExecutionMode.NORMAL.value: do_normal_run,
     ExecutionMode.TESTING.value: do_testing_run,
     ExecutionMode.INFINITE.value: do_infinite_run,
-    ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen ,
-    ExecutionMode.DATA_SANITY_CHECK.value: sanity_check_data
+    ExecutionMode.SIMPLE_DATA_GEN.value: simple_data_gen,
+    ExecutionMode.DATA_SANITY_CHECK.value: sanity_check_data,
+    ExecutionMode.ENVIRONMENT_GEN.value: environment_gen
 }
 
 if __name__ == "__main__":

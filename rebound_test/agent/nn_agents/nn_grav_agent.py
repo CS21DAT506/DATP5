@@ -14,6 +14,7 @@ class NNGravityAgent(NNAgent):
                                                      "gcpd_time": [],
                                                      "overhead_time": [],
                                                      "grav_acceleration": []})
+        self.gcpd = GCPDAgent(target_pos)
 
     def _get_agent_gravity(self, agent_pos, sim):
         agent_acc =  np.array( (0, 0) )
@@ -22,6 +23,9 @@ class NNGravityAgent(NNAgent):
             distance = np.array( (particle.x, particle.y) ) - agent_pos 
             agent_acc = agent_acc + particle.m * distance / np.linalg.norm(distance)**3
         return agent_acc * sim.G
+
+    def expandDim(self, vec):
+        return np.append(vec, [0])
 
     def _get_agent_acceleration(self, sim):
         start_time = time.time()
@@ -36,20 +40,20 @@ class NNGravityAgent(NNAgent):
         nn_input_data.extend([grav[0], grav[1]])
 
         overhead_time = time.time() - start_time
-        res = np.append( self.model.predict([nn_input_data])[0], [0] ) # add 0 as the z-axis
+        res = self.expandDim(self.model(np.array([nn_input_data]))) # add 0 as the z-axis
         agent_time = time.time() - start_time - overhead_time
-        #gcpd_res = self.gcpd.get_agent_acceleration(agent_pos, np.arrar((particle.vx, particle.vy)), grav)
+        gcpd_res = self.gcpd.get_agent_acceleration(self.expandDim(agent_pos), np.array((particle.vx, particle.vy, 0)), self.expandDim(grav))
         gcpd_time = time.time() - start_time - agent_time - overhead_time
 
         if sim.t * UPDATE_CONST - floor(sim.t * UPDATE_CONST) < 0.01 * UPDATE_CONST:
             bar.next()
 
-        self.data_storage["agent_acceleration"].append(res)
-        #self.data_storage["gcpd_acceleration"].append(gcpd_res)
+        self.data_storage["agent_acceleration"].append([*res])
+        #self.data_storage["gcpd_acceleration"].append([*gcpd_res])
         self.data_storage["dist_to_target"].append(np.linalg.norm(self.target_pos - agent_pos))
         self.data_storage["agent_time"].append(agent_time)
         self.data_storage["gcpd_time"].append(gcpd_time)
         self.data_storage["overhead_time"].append(overhead_time)
-        self.data_storage["grav_acceleration"].append(grav)
+        self.data_storage["grav_acceleration"].append([*grav])
 
         return res

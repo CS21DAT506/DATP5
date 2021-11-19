@@ -32,18 +32,18 @@ def plot(file_name, first_axis, second_axis):
 
     ...
 
-def loss_plot():    
+def loss_plot(file_folder, smooth=False):    
     mpl.rcParams['legend.fontsize'] = 10
 
     fig = plt.figure()
     axe = fig.gca(projection='3d')
 
-    files = fu.get_data_files("fun_w_val_finalists")
+    files = fu.get_data_files(file_folder)
 
     dicts = []
 
     for loss_file in files:
-        with open("fun_w_val_finalists\\" + loss_file, "rb") as file:
+        with open(file_folder + "\\" + loss_file, "rb") as file:
             json_file = file.read()
             dicts.append(json.loads(json_file))
 
@@ -56,8 +56,8 @@ def loss_plot():
         val_loss_indices = range(len(val_loss))
         smooth_loss = [(loss[i] + loss[(i - 1) if i != 0 else i]) / 2 for i in loss_indices]
         smooth_val_loss = [(val_loss[i] + val_loss[(i - 1) if i != 0 else i]) / 2 for i in val_loss_indices]
-        axe.plot([2 * i for _ in loss], loss_indices , smooth_loss, "o", label=files[i], color=COLOR[i], markersize = 1)
-        axe.plot([2 * i + 0.5 for _ in val_loss], val_loss_indices, smooth_val_loss, "o", label=files[i], color=COLOR[i + dicts_len], markersize = 1)
+        axe.plot([2 * i for _ in loss], loss_indices , smooth_loss if smooth else loss, "o", label=files[i], color=COLOR[i], markersize = 1)
+        axe.plot([2 * i + 0.5 for _ in val_loss], val_loss_indices, smooth_val_loss if smooth else val_loss, "o", label=files[i], color=COLOR[i + dicts_len], markersize = 1)
 
     axe.set_xlabel("Model")
     axe.set_ylabel("Epoch")
@@ -76,5 +76,5 @@ def format(string):
 
 
 if __name__ == '__main__':
-    loss_plot()
+    loss_plot("fun_val_sgd_finalists", smooth=False)
     #plot("val_fun_model_metrics.json", "layer_count", "max_layer_size") #"max_layer_size" layer_count epochs

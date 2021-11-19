@@ -6,3 +6,4 @@ class ExecutionMode(Enum):
     SIMPLE_DATA_GEN = "simple_data_gen"
     DATA_SANITY_CHECK = "data_sanity_check"
     TESTING = "testing"
+    ENVIRONMENT_GEN = "environment_gen"

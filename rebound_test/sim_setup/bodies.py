@@ -18,7 +18,8 @@ def is_valid_configuration(agent, planets, target, min_dist_to_target):
     
     return vector_dist(agent["pos"], target) >= min_dist_to_target
 
-relative_pos = get_vector_with_circular_bound(settings.max_pos_radius)
+def get_relative_pos():
+    return get_vector_with_circular_bound(settings.max_pos_radius)
 
 def get_agent( use_random_pos=False ):
     if not use_random_pos:
@@ -36,30 +37,32 @@ def get_agent( use_random_pos=False ):
 def get_mass(average_mass):
     return max(np.random.normal(average_mass, average_mass / 5), 1)
 
-def get_planet():
-    return {
-            # "mass": settings.planets_mass,
-            "mass": get_mass(settings.planets_mass),
-            "pos": get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos,
-            "radius": settings.planets_radius,
-            "vel": get_vector_with_circular_bound(settings.max_vel_radius),
-    }
+def get_planet(relative_pos):
+    return get_particle(mass = get_mass(settings.planets_mass),
+                        pos = get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos,
+                        radius = settings.planets_radius,
+                        vel = get_vector_with_circular_bound(settings.max_vel_radius))
 
-def get_particles(num_of_planets):
+def get_environment(num_of_planets):
     particles = [get_agent()]
 
-    for _ in range(num_of_planets):
-        particles.append( get_planet() )
+    relative_pos = get_relative_pos()
 
-    return particles
+    for _ in range(num_of_planets):
+        particles.append( get_planet(relative_pos) )
+
+    return particles, get_target_pos(relative_pos)
 
 def get_particle(mass, pos, radius, vel):
     return {
         "mass": mass,
-        "pos": pos,
+        "pos": numpy_to_list(pos),
         "radius": radius,
-        "vel": vel
+        "vel": numpy_to_list(vel)
     }
+
+def numpy_to_list(vec):
+    return [*vec]
 
 def get_colliding_particles():
     agent = get_particle(1.0, np.array((500, 1000, 0)), 5, np.array((0, 0, 0))  )
@@ -68,6 +71,6 @@ def get_colliding_particles():
 
     return [agent, planet_1, planet_2]
 
-def get_target_pos():
+def get_target_pos(relative_pos):
     return get_vector_with_circular_bound(settings.max_pos_radius) - relative_pos
 

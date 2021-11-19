@@ -39,7 +39,9 @@ def extract():
 
 
     for i in range(len(epochs)):
-        if last_val_loss[i] < 0.4:
+        print(str(i) + " | 0.4 > " + str(last_val_loss[i]))
+        if last_val_loss[i] < 2.4:
+            print(str(i) )
             config = ""
             for size in layer_sizes[i]:
                config = config + str(size) + "_"
@@ -49,7 +51,7 @@ def extract():
                 "val_loss": all_val_losses[i]
             }
 
-            with open("fun_w_val_finalists\\" + config + ".json", "w") as file:
+            with open("fun_val_sgd_finalists\\" + config + ".json", "w") as file:
                 jsonstr = json.dumps(losses, indent=4)
                 file.write(jsonstr)
 
