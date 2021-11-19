@@ -71,7 +71,7 @@ def do_normal_run():
     successful_runs = 0
     for i in range(settings.num_of_iterations):
         file_handler = FileHandler(settings.agent_type)
-        archive_fname = file_handler.get_abs_path_of_file(settings.bin_file_ext)
+        archive_fname = file_handler.get_default_file_path(settings.bin_file_ext)
         run_data, status = handle_run(archive_fname)
         info_str = get_info_str(i, status)
         print(f"\n{info_str}\n")

@@ -1,6 +1,6 @@
 sim: 
     run:
-        execution_mode:  'data_sanity_check' # infinite, normal, simple_data_gen, data_sanity_check
+        execution_mode:  'normal' # infinite, normal, simple_data_gen, data_sanity_check
         batch_size: 2 # is only used if do_infinite_run is True
 
     sim_time: 30
@@ -17,7 +17,7 @@ sim:
     bodies: 
         use_fixed_setup: False # disables config_generation 
         agent: 
-            agent_type: 'nn_grav' # provide a value from enum AgentType
+            agent_type: 'gcpd' # provide a value from enum AgentType
             nn_model_path: 'saved_models/nn_grav_vec_22_90_181_90_22/2021_11_10_04_15'
             index: 0
             target_pos: (100, 100, 0) # not used now, should be setup to be used if use_fixed_setup = True 
@@ -32,7 +32,7 @@ sim:
             radius: 5
 
 data:
-    write_data_to_files: False # This should be set to False when using nn_agent
+    write_data_to_files: True # This should be set to False when using nn_agent
     dir_name: data
     dir_analytical_agent: analytical_agent
     dir_gcpd_agent: gcpd_agent
