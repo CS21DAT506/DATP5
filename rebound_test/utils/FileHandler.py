@@ -18,36 +18,9 @@ class FileHandler(BaseFileHandler):
         self.agent_path_bin = self.join(self.agent_path, settings.data_dir_bin)
         if (agent_type == AgentType.ANALYTICAL.value or agent_type == AgentType.GCPD.value):
             self.agent_path_json = self.join(self.agent_path, settings.data_dir_json)
-        # _ensure_agent_dirs_exists could be called here instead of in some specific method
+        self._ensure_agent_dirs_exists()
 
         self.default_file_name = self.get_timestamp_str()
-
-    def _ensure_data_dir_exists(self):
-        self.ensure_dir_exists(self.path_to_data_dir)
-
-    def _ensure_agent_dirs_exists(self):
-        self.ensure_dir_exists(self.agent_path)
-        self.ensure_dir_exists(self.agent_path_bin)
-        if (self.agent_type == AgentType.ANALYTICAL.value 
-         or self.agent_type == AgentType.GCPD.value):
-            self.ensure_dir_exists(self.agent_path_json)
-
-    def _get_path_based_on(self, path_to_agent_dir, extension):
-        if (extension == settings.bin_file_ext):
-            path_to_dir = Path.joinpath(path_to_agent_dir, settings.data_dir_bin)
-        elif(extension == settings.json_file_ext):
-            path_to_dir = Path.joinpath(path_to_agent_dir, settings.data_dir_json)
-        return path_to_dir if path_to_dir is not None else path_to_agent_dir
-
-    def _get_path_to_dir(self, extension):
-        self._ensure_agent_dirs_exists()
-        path_to_dir = self._get_path_based_on(self.agent_path, extension)
-        return path_to_dir
-
-    def _write_to_file(self, file_name, file_extension, data):
-        relative_path = self._get_path_to_dir(file_extension)
-        abs_path_to_file = self.get_abs_path(relative_path, file_name, file_extension)
-        self.write(abs_path_to_file, data)
 
     def get_default_file_path(self, extension, file_name=None):
         path_to_dir = self._get_path_to_dir(extension) # relative path
@@ -60,4 +33,31 @@ class FileHandler(BaseFileHandler):
 
     def get_timestamp_str(self):
         return datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+
+    def _ensure_data_dir_exists(self):
+        self.ensure_dir_exists(self.path_to_data_dir)
+
+    def _ensure_agent_dirs_exists(self):
+        self.ensure_dir_exists(self.agent_path)
+        self.ensure_dir_exists(self.agent_path_bin)
+        if (self.agent_type == AgentType.ANALYTICAL.value 
+         or self.agent_type == AgentType.GCPD.value):
+            self.ensure_dir_exists(self.agent_path_json)
+
+    def _get_path_to_dir(self, extension):
+        path_to_dir = self._get_path_based_on(self.agent_path, extension)
+        return path_to_dir
+
+    def _get_path_based_on(self, path_to_agent_dir, extension):
+        if (extension == settings.bin_file_ext):
+            path_to_dir = Path.joinpath(path_to_agent_dir, settings.data_dir_bin)
+        elif(extension == settings.json_file_ext):
+            path_to_dir = Path.joinpath(path_to_agent_dir, settings.data_dir_json)
+        return path_to_dir if path_to_dir is not None else path_to_agent_dir
+
+    def _write_to_file(self, file_name, file_extension, data):
+        relative_path = self._get_path_to_dir(file_extension)
+        abs_path_to_file = self.get_abs_path(relative_path, file_name, file_extension)
+        self.write(abs_path_to_file, data)
+
 
