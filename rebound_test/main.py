@@ -182,7 +182,9 @@ def environment_gen():
     for i in range(num_of_environments):
         environments.append(get_valid_environment())
 
-    data_dir = FileHandler.get_data_dir("environments")
+    data_dir = FileHandler.get_data_dir("P5/rebound_test/environments")
+
+    print("Environments generated!")
 
     with open(str(data_dir) + "/environments.json", "w") as file:
         jsonstr = json.dumps(environments, indent=4)
