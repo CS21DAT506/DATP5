@@ -7,7 +7,7 @@ import json
 import matplotlib.cm as cm
 
 
-def plot(file_name, first_axis, second_axis):
+def plot(file_name, first_axis, second_axis, val=False):
     metrics = None
     with open(file_name, "rb") as file:
         json_file = file.read()
@@ -20,7 +20,8 @@ def plot(file_name, first_axis, second_axis):
     #for i in range(metric_length):
     axe.plot(metrics[first_axis], metrics[second_axis], metrics["last_loss"], "o", color=np.array((1,0,0,1)), label="last")
     axe.plot(metrics[first_axis], metrics[second_axis], metrics["min_loss"], "o", color=np.array((0,0,1,1)), label="min")
-    axe.plot(metrics[first_axis], metrics[second_axis], metrics["last_val_loss"], "o", color=np.array((0,1,0,1)), label="val")
+    if val: 
+        axe.plot(metrics[first_axis], metrics[second_axis], metrics["last_val_loss"], "o", color=np.array((0,1,0,1)), label="val")
 
     axe.set_xlabel(format(first_axis))
     axe.set_ylabel(format(second_axis))
@@ -56,8 +57,8 @@ def loss_plot(file_folder, smooth=False):
         val_loss_indices = range(len(val_loss))
         smooth_loss = [(loss[i] + loss[(i - 1) if i != 0 else i]) / 2 for i in loss_indices]
         smooth_val_loss = [(val_loss[i] + val_loss[(i - 1) if i != 0 else i]) / 2 for i in val_loss_indices]
-        axe.plot([2 * i for _ in loss], loss_indices , smooth_loss if smooth else loss, "o", label=files[i], color=COLOR[i], markersize = 1)
-        axe.plot([2 * i + 0.5 for _ in val_loss], val_loss_indices, smooth_val_loss if smooth else val_loss, "o", label=files[i], color=COLOR[i + dicts_len], markersize = 1)
+        axe.plot([2 * i for _ in loss], loss_indices , smooth_loss if smooth else loss, "o", label="loss " + str(i), color=COLOR[i], markersize = 1)
+        axe.plot([2 * i + 0.5 for _ in val_loss], val_loss_indices, smooth_val_loss if smooth else val_loss, "o", label="validation loss " + str(i), color=COLOR[i + dicts_len], markersize = 1)
 
     axe.set_xlabel("Model")
     axe.set_ylabel("Epoch")
@@ -76,5 +77,5 @@ def format(string):
 
 
 if __name__ == '__main__':
-    loss_plot("fun_val_sgd_finalists", smooth=False)
-    #plot("val_fun_model_metrics.json", "layer_count", "max_layer_size") #"max_layer_size" layer_count epochs
+    loss_plot("rhomb_val_finalists", smooth=False)
+    #plot("val_rhomb_model_metrics.json", "layer_count", "max_layer_size", val=True) #"max_layer_size" layer_count epochs

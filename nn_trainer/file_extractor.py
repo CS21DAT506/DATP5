@@ -40,7 +40,7 @@ def extract():
 
     for i in range(len(epochs)):
         print(str(i) + " | 0.4 > " + str(last_val_loss[i]))
-        if last_val_loss[i] < 2.4:
+        if last_val_loss[i] < 0.3:
             print(str(i) )
             config = ""
             for size in layer_sizes[i]:
@@ -51,7 +51,7 @@ def extract():
                 "val_loss": all_val_losses[i]
             }
 
-            with open("fun_val_sgd_finalists\\" + config + ".json", "w") as file:
+            with open("rhomb_val_finalists\\" + config + ".json", "w") as file:
                 jsonstr = json.dumps(losses, indent=4)
                 file.write(jsonstr)
 
@@ -64,7 +64,7 @@ def extract():
     #     "epochs": epochs
     # }
 
-    # with open("val_fun_model_metrics.json", "w") as file:
+    # with open("val_rhomb_model_metrics.json", "w") as file:
     #     jsonstr = json.dumps(metrics, indent=4)
     #     file.write(jsonstr)
 

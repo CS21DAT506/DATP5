@@ -32,7 +32,7 @@ def train_nn_from_layers(settings, training_settings, layer_nums, X, y):
     # model.add(layers.Dense(8, activation=activations.relu))
     model.add(layers.Dense(2))
     
-    model.compile(optimizer=optimizers.RMSprop(learning_rate=1e-3, decay=1e-3 / 200),  # learning_rate=0.1
+    model.compile(optimizer=optimizers.Adam(learning_rate=1e-3, decay=1e-3 / 200),  # learning_rate=0.1
                   loss=losses.MAE,
                   #   metrics=[tf.keras.metrics.Accuracy()]
                   )
@@ -79,7 +79,7 @@ def add_decreasing_layer(layers):
     return np.insert(layers * 2, len(layers), 8)
 
 if __name__ == '__main__':
-    layer_nums = np.array([64, 32, 16, 8])
+    layer_nums = np.array([16, 32, 16])
     counter = 1
     factor = 1
     settings = {
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         print(" "*30, f"\rRuns trained: {counter}/{70}")
         counter += 1
         if (factor >= 4):
-            layer_nums = add_decreasing_layer(layer_nums)
+            layer_nums = add_layer(layer_nums)
             factor = 1
         else:
             factor *= 2 ** (1/4)

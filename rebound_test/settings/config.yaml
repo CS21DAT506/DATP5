@@ -1,6 +1,6 @@
 sim: 
     run:
-        execution_mode:  'environment_gen' #environment_gen testing, infinite, normal, simple_data_gen, data_sanity_check
+        execution_mode: 'testing' #environment_gen testing, infinite, normal, simple_data_gen, data_sanity_check
         batch_size: 2 # is only used if do_infinite_run is True
 
     sim_time: 30

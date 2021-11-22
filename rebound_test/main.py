@@ -82,6 +82,8 @@ def do_testing_run():
 
     data_dir = FileHandler.get_data_dir("saved_models")
 
+    
+
     data = [dir for dir in FileHandler.get_data_files(data_dir) if "nn_grav" in dir ]
 
     for model in data:
