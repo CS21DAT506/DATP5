@@ -28,10 +28,11 @@ agent_type = {
     AgentType.NN_GRAV.value:    lambda target_pos, model_path : NNGravityAgent(target_pos, model_path),
 }
 
-def check_collision(particles, intial_agent_mass):
+def check_collision(particles, intial_agent_mass, throw_exception=True):
     agent = particles[settings.agent_index]
-    if agent.m > intial_agent_mass:
+    if agent.m > intial_agent_mass and throw_exception:
         raise CollisionException(f"A collision involving the agent has happened.")
+    return agent.m > intial_agent_mass
 
 def get_valid_environment():
     particles = None
@@ -45,8 +46,11 @@ def get_valid_environment():
     return {"target_pos": target_pos, "particles": particles}
 
 def run(archive_fname, model_path, config=None):
+    is_testing = False
     if config is None :
         config = get_valid_environment()
+    else:
+        is_testing = True
 
     target_pos = config["target_pos"]
     particles = config["particles"]
@@ -55,7 +59,11 @@ def run(archive_fname, model_path, config=None):
 
     sim = setup(agent, archive_fname, particle_list=particles)
     sim.integrate(settings.sim_time)
-    check_collision(sim.particles, particles[settings.agent_index]['mass'])
+    
+    collides = check_collision(sim.particles, particles[settings.agent_index]['mass'], throw_exception=not is_testing)
+
+    if is_testing:
+        agent.data_storage["collision"] = collides
 
     archive = rebound.SimulationArchive(archive_fname)
     return target_pos, archive, agent
@@ -81,35 +89,40 @@ def handle_run(archive_fname, model_path, config = None):
 def do_testing_run():
 
     data_dir = FileHandler.get_data_dir("saved_models")
+    env_path = FileHandler.get_data_dir("environments")
 
-    
+    environments = None
+
+    with open(Path.joinpath(env_path, "environments.json"), "r") as file:
+            json_file = file.read()
+            environments = json.loads(json_file)
 
     data = [dir for dir in FileHandler.get_data_files(data_dir) if "nn_grav" in dir ]
 
-    for model in data:
-        model_folders = FileHandler.get_data_files(Path.joinpath(data_dir, model))
+    for i in range(settings.num_of_iterations):
+        for model in data:
+            model_folders = FileHandler.get_data_files(Path.joinpath(data_dir, model))
 
-        model_path = "saved_models/" + model + "/" + [dir for dir in model_folders if "2021" in dir ][0]
+            model_path = "saved_models/" + model + "/" + [dir for dir in model_folders if "2021" in dir ][0]
       
-        for i in range(settings.num_of_iterations):
             folder = Path.joinpath(FileHandler.get_data_dir("testing_data"), model)
             FileHandler.ensure_dir_exists(folder)
 
-            win_folder_path = str(folder)
+            archive_path = str(folder) + "/archive_" + str(i)
             
-            archive_fname = win_folder_path + "/archive_" + str(i) + ".bin"
-            run_data, status = handle_run(archive_fname, model_path)
+            archive_fname = archive_path + ".bin"
+            run_data, status = handle_run(archive_fname, model_path, config=environments[i])
 
             target_pos, archive, agent = run_data
 
             storage = agent.data_storage
 
-            with open(win_folder_path + "/archive_" + str(i) + ".json", "w") as file:
+            with open(archive_path + ".json", "w") as file:
                 jsonstr = json.dumps(storage, indent=4)
                 file.write(jsonstr)
 
             info_str = get_info_str(i, status)
-            print(f"\n{info_str}\n")
+            print(f"\n{model}: {info_str}\n")
             resetBar()
 
 def do_normal_run():
