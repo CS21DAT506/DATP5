@@ -27,12 +27,10 @@ def get_agent( use_random_pos=False ):
     else:
         pos = get_vector_with_circular_bound(settings.max_pos_radius)
 
-    return {
-        "mass": settings.agent_mass,
-        "pos": pos,
-        "radius": settings.agent_radius,
-        "vel": get_vector_with_circular_bound(settings.max_vel_radius), 
-    }
+    return get_particle(mass = settings.agent_mass,
+                        pos = pos,
+                        radius = settings.agent_radius,
+                        vel = get_vector_with_circular_bound(settings.max_vel_radius))
 
 def get_mass(average_mass):
     return max(np.random.normal(average_mass, average_mass / 5), 1)
@@ -51,7 +49,7 @@ def get_environment(num_of_planets):
     for _ in range(num_of_planets):
         particles.append( get_planet(relative_pos) )
 
-    return particles, get_target_pos(relative_pos)
+    return particles, numpy_to_list(get_target_pos(relative_pos))
 
 def get_particle(mass, pos, radius, vel):
     return {
@@ -62,7 +60,7 @@ def get_particle(mass, pos, radius, vel):
     }
 
 def numpy_to_list(vec):
-    return [*vec]
+    return vec.tolist()
 
 def get_colliding_particles():
     agent = get_particle(1.0, np.array((500, 1000, 0)), 5, np.array((0, 0, 0))  )
