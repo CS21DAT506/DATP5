@@ -76,7 +76,7 @@ def do_normal_run():
         info_str = get_info_str(i, status)
         print(f"\n{info_str}\n")
         if status['run_succeeded']:
-            successful_runs += 1 
+            successful_runs += 1
             (target_pos, archive, agent) = run_data
             performance = calculate_run_performance(archive, target_pos)
             if (settings.write_data_to_files):
@@ -102,7 +102,7 @@ def do_infinite_run():
         run_count += 1
 
         if status['run_succeeded']:
-            successful_runs += 1 
+            successful_runs += 1
             batch.append(run_data)
             if len(batch) >= settings.batch_size and settings.write_data_to_files:
                 archive_as_json = get_batch_as_json_str(batch)
@@ -120,7 +120,7 @@ def simple_data_gen():
         gcpd_agent = GCPDAgent(target_pos)
 
         input_data_array.append( [ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ] )
-    
+
         acc = gcpd_agent._get_agent_acceleration(agent['pos'], agent['vel'], np.array( [0, 0, 0] ))
         ouput_data_array.append( [ *acc[:2] ] )
 
@@ -129,7 +129,7 @@ def simple_data_gen():
     f_handler = FileHandler(settings.agent_type)
     f_handler.write_to_file(settings.json_file_ext, json_str)
 
-def get_data_dir(dir_name): 
+def get_data_dir(dir_name):
     return Path.joinpath(Path().resolve(), dir_name)
 
 def get_data_files(data_dir):

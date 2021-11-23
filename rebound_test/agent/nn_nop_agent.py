@@ -1,6 +1,6 @@
 import numpy as np
 from agent.nn_agent import NNAgent
-from settings.settings_access import settings 
+from settings.settings_access import settings
 from math import floor
 
 from progress.bar import IncrementalBar
@@ -16,7 +16,7 @@ class NopAgent(NNAgent):
         nn_input_data.extend([particle.x, particle.y, particle.vx, particle.vy])
 
         # start_t = time.time()
-        res = np.append( self.model.predict([nn_input_data])[0], [0] ) # add 0 as the z-axis
+        res = np.append( self.model([nn_input_data])[0], [0] ) # add 0 as the z-axis
         # print(f"Finished predicting. Time spent: {time.time() - start_t}")
         # print(f"RES: {res}")
 
