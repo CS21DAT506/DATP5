@@ -5,6 +5,7 @@ from agent.nn_agent import NNAgent
 from agent.nn_nop_agent import NopAgent
 from agent.actor_critic_agent import ActorCriticAgent
 from agent.actor_critic_action import Agent as ACAgent2
+from agent.actor_critic_ddpg import AgentDDPG
 from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
@@ -23,7 +24,8 @@ agent_type = {
     AgentType.NN.value: lambda target_pos: NNAgent(target_pos, settings.nn_model_path),
     AgentType.NN_NOP.value: lambda target_pos: NopAgent(target_pos, settings.nn_model_path),
     # AgentType.NN_AC.value: ActorCriticAgent() # the call function of ACAgent takes targetpos as 
-    AgentType.NN_AC.value: ACAgent2() # the call function of ACAgent takes targetpos as 
+    # AgentType.NN_AC.value: ACAgent2(), # the call function of ACAgent takes targetpos as 
+    AgentType.NN_AC.value: AgentDDPG(), # the call function of ACAgent takes targetpos as 
 }
 
 def check_collision(particles, intial_agent_mass):

@@ -187,7 +187,6 @@ class ActorCriticAgent(AgentBase):
         # print("\n\nLOSS:", total_loss)
         gradient = tape.gradient(
             total_loss, self.actor_critic.trainable_variables,
-            # unconnected_gradients=tf.UnconnectedGradients.ZERO
             )
 
         self.actor_critic.optimizer.apply_gradients(zip(gradient, self.actor_critic.trainable_variables))

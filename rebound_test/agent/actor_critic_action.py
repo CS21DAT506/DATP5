@@ -11,7 +11,7 @@ from settings.SettingsAccess import settings
 
 
 class Agent(AgentBase):
-    def __init__(self, alpha=0.0003, gamma=0.99, n_actions=2):
+    def __init__(self, alpha=0.0003, gamma=0.99, n_actions=4):
         max_acceleration = settings.max_acceleration
 
         self.gamma = gamma
@@ -20,8 +20,8 @@ class Agent(AgentBase):
         self.actions = [
             [max_acceleration,0],[-max_acceleration,0],
             [0,max_acceleration],[0,-max_acceleration],
-            [max_acceleration/2, max_acceleration/2], [max_acceleration/2, -max_acceleration/2],
-            [-max_acceleration/2, max_acceleration/2], [-max_acceleration/2, -max_acceleration/2],
+            # [max_acceleration/2, max_acceleration/2], [max_acceleration/2, -max_acceleration/2],
+            # [-max_acceleration/2, max_acceleration/2], [-max_acceleration/2, -max_acceleration/2],
         ]
 
         self.actor_critic = ActorCriticNetwork(n_actions=n_actions)
@@ -60,6 +60,9 @@ class Agent(AgentBase):
         _, probs = self.actor_critic(state)
 
         action_probabilities = tfp.distributions.Categorical(probs=probs)
+        # print(state)
+        # print(probs)
+        # input("")
         action = action_probabilities.sample()
 
         self.action = action
@@ -87,16 +90,54 @@ class Agent(AgentBase):
                 self.done = True
             else:
                 self.done = False
-            self.reward = -1.0
-            # self.reward = -dist
+            # self.reward = -1.0
+            self.reward = -dist
 
         self.score += self.reward
         return self.reward
 
-    def learn(self, reward):
+    def learn(self):
         state = tf.convert_to_tensor([self.state])
         new_state = tf.convert_to_tensor([self.new_state])
-        reward = tf.convert_to_tensor(reward)
+        reward = tf.convert_to_tensor(np.array([self.reward]))
+
+        with tf.GradientTape(persistent=True) as tape:
+            state_value, probs = self.actor_critic(state)
+            new_state_value, _ = self.actor_critic(new_state)
+
+            state_value = tf.squeeze(state_value)
+            new_state_value = tf.squeeze(new_state_value)
+
+            action_probs = tfp.distributions.Categorical(probs=probs)
+            
+            log_prob = action_probs.log_prob(self.action)
+            action_probs = np.array(probs[0])
+
+            delta = reward + self.gamma * new_state_value*(1-int(self.done)) - state_value
+            actor_loss = -log_prob * delta
+            critic_loss = delta**2
+
+            total_loss = actor_loss + critic_loss
+
+        # with tf.GradientTape(persistent=True) as tape:
+        #     state_value, probs = self.actor_critic(state)
+        #     new_state_value, _ = self.actor_critic(new_state)
+
+        #     state_value = tf.squeeze(state_value)
+        #     new_state_value = tf.squeeze(new_state_value)
+
+        #     action_probs = tfp.distributions.Categorical(probs=probs)
+
+        #     log_prob = action_probs.log_prob(self.action)
+        #     # print(log_prob)
+        #     # input("")
+        #     action_probs = np.array(probs[0])
+
+        #     delta = reward + self.gamma * new_state_value*(1-int(self.done)) - state_value
+        #     actor_loss = -log_prob * delta
+        #     critic_loss = delta**2
+
+        #     total_loss = actor_loss + critic_loss
 
         with tf.GradientTape(persistent=True) as tape:
             state_value, probs = self.actor_critic(state)
@@ -110,13 +151,15 @@ class Agent(AgentBase):
             log_prob = action_probs.log_prob(self.action)
             action_probs = np.array(probs[0])
 
-            delta = reward + self.gamma * new_state_value*(1-int(self.done)) - state_value
+            delta = reward + self.gamma * \
+                new_state_value*(1-int(self.done)) - state_value
             actor_loss = -log_prob * delta
             critic_loss = delta**2
 
             total_loss = actor_loss + critic_loss
 
-        gradient = tape.gradient(total_loss, self.actor_critic.trainable_variables)
+        gradient = tape.gradient(total_loss, self.actor_critic.trainable_variables,
+                                unconnected_gradients=tf.UnconnectedGradients.ZERO)
         self.actor_critic.optimizer.apply_gradients(zip(gradient, self.actor_critic.trainable_variables))
 
     def get_thrust(self, sim):
@@ -138,14 +181,15 @@ class Agent(AgentBase):
 
         if self.time != sim.t:
             self.time = sim.t
-            print("time:", self.time)
             action = self.choose_action(observation)
             self.output = action
+            print("time:", self.time, end=" | ")
+            print("action:", action)
             self.output = self.actions[self.output]
 
 
-            reward = self.cal_reward(sim)
-            self.learn(reward=reward)
+            self.cal_reward(sim)
+            self.learn()
 
         # print("action_space ", self.action_space)
         # print("action ", self.output)
