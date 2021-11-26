@@ -193,11 +193,13 @@ def simple_data_gen():
 def environment_gen():
 
     environments = []
-    num_of_environments = 1000
+    num_of_environments = 10000
     for i in range(num_of_environments):
         environments.append(get_valid_environment())
+        if i % 100 == 0:
+            print(str(i / 100) + " %")
 
-    data_dir = FileHandler.get_data_dir("P5/rebound_test/environments")
+    data_dir = FileHandler.get_data_dir("rebound_test/environments")
 
     print("Environments generated!")
 

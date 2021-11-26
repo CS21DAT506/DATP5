@@ -49,7 +49,7 @@ class NNGravityAgent(NNAgent):
             bar.next()
 
         self.data_storage["agent_acceleration"].append([*res])
-        #self.data_storage["gcpd_acceleration"].append([*gcpd_res])
+        self.data_storage["gcpd_acceleration"].append([*gcpd_res])
         self.data_storage["dist_to_target"].append(np.linalg.norm(self.target_pos - agent_pos))
         self.data_storage["agent_time"].append(agent_time)
         self.data_storage["gcpd_time"].append(gcpd_time)
