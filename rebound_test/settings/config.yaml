@@ -5,7 +5,7 @@ sim:
 
     sim_time: 30
     num_of_data_points: 30
-    num_of_iterations: 1
+    num_of_iterations: 1000
 
     # For randomly generating positions, velocities, etc. of bodies   
     config_generation: 
