@@ -10,7 +10,8 @@ Pipfile.lock
 */dec_saved_models/*
 
 # data
-*json
+*.json
+*.png
 
 # gekko data save paths
 gekko_data_gen/*.txt
