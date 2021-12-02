@@ -107,7 +107,7 @@ def mean_confidence_interval(data, confidence=0.95):
 def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = False):
 
     data = None
-    with open("testing_data_handling/extracted_data.json", "r") as file:
+    with open("extracted_data.json", "r") as file:
                 json_file = file.read()
                 data = json.loads(json_file)
 
@@ -119,7 +119,7 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = 
 
     x = range(len(data))
     
-    labels = [np.sum(list(map(int, s.split("_")[3:]))) for s in data.keys()]
+    labels = [compute_label(s) for s in data.keys()]
 
     data = pd.DataFrame({
         "labels": labels,
@@ -142,11 +142,21 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = 
     else:
         plt.show()
 
+def compute_label(model_name):
+    is_grav_vec = "nn_grav_vec" in model_name
+
+    numbers = list(map(int, model_name.split("_")[3 if is_grav_vec else 2:]))
+
+    is_rhombic = numbers[0] < numbers[1]
+
+    postfix = (("R" if is_rhombic else "F") if is_grav_vec else "S")
+    return str(np.sum(numbers)) + postfix
+
 def fuel_to_5p_to_target_plot(save_plot = False):
-    plot_data_2d("fuel_to_5p_to_target", title="Fuel to reach target", label = "Fuel", min = 18000, max = 22000, save_plot=save_plot)
+    plot_data_2d("fuel_to_5p_to_target", title="Fuel to reach target", label = "Fuel", min = 18000, max = 35000, save_plot=save_plot)
 
 def fuel_plot(save_plot = False):
-    plot_data_2d("fuel", title="Fuel", label = "Fuel", min = 25000, max = 35000, save_plot=save_plot)
+    plot_data_2d("fuel", title="Fuel", label = "Fuel", min = 18000, max = 35000, save_plot=save_plot)
 
 def reaches_target_plot(save_plot = False):
     plot_data_2d("reaches_target", title="Rate of reaching target", label = "Rate", max = 1, save_plot=save_plot)
@@ -197,13 +207,13 @@ def grav_length_stay_at_target_plot(save_plot = False):
     plot_data_2d("grav_length_stay_at_target", title="Length of gravitational vector for staying at target", label = "Gravitational acceleration", max = 5, save_plot=save_plot)
 
 def max_grav_length_plot(save_plot = False):
-    plot_data_2d("max_grav", title="Maximum gravitational acceleration", label = "Gravitational acceleration", max = 10, save_plot=save_plot)
+    plot_data_2d("max_grav", title="Maximum gravitational acceleration", label = "Gravitational acceleration", max = 11000, save_plot=save_plot)
 
 def max_grav_length_stay_at_target_plot(save_plot = False):
-    plot_data_2d("max_grav_stays_at_target", title="Maximum gravitational acceleration for staying at target", label = "Gravitational acceleration", max = 10, save_plot=save_plot)
+    plot_data_2d("max_grav_stays_at_target", title="Maximum gravitational acceleration for staying at target", label = "Gravitational acceleration", max = 3000, save_plot=save_plot)
 
 if __name__ == "__main__":
     #extract_data()
-    max_grav_length_stay_at_target_plot()
+    max_grav_length_plot()
 
     ...
