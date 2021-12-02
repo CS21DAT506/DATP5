@@ -104,7 +104,7 @@ def mean_confidence_interval(data, confidence=0.95):
 
     return m, h
 
-def plot_data_2d(data_key, label = "y", min = 0, max = 1000):
+def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = False):
 
     data = None
     with open("testing_data_handling/extracted_data.json", "r") as file:
@@ -135,44 +135,75 @@ def plot_data_2d(data_key, label = "y", min = 0, max = 1000):
     plt.ylim(min, max)
     plt.ylabel(label)
     plt.xlabel("Model")
+    plt.title(title)
 
-    plt.show()
+    if(save_plot):
+        plt.savefig("plots/" + title.replace(" ", "_") + ".png")
+    else:
+        plt.show()
 
-def fuel_to_5p_to_target_plot():
-    plot_data_2d("fuel_to_5p_to_target", label = "Fuel", min = 18000, max = 22000)
+def fuel_to_5p_to_target_plot(save_plot = False):
+    plot_data_2d("fuel_to_5p_to_target", title="Fuel to reach target", label = "Fuel", min = 18000, max = 22000, save_plot=save_plot)
 
-def fuel_plot():
-    plot_data_2d("fuel", label = "Fuel", min = 25000, max = 35000)
+def fuel_plot(save_plot = False):
+    plot_data_2d("fuel", title="Fuel", label = "Fuel", min = 25000, max = 35000, save_plot=save_plot)
 
-def reaches_target_plot():
-    plot_data_2d("reaches_target", label = "Rate of Reaching Target", min = 0.5, max = 0.9)
+def reaches_target_plot(save_plot = False):
+    plot_data_2d("reaches_target", title="Rate of reaching target", label = "Rate", max = 1, save_plot=save_plot)
 
-def collisions_plot():
-    plot_data_2d("collisions", label = "Rate of Colliding", min = 0.0, max = 0.3)
+def collisions_plot(save_plot = False):
+    plot_data_2d("collisions", title = "Rate of collision", label="Rate", max = 1, save_plot=save_plot)
 
-def agent_time_plot():
-    plot_data_2d("agent_time", label = "Time", min = 0, max = 0.01)
+def agent_time_plot(save_plot = False):
+    plot_data_2d("agent_time", title="Time of neural network computations", label = "Time [s]", max = 0.001, save_plot=save_plot)
 
-def gcpd_time_plot():
-    plot_data_2d("gcpd_time", label = "Time", min = 0, max = 0.001)
+def gcpd_time_plot(save_plot = False):
+    plot_data_2d("gcpd_time", title="Time of GCPD computations", label = "Time [s]", max = 0.001, save_plot=save_plot)
 
-def overhead_time_plot():
-    plot_data_2d("overhead_time", label = "Time", min = 0, max = 0.00-1)
+def overhead_time_plot(save_plot = False):
+    plot_data_2d("overhead_time", title="Time of overhead computations", label = "Time [s]", max = 0.001, save_plot=save_plot)
 
-def end_cost_plot():
-    plot_data_2d("end_cost", label = "Cost", min = 0, max = 40000)
+def end_cost_plot(save_plot = False):
+    plot_data_2d("end_cost", title="Cost given as final distance to target", label = "Cost", max = 40000, save_plot=save_plot)
 
-def time_to_5p_to_target_plot():
-    plot_data_2d("time_to_5p_to_target", label = "Time", min = 0, max = 25)
+def time_to_5p_to_target_plot(save_plot = False):
+    plot_data_2d("time_to_5p_to_target", title="Time to reach target", label = "Time", max = 25, save_plot=save_plot)
 
-def stays_at_target_plot():
-    plot_data_2d("stays_at_target", label = "Rate of Staying at Target", min = 0.4, max = 0.65)
+def stays_at_target_plot(save_plot = False):
+    plot_data_2d("stays_at_target", title="Rate of staying at Target", label = "Rate", max = 1, save_plot=save_plot)
 
-def fuel_for_at_target_at_end_plot():
-    plot_data_2d("fuel_for_at_target_at_end", label = "Fuel", min = 20000, max = 30000)
+def fuel_for_at_target_at_end_plot(save_plot = False):
+    plot_data_2d("fuel_for_at_target_at_end", title="Fuel to reach and stay at target", label = "Fuel", min = 20000, max = 30000, save_plot=save_plot)
+
+def acc_squared_error_plot(save_plot = False):
+    plot_data_2d("acc_se", title="Mean squared error", label = "Error", max = 5, save_plot=save_plot)
+
+def acc_absolute_error_plot(save_plot = False):
+    plot_data_2d("acc_ae", title="Mean absolute error", label = "Error", max = 5, save_plot=save_plot)
+   
+def capped_acc_squared_error_plot(save_plot = False):
+    plot_data_2d("capped_acc_se", title="Mean squared error of capped acceleration", label = "Error", max = 5, save_plot=save_plot)
+
+def capped_acc_absolute_error_plot(save_plot = False):
+    plot_data_2d("capped_acc_ae", title="Mean absolute error of capped acceleration", label = "Error", max = 5, save_plot=save_plot)
+    
+def grav_length_plot(save_plot = False):
+    plot_data_2d("grav_length", title="Length of gravitatial vector", label = "Gravitational acceleration", max = 5, save_plot=save_plot)
+
+def grav_length_reach_target_plot(save_plot = False):
+    plot_data_2d("grav_length_reach_target", title="Length of gravitational vector for reaching target", label = "Gravitational acceleration", max = 5, save_plot=save_plot)
+
+def grav_length_stay_at_target_plot(save_plot = False):
+    plot_data_2d("grav_length_stay_at_target", title="Length of gravitational vector for staying at target", label = "Gravitational acceleration", max = 5, save_plot=save_plot)
+
+def max_grav_length_plot(save_plot = False):
+    plot_data_2d("max_grav", title="Maximum gravitational acceleration", label = "Gravitational acceleration", max = 10, save_plot=save_plot)
+
+def max_grav_length_stay_at_target_plot(save_plot = False):
+    plot_data_2d("max_grav_stays_at_target", title="Maximum gravitational acceleration for staying at target", label = "Gravitational acceleration", max = 10, save_plot=save_plot)
 
 if __name__ == "__main__":
     #extract_data()
-    
+    max_grav_length_stay_at_target_plot()
 
     ...
