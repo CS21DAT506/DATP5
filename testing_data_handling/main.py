@@ -8,17 +8,14 @@ from matplotlib import cm
 from matplotlib.ticker import FuncFormatter
 import file_util as FileHandler
 from pathlib import Path
-from progresbar import *
+from progress.bar import IncrementalBar
 from scipy import stats
 import pandas as pd
 
-
 def extract_data():
-    num_of_environments = 1000
+    data_dir = FileHandler.get_data_dir("testing_data")
 
-    data_dir = FileHandler.get_data_dir("testing_data_handling/testing_data")
-
-    data = [dir for dir in FileHandler.get_data_files(data_dir) if "nn_grav" in dir ]
+    data = [dir for dir in FileHandler.get_data_files(data_dir)]
 
     processed_data = {}
 
@@ -35,12 +32,25 @@ def extract_data():
             "collisions": [],
             "reaches_target": [],
             "stays_at_target": [],
-            "fuel_for_at_target_at_end": []
+            "fuel_for_at_target_at_end": [],
+            "acc_se": [],
+            "acc_ae": [],
+            "capped_acc_se": [],
+            "capped_acc_ae": [],
+            "grav_length": [],
+            "grav_length_reach_target": [],
+            "grav_length_stay_at_target": [],
+            "max_grav": [],
+            "max_grav_stays_at_target": []
         }
 
+        folder = Path.joinpath(data_dir, model)
+
+        num_of_environments = int(len(FileHandler.get_data_files(folder))/2)
+
+        bar = IncrementalBar('File loaded: ', max=num_of_environments, suffix='%(percent)d%%')
+
         for i in range(num_of_environments):
-              
-            folder = Path.joinpath(data_dir, model)
 
             archive_path = str(folder) + "/archive_" + str(i) + ".json"
 
@@ -64,16 +74,31 @@ def extract_data():
 
                 at_target_at_end = dist_to_target[-1] < dist_to_target[0] * 0.05
                 extracted_data["stays_at_target"].append(1 if at_target_at_end else 0)
-                if at_target_at_end:
+
+                grav_lengths = []
+                for vec in metrics["grav_acceleration"]:
+                    grav_lengths.append(np.linalg.norm(vec))
+                extracted_data["grav_length"].extend(grav_lengths)
+
+                max_grav = max(grav_lengths)
+
+                extracted_data["max_grav"].append(max_grav)
+
+                if at_target_at_end :
                     extracted_data["fuel_for_at_target_at_end"].append(agent_fuel)
+                    extracted_data["grav_length_stay_at_target"].extend(grav_lengths)
+                    extracted_data["max_grav_stays_at_target"].append(max_grav)
 
                 agent_fuel = 0
                 target_reached = 0
+                grav_lengths = []
                 for i in range(len(dist_to_target)):
                     agent_fuel += min(10, np.linalg.norm(metrics["agent_acceleration"][i]))
+                    grav_lengths.append(np.linalg.norm(metrics["grav_acceleration"][i]))
                     if dist_to_target[i] < dist_to_target[0] * 0.05:
                         extracted_data["time_to_5p_to_target"].append(i * 0.01)
                         extracted_data["fuel_to_5p_to_target"].append(agent_fuel)
+                        extracted_data["grav_length_reach_target"].extend(grav_lengths)
                         target_reached = 1
                         break
                 extracted_data["reaches_target"].append(target_reached)
@@ -81,9 +106,22 @@ def extract_data():
                 extracted_data["end_cost"].append(dist_to_target[-1])
 
 
+                for i in range(len(metrics["agent_acceleration"])):
+                    model_to_gcpd_diff = np.array(metrics["agent_acceleration"][i]) - np.array(metrics["gcpd_acceleration"][i])
+                    capped_model_to_gcpd_diff = np.array(cap_vector_length(metrics["agent_acceleration"][i], 10)) - np.array(metrics["gcpd_acceleration"][i])
+
+                    for value in capped_model_to_gcpd_diff[:2]:
+                        extracted_data["capped_acc_se"].append(value**2)
+                        extracted_data["capped_acc_ae"].append(abs(value))
+
+                    for value in model_to_gcpd_diff[:2]:
+                        extracted_data["acc_se"].append(value**2)
+                        extracted_data["acc_ae"].append(abs(value))
+
+                ...
+
             bar.next()
         print( f"\t{model} " + " " * (30 - len(model)) + "has been loaded")
-        resetBar()
 
         processed_data[model] = {}
 
@@ -92,9 +130,21 @@ def extract_data():
             processed_data[model][key + "_m"] = float(m)
             processed_data[model][key + "_h"] = float(h)
 
-    with open("testing_data_handling/extracted_data.json", "w") as file:
+    with open("extracted_data.json", "w") as file:
             jsonstr = json.dumps(processed_data, indent=4)
             file.write(jsonstr)
+
+def abs_vector_pr_dim(vec):
+    sum = 0
+    for value in vec:
+        sum += abs(value)
+    return sum
+
+def cap_vector_length(vec, max_length):
+    length = np.linalg.norm(vec)
+    if length > max_length:
+        return vec / length * max_length
+    return vec
 
 def mean_confidence_interval(data, confidence=0.95):
     """Stolen from stack-overflow"""

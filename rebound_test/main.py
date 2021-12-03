@@ -97,7 +97,7 @@ def do_testing_run():
             json_file = file.read()
             environments = json.loads(json_file)
 
-    data = [dir for dir in FileHandler.get_data_files(data_dir) if "nn_grav" in dir ]
+    data = [dir for dir in FileHandler.get_data_files(data_dir)]
 
     for i in range(settings.num_of_iterations):
         for model in data:
