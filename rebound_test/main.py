@@ -99,7 +99,7 @@ def do_testing_run():
 
     data = [dir for dir in FileHandler.get_data_files(data_dir)]
 
-    for i in range(settings.num_of_iterations):
+    for i in range(5080, settings.num_of_iterations):
         for model in data:
             model_folders = FileHandler.get_data_files(Path.joinpath(data_dir, model))
 

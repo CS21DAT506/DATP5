@@ -15,12 +15,10 @@ import pandas as pd
 def extract_data():
     data_dir = FileHandler.get_data_dir("testing_data")
 
-    data = [dir for dir in FileHandler.get_data_files(data_dir)]
-
-    processed_data = {}
+    data = FileHandler.get_data_files(data_dir)
 
     for model in data:
-        
+        model = "no_planet_128_32_8"
         extracted_data = {
             "agent_time": [],
             "gcpd_time": [],
@@ -46,9 +44,9 @@ def extract_data():
 
         folder = Path.joinpath(data_dir, model)
 
-        num_of_environments = int(len(FileHandler.get_data_files(folder))/2)
+        num_of_environments = 5080 #int(len(FileHandler.get_data_files(folder))/2)
 
-        bar = IncrementalBar('File loaded: ', max=num_of_environments, suffix='%(percent)d%%')
+        bar = IncrementalBar('Files loaded: ', max=num_of_environments//10, suffix='%(percent)d%%')
 
         for i in range(num_of_environments):
 
@@ -92,11 +90,11 @@ def extract_data():
                 agent_fuel = 0
                 target_reached = 0
                 grav_lengths = []
-                for i in range(len(dist_to_target)):
-                    agent_fuel += min(10, np.linalg.norm(metrics["agent_acceleration"][i]))
-                    grav_lengths.append(np.linalg.norm(metrics["grav_acceleration"][i]))
-                    if dist_to_target[i] < dist_to_target[0] * 0.05:
-                        extracted_data["time_to_5p_to_target"].append(i * 0.01)
+                for ii in range(len(dist_to_target)):
+                    agent_fuel += min(10, np.linalg.norm(metrics["agent_acceleration"][ii]))
+                    grav_lengths.append(np.linalg.norm(metrics["grav_acceleration"][ii]))
+                    if dist_to_target[ii] < dist_to_target[0] * 0.05:
+                        extracted_data["time_to_5p_to_target"].append(ii * 0.01)
                         extracted_data["fuel_to_5p_to_target"].append(agent_fuel)
                         extracted_data["grav_length_reach_target"].extend(grav_lengths)
                         target_reached = 1
@@ -106,9 +104,9 @@ def extract_data():
                 extracted_data["end_cost"].append(dist_to_target[-1])
 
 
-                for i in range(len(metrics["agent_acceleration"])):
-                    model_to_gcpd_diff = np.array(metrics["agent_acceleration"][i]) - np.array(metrics["gcpd_acceleration"][i])
-                    capped_model_to_gcpd_diff = np.array(cap_vector_length(metrics["agent_acceleration"][i], 10)) - np.array(metrics["gcpd_acceleration"][i])
+                for ii in range(len(metrics["agent_acceleration"])):
+                    model_to_gcpd_diff = np.array(metrics["agent_acceleration"][ii]) - np.array(metrics["gcpd_acceleration"][ii])
+                    capped_model_to_gcpd_diff = np.array(cap_vector_length(metrics["agent_acceleration"][ii], 10)) - np.array(metrics["gcpd_acceleration"][ii])
 
                     for value in capped_model_to_gcpd_diff[:2]:
                         extracted_data["capped_acc_se"].append(value**2)
@@ -120,19 +118,21 @@ def extract_data():
 
                 ...
 
-            bar.next()
-        print( f"\t{model} " + " " * (30 - len(model)) + "has been loaded")
+            if i % 10 == 0: 
+                bar.next()
+        print( f"{model} " + " " * (30 - len(model)) + "\n Processesing complete")
 
-        processed_data[model] = {}
+        processed_data = {}
 
         for key in extracted_data.keys():
             m, h = mean_confidence_interval(extracted_data[key])
-            processed_data[model][key + "_m"] = float(m)
-            processed_data[model][key + "_h"] = float(h)
+            processed_data[key + "_m"] = float(m)
+            processed_data[key + "_h"] = float(h)
 
-    with open("extracted_data.json", "w") as file:
-            jsonstr = json.dumps(processed_data, indent=4)
-            file.write(jsonstr)
+        with open("data/extracted_data_" + model + ".json", "w") as file:
+                jsonstr = json.dumps(processed_data, indent=4)
+                file.write(jsonstr)
+        print("File saved")
 
 def abs_vector_pr_dim(vec):
     sum = 0
@@ -205,6 +205,9 @@ def Sci_Formatter(x,lim):
     return '{0:.2f}e{1:.0f}'.format(np.sign(x)*10**(-np.floor(np.log10(abs(x)))+np.log10(abs(x))),np.floor(np.log10(abs(x))))
 
 def compute_label(model_name):
+    if model_name == "gcpd":
+        return "GCPD"
+
     is_grav_vec = "nn_grav_vec" in model_name
 
     numbers = list(map(int, model_name.split("_")[3 if is_grav_vec else 2:]))
@@ -287,14 +290,14 @@ def plot_stacked_bars():
     ax.set_position([box.x0, box.y0 + box.height * 0.3, box.width, box.height * 0.7])
 
     ax.set_ylabel("Likelihood")
-    ax.set_title("Outcomes and their likelihood")
+    ax.set_title("Outcomes and their likelihoods")
     ax.legend(loc='center left', bbox_to_anchor=(0.2, -0.3))
     plt.show()
 
 if __name__ == "__main__":
     #extract_data()
-    plot_stacked_bars()
-    # for key in plot_setups.keys():
-    #     plot_with_formatting(key, save_plot=True)
+    #plot_stacked_bars()
+    for key in plot_setups.keys():
+        plot_with_formatting(key, save_plot=True)
 
     ...

@@ -37,18 +37,16 @@ class NNGravityAgent(NNAgent):
 
         agent_pos = np.array( (particle.x, particle.y) )
         grav = self._get_agent_gravity(agent_pos, sim )
-        ##nn_input_data.extend([grav[0], grav[1]])
+        nn_input_data.extend([grav[0], grav[1]])
 
         overhead_time = time.time() - start_time
-        #res = self.expandDim(self.model(np.array([nn_input_data]))) # add 0 as the z-axis
+        res = self.expandDim(self.model(np.array([nn_input_data]))) # add 0 as the z-axis
         agent_time = time.time() - start_time - overhead_time
         gcpd_res = self.gcpd.get_agent_acceleration(self.expandDim(agent_pos), np.array((particle.vx, particle.vy, 0)), self.expandDim(grav))
         gcpd_time = time.time() - start_time - agent_time - overhead_time
 
         if sim.t * UPDATE_CONST - floor(sim.t * UPDATE_CONST) < 0.01 * UPDATE_CONST:
             bar.next()
-
-        res = gcpd_res
 
         self.data_storage["agent_acceleration"].append([*res])
         self.data_storage["gcpd_acceleration"].append([*gcpd_res])
