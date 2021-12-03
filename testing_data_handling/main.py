@@ -191,10 +191,60 @@ def plot_with_formatting(data_key, save_plot = False):
     setup = plot_setups[data_key]
     plot_data_2d(data_key, setup["title"], setup["label"], setup["min"], setup["max"], save_plot=save_plot)
 
+def plot_stacked_bars():
+    data = None
+    with open("extracted_data.json", "r") as file:
+                json_file = file.read()
+                data = json.loads(json_file)
+
+    COLOR = cm.rainbow(np.linspace(0, 1, 5))
+    plot_design = ["-o", "-d"]
+
+    collisions = [model["collisions_m"] for model in data.values()] #P(Collision)
+    reaches_target  = [model["reaches_target_m"]  * (1 - model["collisions_m"]) for model in data.values()] #P(reach \/ stay | !Collision) * (1 - P(Collision))
+    stays_at_target = [model["stays_at_target_m"] * (1 - model["collisions_m"]) for model in data.values()] #P(stay | Collision) * (1 - P(Collision))
+
+    reaches_not_stays_at_target = [reaches_target[i] for i in range(len(collisions))]
+    does_not_reach = [1.0 - collisions[i] - reaches_target[i] + reaches_not_stays_at_target[i] for i in range(len(collisions))]
+    collisions = [collisions[i] + does_not_reach[i] for i in range(len(collisions))]
+
+
+    labels = [compute_label(s) for s in data.keys()]
+
+    data = pd.DataFrame({
+        "labels": labels,
+        "collisions": collisions,
+        "reaches_not_stays": reaches_not_stays_at_target,
+        "stays": stays_at_target,
+        "not_reach": does_not_reach
+    })
+
+    sorted_data = data.sort_values(by=["labels"])
+
+    fig, ax = plt.subplots()
+    width = 0.6
+
+    # print(sorted_data["reaches_not_stays"])
+    # print(sorted_data["stays"])
+    # print([0] * 10)
+
+    ax.bar(sorted_data["labels"], sorted_data["collisions"],        width, label="Collides",                         color=COLOR[3])
+    ax.bar(sorted_data["labels"], sorted_data["not_reach"],         width, label="Does not reach target",            color=COLOR[2])
+    ax.bar(sorted_data["labels"], sorted_data["reaches_not_stays"], width, label="Reaches target but does not stay", color=COLOR[1])
+    ax.bar(sorted_data["labels"], sorted_data["stays"],             width, label="Stays at target",                  color=COLOR[0])
+
+    box = ax.get_position()
+    ax.set_position([box.x0, box.y0 + box.height * 0.3, box.width, box.height * 0.7])
+
+    ax.set_ylabel("Likelihood")
+    ax.set_title("Outcomes and their likelihood")
+    ax.legend(loc='center left', bbox_to_anchor=(0.2, -0.3))
+    plt.show()
 
 if __name__ == "__main__":
     #extract_data()
-    for key in plot_setups.keys():
-        plot_with_formatting(key, save_plot=True)
+    plot_stacked_bars()
+    # for key in plot_setups.keys():
+    #     plot_with_formatting(key, save_plot=True)
 
     ...
