@@ -5,6 +5,7 @@ import math
 import matplotlib as mpl
 import json 
 from matplotlib import cm
+from matplotlib.ticker import FuncFormatter
 import file_util as FileHandler
 from pathlib import Path
 from progress.bar import IncrementalBar
@@ -154,7 +155,7 @@ def mean_confidence_interval(data, confidence=0.95):
 
     return m, h
 
-def plot_data_2d(data_key, title = "", label = "y", min = 0, max = 1000):
+def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = False):
 
     data = None
     with open("extracted_data.json", "r") as file:
@@ -169,7 +170,7 @@ def plot_data_2d(data_key, title = "", label = "y", min = 0, max = 1000):
 
     x = range(len(data))
     
-    labels = [np.sum(list(map(int, s.split("_")[3:]))) for s in data.keys()]
+    labels = [compute_label(s) for s in data.keys()]
 
     data = pd.DataFrame({
         "labels": labels,
@@ -179,70 +180,71 @@ def plot_data_2d(data_key, title = "", label = "y", min = 0, max = 1000):
 
     sorted_data = data.sort_values(by=["labels"])
 
+    
     plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
 
     plt.xticks(x, sorted_data["labels"])
     plt.ylim(min, max)
     plt.ylabel(label)
     plt.xlabel("Model")
-
     plt.title(title)
 
-    plt.show()
+    if(max < 1):
+        plt.gca().get_yaxis().set_major_formatter(FuncFormatter(Sci_Formatter)) #plt.LogFormatter(10, labelOnlyBase = False))
 
-def fuel_to_5p_to_target_plot():
-    plot_data_2d("fuel_to_5p_to_target", title="Fuel to reach target", label = "Fuel", min = 17000, max = 21000)
+    if(save_plot):
+        plt.savefig("plots/" + title.replace(" ", "_") + ".png")
+        plt.clf()
+    else:
+        plt.show()
 
-def fuel_plot():
-    plot_data_2d("fuel", title="Fuel", label = "Fuel", min = 25000, max = 30000)
+def Sci_Formatter(x,lim):
+    """Stolen from stack overflow"""
+    if x == 0:
+        return 0
+    return '{0:.2f}e{1:.0f}'.format(np.sign(x)*10**(-np.floor(np.log10(abs(x)))+np.log10(abs(x))),np.floor(np.log10(abs(x))))
 
-def reaches_target_plot():
-    plot_data_2d("reaches_target", title="Rate of reaching target", label = "Rate", min = 0, max = 1)
+def compute_label(model_name):
+    is_grav_vec = "nn_grav_vec" in model_name
 
-def collisions_plot():
-    plot_data_2d("collisions", title="Rate of collision", label = "Rate", min = 0.0, max = 1)
+    numbers = list(map(int, model_name.split("_")[3 if is_grav_vec else 2:]))
 
-def agent_time_plot():
-    plot_data_2d("agent_time", title="Time of neural network computations", label = "Time", min = 0, max = 0.002)
+    is_rhombic = numbers[0] < numbers[1]
 
-def gcpd_time_plot():
-    plot_data_2d("gcpd_time", title="Time of GCPD computations", label = "Time", min = 0, max = 0.0002)
+    postfix = (("R" if is_rhombic else "F") if is_grav_vec else "S")
+    return str(np.sum(numbers)) + postfix
 
-def overhead_time_plot():
-    plot_data_2d("overhead_time", title="Time of overhead computations", label = "Time", min = 0, max = 0.0002)
+plot_setups = {
+    "fuel_to_5p_to_target":         {"title":"Fuel to reach target",                                        "label": "Fuel", "min": 16000, "max": 35000},
+    "fuel":                         {"title":"Fuel",                                                        "label": "Fuel", "min": 16000, "max": 35000},
+    "reaches_target":               {"title":"Likelihood of reaching target",                               "label": "Likelihood", "min": 0, "max": 1},
+    "collisions":                   {"title":"Likelihood of collision",                                     "label": "Likelihood", "min": 0,  "max": 1},
+    "agent_time":                   {"title":"Time of neural network computations",                         "label": "Time [s]", "min": 0,  "max": 0.002},
+    "gcpd_time":                    {"title":"Time of GCPD computations",                                   "label": "Time [s]", "min": 0,  "max": 0.002},
+    "overhead_time":                {"title":"Time of overhead computations",                               "label": "Time [s]", "min": 0,  "max": 0.002},
+    "end_cost":                     {"title":"Cost given as final distance to target",                      "label": "Cost", "min": 0,  "max": 21000},
+    "time_to_5p_to_target":         {"title":"Time to reach target",                                        "label": "Time", "min": 0,  "max": 25},
+    "stays_at_target":              {"title":"Likelihood of staying at Target",                             "label": "Likelihood", "min": 0,  "max": 1},
+    "fuel_for_at_target_at_end":    {"title":"Fuel to reach and stay at target",                            "label": "Fuel", "min": 16000, "max": 35000},
+    "acc_se":                       {"title":"Mean squared error",                                          "label": "Error", "min": 0,  "max": 20000},
+    "acc_ae":                       {"title":"Mean absolute error",                                         "label": "Error", "min": 0,  "max": 7},
+    "capped_acc_se":                {"title":"Mean squared error of capped acceleration",                   "label": "Error", "min": 0,  "max": 22},
+    "capped_acc_ae":                {"title":"Mean absolute error of capped acceleration",                  "label": "Error", "min": 0,  "max": 7},
+    "grav_length":                  {"title":"Length of gravitatial vector",                                "label": "Gravitational acceleration", "min": 0,  "max": 40},
+    "grav_length_reach_target":     {"title":"Length of gravitational vector for reaching target",          "label": "Gravitational acceleration", "min": 0,  "max": 40},
+    "grav_length_stay_at_target":   {"title":"Length of gravitational vector for staying at target",        "label": "Gravitational acceleration", "min": 0,  "max": 40},
+    "max_grav":                     {"title":"Maximum gravitational acceleration",                          "label": "Gravitational acceleration", "min": 0,  "max": 11000},
+    "max_grav_stays_at_target":     {"title":"Maximum gravitational acceleration for staying at target",    "label": "Gravitational acceleration", "min": 0,  "max": 2500}
+}
 
-def end_cost_plot():
-    plot_data_2d("end_cost", title="Cost given as final distance to target", label = "Cost", min = 0, max = 30000)
+def plot_with_formatting(data_key, save_plot = False):
+    setup = plot_setups[data_key]
+    plot_data_2d(data_key, setup["title"], setup["label"], setup["min"], setup["max"], save_plot=save_plot)
 
-def time_to_5p_to_target_plot():
-    plot_data_2d("time_to_5p_to_target", title="Time to reach target", label = "Time", min = 20, max = 22)
-
-def stays_at_target_plot():
-    plot_data_2d("stays_at_target", title="Rate of staying at target", label = "Rate", min = 0, max = 1)
-
-def fuel_for_at_target_at_end_plot():
-    plot_data_2d("fuel_for_at_target_at_end", title="Fuel to reach and stay at target", label = "Fuel", min = 20000, max = 30000)
-
-def abs_loss_plot():
-    plot_data_2d("acc_abs_loss", title="Loss between model and GCPD (mae)", label = "Loss", min = 0, max = 5)
-
-def square_loss_plot():
-    plot_data_2d("acc_diff", title="Loss between model and GCPD (mse)", label = "Loss", min = 0, max = 5)
 
 if __name__ == "__main__":
     #extract_data()
-    # fuel_to_5p_to_target_plot()
-    # fuel_plot()
-    # reaches_target_plot()
-    # collisions_plot()
-    # agent_time_plot()
-    # gcpd_time_plot()
-    # overhead_time_plot()
-    end_cost_plot()
-    # time_to_5p_to_target_plot()
-    # stays_at_target_plot()
-    #fuel_for_at_target_at_end_plot()
-    #abs_loss_plot()
-    # square_loss_plot()
+    for key in plot_setups.keys():
+        plot_with_formatting(key, save_plot=True)
 
     ...
