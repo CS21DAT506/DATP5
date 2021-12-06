@@ -12,19 +12,71 @@ from progress.bar import IncrementalBar
 from scipy import stats
 import pandas as pd
 
+def extract_additional_data():
+    data_dir = FileHandler.get_data_dir("testing_data")
+
+    data = FileHandler.get_data_files(data_dir)
+
+    processed_data = {}
+
+    for model in data:
+        extracted_data = {
+            "min_cost": [],
+            "min_start_cost_ratio": [],
+            "ends_further_than_start": []
+        }
+
+        folder = Path.joinpath(data_dir, model)
+
+        num_of_environments = int(len(FileHandler.get_data_files(folder))/2)
+
+        bar = IncrementalBar('Files loaded: ', max=num_of_environments//10, suffix='%(percent)d%%')
+
+        for i in range(num_of_environments):
+
+            archive_path = str(folder) + "/archive_" + str(i) + ".json"
+
+            metrics = None
+            with open(archive_path, "r") as file:
+                json_file = file.read()
+                metrics = json.loads(json_file)
+
+            if not metrics["collision"]:
+                dist_to_target = metrics["dist_to_target"]
+                min_dist = min(dist_to_target)
+                extracted_data["min_cost"].append(min_dist)
+                extracted_data["min_start_cost_ratio"].append(min_dist / dist_to_target[0])
+                extracted_data["ends_further_than_start"].append(1 if dist_to_target[-1] > dist_to_target[0] else 0)
+
+            if i % 10 == 0: 
+                bar.next()
+        print( f"{model} " + " " * (30 - len(model)) + "\n Processesing complete")
+
+        processed_data[model] = {}
+
+        for key in extracted_data.keys():
+            m, h = mean_confidence_interval(extracted_data[key])
+            processed_data[key + "_m"] = float(m)
+            processed_data[key + "_h"] = float(h)
+
+    with open("data/additional_data.json", "w") as file:
+            jsonstr = json.dumps(processed_data, indent=4)
+            file.write(jsonstr)
+    print("File saved")
+
 def extract_data():
     data_dir = FileHandler.get_data_dir("testing_data")
 
     data = FileHandler.get_data_files(data_dir)
 
     for model in data:
-        model = "no_planet_128_32_8"
         extracted_data = {
             "agent_time": [],
             "gcpd_time": [],
             "overhead_time": [],
             "fuel": [],
             "end_cost": [],
+            "min_cost": [],
             "time_to_5p_to_target": [],
             "fuel_to_5p_to_target": [],
             "collisions": [],
@@ -44,7 +96,7 @@ def extract_data():
 
         folder = Path.joinpath(data_dir, model)
 
-        num_of_environments = 5080 #int(len(FileHandler.get_data_files(folder))/2)
+        num_of_environments = int(len(FileHandler.get_data_files(folder))/2)
 
         bar = IncrementalBar('Files loaded: ', max=num_of_environments//10, suffix='%(percent)d%%')
 
@@ -102,7 +154,7 @@ def extract_data():
                 extracted_data["reaches_target"].append(target_reached)
 
                 extracted_data["end_cost"].append(dist_to_target[-1])
-
+                extracted_data["min_cost"].append(min(dist_to_target))
 
                 for ii in range(len(metrics["agent_acceleration"])):
                     model_to_gcpd_diff = np.array(metrics["agent_acceleration"][ii]) - np.array(metrics["gcpd_acceleration"][ii])
@@ -225,7 +277,8 @@ plot_setups = {
     "agent_time":                   {"title":"Time of neural network computations",                         "label": "Time [s]", "min": 0,  "max": 0.002},
     "gcpd_time":                    {"title":"Time of GCPD computations",                                   "label": "Time [s]", "min": 0,  "max": 0.002},
     "overhead_time":                {"title":"Time of overhead computations",                               "label": "Time [s]", "min": 0,  "max": 0.002},
-    "end_cost":                     {"title":"Cost given as final distance to target",                      "label": "Cost", "min": 0,  "max": 21000},
+    "end_cost":                     {"title":"Cost given as final distance to target",                      "label": "Cost", "min": 0,  "max": 151000},
+    "min_cost":                     {"title":"Cost given as minimum distance to target",                    "label": "Cost", "min": 0,  "max": 150},
     "time_to_5p_to_target":         {"title":"Time to reach target",                                        "label": "Time", "min": 0,  "max": 25},
     "stays_at_target":              {"title":"Likelihood of staying at Target",                             "label": "Likelihood", "min": 0,  "max": 1},
     "fuel_for_at_target_at_end":    {"title":"Fuel to reach and stay at target",                            "label": "Fuel", "min": 16000, "max": 35000},
@@ -244,7 +297,7 @@ def plot_with_formatting(data_key, save_plot = False):
     setup = plot_setups[data_key]
     plot_data_2d(data_key, setup["title"], setup["label"], setup["min"], setup["max"], save_plot=save_plot)
 
-def plot_stacked_bars():
+def plot_stacked_bars(save_plot=False):
     data = None
     with open("extracted_data.json", "r") as file:
                 json_file = file.read()
@@ -292,12 +345,18 @@ def plot_stacked_bars():
     ax.set_ylabel("Likelihood")
     ax.set_title("Outcomes and their likelihoods")
     ax.legend(loc='center left', bbox_to_anchor=(0.2, -0.3))
-    plt.show()
+    
+    if(save_plot):
+        plt.savefig("plots/Outcomes.png")
+        plt.clf()
+    else:
+        plt.show()
 
 if __name__ == "__main__":
     #extract_data()
-    #plot_stacked_bars()
-    for key in plot_setups.keys():
-        plot_with_formatting(key, save_plot=True)
+    extract_additional_data()
+    # plot_stacked_bars(save_plot=True)
+    # for key in plot_setups.keys():
+    #     plot_with_formatting(key, save_plot=True)
 
     ...
