@@ -240,6 +240,11 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_mod
 
     plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
 
+    fig = plt.subplot()
+
+    box = fig.get_position()
+    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
+
     plt.xticks(x, labels)
     plt.ylim(min, max)
     plt.ylabel(label)
@@ -248,6 +253,59 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_mod
 
     if(max < 1):
         plt.gca().get_yaxis().set_major_formatter(FuncFormatter(Sci_Formatter)) #plt.LogFormatter(10, labelOnlyBase = False))
+
+    if(save_plot):
+        plt.savefig("plots/" + title.replace(" ", "_") + ".png")
+        plt.clf()
+    else:
+        plt.show()
+
+def time_plot(save_plot = False):
+
+    data = None
+    with open("extracted_data.json", "r") as file:
+                json_file = file.read()
+                data = json.loads(json_file)
+
+    COLOR = cm.rainbow(np.linspace(0, 1, len(data)))
+    plot_design = ["-o", "-d"]
+
+    mean = [model["agent_time_m"] for model in data.values()]
+    h = [model["agent_time_h"] for model in data.values()]
+   
+    labels = [compute_label(s) for s in data.keys()]
+
+    gcpd_index = labels.index("GCPD")
+    mean[gcpd_index] = data["gcpd"]["gcpd_time_m"]
+    h[gcpd_index] = data["gcpd"]["gcpd_time_h"]
+
+    data = pd.DataFrame({
+        "labels": labels,
+        "h": h,
+        "mean": mean
+    })
+
+    sorted_data = data.sort_values(by=["labels"])
+    labels = sorted_data["labels"]
+    
+    x = range(0, len(labels))
+
+    plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
+
+    title = "Time of computations"
+
+    plt.xticks(x, labels)
+    plt.ylim(0, 0.002)
+    plt.ylabel("Time [s]")
+    plt.xlabel("Model")
+    plt.title(title)
+    
+    plt.gca().get_yaxis().set_major_formatter(FuncFormatter(Sci_Formatter)) #plt.LogFormatter(10, labelOnlyBase = False))
+
+    fig = plt.subplot()
+
+    box = fig.get_position()
+    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width * 1.08, box.height])
 
     if(save_plot):
         plt.savefig("plots/" + title.replace(" ", "_") + ".png")
@@ -281,7 +339,7 @@ plot_setups = {
     "Likelihood of reaching target":                            {"data_key":"reaches_target",               "label": "Likelihood", "min": 0, "max": 1},
     "Likelihood of collision":                                  {"data_key":"collisions",                   "label": "Likelihood", "min": 0,  "max": 1},
     "Likelihood of staying at Target":                          {"data_key":"stays_at_target",              "label": "Likelihood", "min": 0,  "max": 1},
-    "Time of neural network computations":                      {"data_key":"agent_time",                   "label": "Time [s]", "min": 0,  "max": 0.002},
+    "Time of neural network computations":                      {"data_key":"agent_time",                   "label": "Time [s]", "min": 0,  "max": 0.002, "unwanted_models": ["GCPD"]},
     "Time of GCPD computations":                                {"data_key":"gcpd_time",                    "label": "Time [s]", "min": 0,  "max": 0.002},
     "Time of overhead computations":                            {"data_key":"overhead_time",                "label": "Time [s]", "min": 0,  "max": 0.002},
     "Cost given as final distance to target":                   {"data_key":"end_cost",                     "label": "Cost", "min": 0,  "max": 151000},
@@ -370,8 +428,9 @@ def printList(list):
 if __name__ == "__main__":
     #extract_data()
     #extract_additional_data()
-    plot_stacked_bars(save_plot=True)
+    # plot_stacked_bars(save_plot=True)
     # for key in plot_setups.keys():
     #     plot_with_formatting(key, save_plot=True)
+    time_plot(save_plot=True)
 
     ...

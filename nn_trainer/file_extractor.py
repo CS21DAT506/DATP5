@@ -4,9 +4,9 @@ import numpy as np
 from pathlib import Path
 import json 
 
-def extract(): 
+def extract(path, save_metrics, save_epochs): 
 
-    data_dir = fu.get_data_dir("saved_models")
+    data_dir = fu.get_data_dir(path)
 
     data = [dir for dir in fu.get_data_files(data_dir) if "nn_grav" in dir ]
 
@@ -37,54 +37,38 @@ def extract():
             min_loss.append(min(losses))
             epochs.append(len(losses))
 
+    if save_epochs:
+        for i in range(len(epochs)):
+            print(str(i) + " | 0.4 > " + str(last_val_loss[i]))
+            if last_val_loss[i] < 0.42:
+                print(str(i) )
+                config = ""
+                for size in layer_sizes[i]:
+                    config = config + str(size) + "_"
+            
+                losses = {
+                    "loss": all_losses[i],
+                    "val_loss": all_val_losses[i]
+                }
 
-    for i in range(len(epochs)):
-        print(str(i) + " | 0.4 > " + str(last_val_loss[i]))
-        if last_val_loss[i] < 0.42:
-            print(str(i) )
-            config = ""
-            for size in layer_sizes[i]:
-               config = config + str(size) + "_"
-        
-            losses = {
-                "loss": all_losses[i],
-                "val_loss": all_val_losses[i]
-            }
+                with open("fun_w_val_finalists\\" + config + ".json", "w") as file:
+                    jsonstr = json.dumps(losses, indent=4)
+                    file.write(jsonstr)
 
-            with open("fun_w_val_finalists\\" + config + ".json", "w") as file:
-                jsonstr = json.dumps(losses, indent=4)
-                file.write(jsonstr)
+    if save_metrics :
+        metrics = {
+            "last_val_loss": last_val_loss,
+            "layer_count": layer_count,
+            "max_layer_size": max_layer_size,
+            "last_loss": last_loss,
+            "min_loss": min_loss,
+            "epochs": epochs
+        }
 
-    # metrics = {
-    #     "last_val_loss": last_val_loss,
-    #     "layer_count": layer_count,
-    #     "max_layer_size": max_layer_size,
-    #     "last_loss": last_loss,
-    #     "min_loss": min_loss,
-    #     "epochs": epochs
-    # }
-
-    # with open("val_rhomb_model_metrics.json", "w") as file:
-    #     jsonstr = json.dumps(metrics, indent=4)
-    #     file.write(jsonstr)
-
-    
-
-
-
-    ...
-
-    # for file_index in range(len(training_data)):
-    #     file = data[file_index]
-
-    #     path_to_json_file = str( Path.joinpath( data_dir, file ) )
-    #     print(f" data: {path_to_json_file}")
-    #     print(f"Training file: {file_index}/{len(training_data)}", end="\r")
-
-
-    #     X, y = nn_util.load_nn_data(path_to_json_file)
-
+        with open(path + "_metrics.json", "w") as file:
+            jsonstr = json.dumps(metrics, indent=4)
+            file.write(jsonstr)
 
 if __name__ == '__main__':
-    extract()
+    extract(path = "fun_w_val_grav_vec", save_metrics = True, save_epochs=False)
 

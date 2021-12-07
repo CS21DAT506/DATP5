@@ -77,5 +77,5 @@ def format(string):
 
 
 if __name__ == '__main__':
-    loss_plot("rhomb_val_finalists", smooth=False)
-    #plot("val_rhomb_model_metrics.json", "layer_count", "max_layer_size", val=True) #"max_layer_size" layer_count epochs
+    #loss_plot("rhomb_val_finalists", smooth=False)
+    plot("fun_w_val_grav_vec_metrics.json", "layer_count", "max_layer_size", val=True) #"max_layer_size" layer_count epochs
