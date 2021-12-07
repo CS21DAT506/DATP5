@@ -56,8 +56,8 @@ def extract_additional_data():
 
         for key in extracted_data.keys():
             m, h = mean_confidence_interval(extracted_data[key])
-            processed_data[key + "_m"] = float(m)
-            processed_data[key + "_h"] = float(h)
+            processed_data[model][key + "_m"] = float(m)
+            processed_data[model][key + "_h"] = float(h)
 
     with open("data/additional_data.json", "w") as file:
             jsonstr = json.dumps(processed_data, indent=4)
@@ -207,7 +207,7 @@ def mean_confidence_interval(data, confidence=0.95):
 
     return m, h
 
-def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = False):
+def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_models = [], save_plot = False):
 
     data = None
     with open("extracted_data.json", "r") as file:
@@ -219,9 +219,7 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = 
 
     mean = [model[data_key + "_m"] for model in data.values()]
     h = [model[data_key + "_h"] for model in data.values()]
-
-    x = range(len(data))
-    
+   
     labels = [compute_label(s) for s in data.keys()]
 
     data = pd.DataFrame({
@@ -231,11 +229,18 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, save_plot = 
     })
 
     sorted_data = data.sort_values(by=["labels"])
+    labels = sorted_data["labels"]
 
+    sorted_data = sorted_data.set_index("labels").drop(unwanted_models, axis = 0)
     
+    if len(unwanted_models) > 0 :
+        labels = [x for x in labels if x not in unwanted_models]
+    
+    x = range(len(labels))
+
     plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
 
-    plt.xticks(x, sorted_data["labels"])
+    plt.xticks(x, labels)
     plt.ylim(min, max)
     plt.ylabel(label)
     plt.xlabel("Model")
@@ -270,32 +275,36 @@ def compute_label(model_name):
     return str(np.sum(numbers)) + postfix
 
 plot_setups = {
-    "fuel_to_5p_to_target":         {"title":"Fuel to reach target",                                        "label": "Fuel", "min": 16000, "max": 35000},
-    "fuel":                         {"title":"Fuel",                                                        "label": "Fuel", "min": 16000, "max": 35000},
-    "reaches_target":               {"title":"Likelihood of reaching target",                               "label": "Likelihood", "min": 0, "max": 1},
-    "collisions":                   {"title":"Likelihood of collision",                                     "label": "Likelihood", "min": 0,  "max": 1},
-    "agent_time":                   {"title":"Time of neural network computations",                         "label": "Time [s]", "min": 0,  "max": 0.002},
-    "gcpd_time":                    {"title":"Time of GCPD computations",                                   "label": "Time [s]", "min": 0,  "max": 0.002},
-    "overhead_time":                {"title":"Time of overhead computations",                               "label": "Time [s]", "min": 0,  "max": 0.002},
-    "end_cost":                     {"title":"Cost given as final distance to target",                      "label": "Cost", "min": 0,  "max": 151000},
-    "min_cost":                     {"title":"Cost given as minimum distance to target",                    "label": "Cost", "min": 0,  "max": 150},
-    "time_to_5p_to_target":         {"title":"Time to reach target",                                        "label": "Time", "min": 0,  "max": 25},
-    "stays_at_target":              {"title":"Likelihood of staying at Target",                             "label": "Likelihood", "min": 0,  "max": 1},
-    "fuel_for_at_target_at_end":    {"title":"Fuel to reach and stay at target",                            "label": "Fuel", "min": 16000, "max": 35000},
-    "acc_se":                       {"title":"Mean squared error",                                          "label": "Error", "min": 0,  "max": 20000},
-    "acc_ae":                       {"title":"Mean absolute error",                                         "label": "Error", "min": 0,  "max": 7},
-    "capped_acc_se":                {"title":"Mean squared error of capped acceleration",                   "label": "Error", "min": 0,  "max": 22},
-    "capped_acc_ae":                {"title":"Mean absolute error of capped acceleration",                  "label": "Error", "min": 0,  "max": 7},
-    "grav_length":                  {"title":"Length of gravitatial vector",                                "label": "Gravitational acceleration", "min": 0,  "max": 40},
-    "grav_length_reach_target":     {"title":"Length of gravitational vector for reaching target",          "label": "Gravitational acceleration", "min": 0,  "max": 40},
-    "grav_length_stay_at_target":   {"title":"Length of gravitational vector for staying at target",        "label": "Gravitational acceleration", "min": 0,  "max": 40},
-    "max_grav":                     {"title":"Maximum gravitational acceleration",                          "label": "Gravitational acceleration", "min": 0,  "max": 11000},
-    "max_grav_stays_at_target":     {"title":"Maximum gravitational acceleration for staying at target",    "label": "Gravitational acceleration", "min": 0,  "max": 2500}
+    "Fuel to reach target":                                     {"data_key":"fuel_to_5p_to_target",         "label": "Fuel", "min": 16000, "max": 32000},
+    "Fuel":                                                     {"data_key":"fuel",                         "label": "Fuel", "min": 16000, "max": 32000},
+    "Fuel to reach and stay at target":                         {"data_key":"fuel_for_at_target_at_end",    "label": "Fuel", "min": 16000, "max": 32000},
+    "Likelihood of reaching target":                            {"data_key":"reaches_target",               "label": "Likelihood", "min": 0, "max": 1},
+    "Likelihood of collision":                                  {"data_key":"collisions",                   "label": "Likelihood", "min": 0,  "max": 1},
+    "Likelihood of staying at Target":                          {"data_key":"stays_at_target",              "label": "Likelihood", "min": 0,  "max": 1},
+    "Time of neural network computations":                      {"data_key":"agent_time",                   "label": "Time [s]", "min": 0,  "max": 0.002},
+    "Time of GCPD computations":                                {"data_key":"gcpd_time",                    "label": "Time [s]", "min": 0,  "max": 0.002},
+    "Time of overhead computations":                            {"data_key":"overhead_time",                "label": "Time [s]", "min": 0,  "max": 0.002},
+    "Cost given as final distance to target":                   {"data_key":"end_cost",                     "label": "Cost", "min": 0,  "max": 151000},
+    "Cost given as final distance to target (508R removed)":    {"data_key":"end_cost",                     "label": "Cost", "min": 0,  "max": 25000,   "unwanted_models": ["508R"]},
+    "Cost given as minimum distance to target":                 {"data_key":"min_cost",                     "label": "Cost", "min": 0,  "max": 150},
+    "Time to reach target":                                     {"data_key":"time_to_5p_to_target",         "label": "Time", "min": 0,  "max": 25},
+    "Mean squared error (168S removed)":                        {"data_key":"acc_se",                       "label": "Error", "min": 0,  "max": 200,    "unwanted_models": ["GCPD", "168S"]},
+    "Mean squared error":                                       {"data_key":"acc_se",                       "label": "Error", "min": 0,  "max": 20000,  "unwanted_models": ["GCPD"]},
+    "Mean absolute error":                                      {"data_key":"acc_ae",                       "label": "Error", "min": 0,  "max": 7,      "unwanted_models": ["GCPD"]},
+    "Mean squared error of capped acceleration":                {"data_key":"capped_acc_se",                "label": "Error", "min": 0,  "max": 22,     "unwanted_models": ["GCPD"]},
+    "Mean absolute error of capped acceleration":               {"data_key":"capped_acc_ae",                "label": "Error", "min": 0,  "max": 7,      "unwanted_models": ["GCPD"]},
+    "Length of gravitatial vector":                             {"data_key":"grav_length",                  "label": "Gravitational acceleration", "min": 0,  "max": 40},
+    "Length of gravitational vector for reaching target":       {"data_key":"grav_length_reach_target",     "label": "Gravitational acceleration", "min": 0,  "max": 40},
+    "Length of gravitational vector for staying at target":     {"data_key":"grav_length_stay_at_target",   "label": "Gravitational acceleration", "min": 0,  "max": 40},
+    "Maximum gravitational acceleration":                       {"data_key":"max_grav",                     "label": "Gravitational acceleration", "min": 0,  "max": 11000},
+    "Maximum gravitational acceleration for staying at target": {"data_key":"max_grav_stays_at_target",     "label": "Gravitational acceleration", "min": 0,  "max": 2500}
 }
 
-def plot_with_formatting(data_key, save_plot = False):
-    setup = plot_setups[data_key]
-    plot_data_2d(data_key, setup["title"], setup["label"], setup["min"], setup["max"], save_plot=save_plot)
+def plot_with_formatting(title, save_plot = False):
+    setup = plot_setups[title]
+    plot_data_2d(setup["data_key"], title, setup["label"], setup["min"], setup["max"], 
+                 unwanted_models= setup["unwanted_models"] if "unwanted_models" in setup else [], 
+                 save_plot=save_plot)
 
 def plot_stacked_bars(save_plot=False):
     data = None
@@ -311,8 +320,8 @@ def plot_stacked_bars(save_plot=False):
     stays_at_target = [model["stays_at_target_m"] * (1 - model["collisions_m"]) for model in data.values()] #P(stay | Collision) * (1 - P(Collision))
 
     reaches_not_stays_at_target = [reaches_target[i] for i in range(len(collisions))]
-    does_not_reach = [1.0 - collisions[i] - reaches_target[i] + reaches_not_stays_at_target[i] for i in range(len(collisions))]
-    collisions = [collisions[i] + does_not_reach[i] for i in range(len(collisions))]
+    does_not_reach = [1.0 - collisions[i] for i in range(len(collisions))]
+    collisions = [1.0 for i in range(len(collisions))]
 
 
     labels = [compute_label(s) for s in data.keys()]
@@ -352,10 +361,16 @@ def plot_stacked_bars(save_plot=False):
     else:
         plt.show()
 
+def printList(list):  
+        for value in list:
+            string_value = "{:.2f}".format(value) if type(value) is float else value
+            print(string_value + ", ", end="")
+        print("")
+
 if __name__ == "__main__":
     #extract_data()
-    extract_additional_data()
-    # plot_stacked_bars(save_plot=True)
+    #extract_additional_data()
+    plot_stacked_bars(save_plot=True)
     # for key in plot_setups.keys():
     #     plot_with_formatting(key, save_plot=True)
 
