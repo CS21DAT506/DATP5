@@ -7,6 +7,12 @@ import pandas as pd
 import util as Util
 
 
+def plot_2d(self, x, y, sim):
+        COLOR = cm.rainbow(np.linspace(0, 1, len(sim.particles)))
+
+        for i in range(len(x)):
+            plt.plot(x, y, color=COLOR[i])
+
 def plot_with_formatting(plot_setups, title, save_plot = False):
     setup = plot_setups[title]
     plot_data_2d(setup["data_key"], title, setup["label"], setup["min"], setup["max"], 

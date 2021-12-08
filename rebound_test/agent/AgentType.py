@@ -6,3 +6,4 @@ class AgentType(Enum):
     NN = "nn"
     NN_NOP = "nn_nop"
     NN_GRAV = "nn_grav"
+    NN_TESTING = "nn_testing"

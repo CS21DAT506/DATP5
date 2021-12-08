@@ -9,15 +9,6 @@ MAX_ACCELERATION = settings.max_acceleration
 from utils.vectors import normalize
 
 class AnalyticalAgent(AgentBase):
-    def get_agent_gravity(self, agent_pos, sim):
-        agent_acc =  np.array( (0, 0, 0) )
-
-        for i in range(1, len(sim.particles)):
-            particle = sim.particles[i]
-            distance = np.array( (particle.x, particle.y, particle.z) ) - agent_pos 
-            agent_acc = agent_acc + particle.m * distance / np.linalg.norm(distance)**3
-        
-        return agent_acc * sim.G
 
     def scale_policy(self, velocity_scale_min, velocity_scale_max):
         if (velocity_scale_max >= PREFERRED_VALUE and velocity_scale_min <= PREFERRED_VALUE):

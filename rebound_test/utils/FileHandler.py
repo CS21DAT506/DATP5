@@ -67,12 +67,10 @@ class FileHandler(BaseFileHandler):
     def _write_to_file(self, file_name, file_extension, data):
         relative_path = self._get_path_to_dir(file_extension)
         abs_path_to_file = self.get_abs_path(relative_path, file_name, file_extension)
-        self.write(abs_path_to_file, data)
-
+        BaseFileHandler.write(abs_path_to_file, data)
 
     def write_to_file(self, file_extension, json):
         self._write_to_file(self.file_name, file_extension, json)
-
     
     @staticmethod
     def get_data_dir(dir_name): 

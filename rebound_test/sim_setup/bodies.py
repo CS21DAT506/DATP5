@@ -3,6 +3,17 @@ from utils.vectors import vector_dist
 from settings.settings_access import settings
 import numpy as np
 
+def get_valid_environment():
+    particles = None
+    target_pos = None
+    is_valid_conf = False
+   
+    while not is_valid_conf:
+        particles, target_pos = get_environment(settings.num_of_planets)
+        is_valid_conf = is_valid_configuration(particles[settings.agent_index], particles[settings.agent_index+1:], target_pos, settings.min_dist_to_target)
+   
+    return {"target_pos": target_pos, "particles": particles}
+
 def is_valid_configuration(agent, planets, target, min_dist_to_target):
     for p1 in planets:
         for p2 in planets:
