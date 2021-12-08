@@ -1,0 +1,15 @@
+data_in_single_file: true
+data_dir_name: 'data'
+data_file_name: 'gravity_vector_data.json'
+do_evaluation: true
+do_early_stopping: false
+do_save_model: true
+evaluation_size: 30
+early_stopping_patience: 500
+shuffle_data_in_batch: false
+
+training_settings:     
+    batch_size: 32000    
+    epochs: 6000         
+    verbose: 0           
+

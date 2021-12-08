@@ -7,9 +7,11 @@ Pipfile.lock
 
 # folder for saved models
 */saved_models/*
+*/dec_saved_models/*
 
 # data
-*json
+*.json
+*.png
 
 # gekko data save paths
 gekko_data_gen/*.txt
@@ -151,3 +153,6 @@ dmypy.json
 
 *.swp
 *.swap
+nn_trainer/nn_grav_vec_rhombus_models/**/*
+nn_trainer/finalists/**/*
+

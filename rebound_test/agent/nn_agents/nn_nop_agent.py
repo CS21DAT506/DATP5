@@ -1,6 +1,6 @@
 import numpy as np
-from agent.nn_agent import NNAgent
-from settings.settings_access import settings
+from agent.nn_agents.nn_agent import NNAgent
+from settings.settings_access import settings 
 from math import floor
 
 from progress.bar import IncrementalBar

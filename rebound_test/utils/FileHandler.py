@@ -1,10 +1,10 @@
 from agent.AgentType import AgentType
 from exceptions.InvalidAgentType import InvalidAgentType
 from settings.settings_access import settings
-import pathlib
 from pathlib import Path
 from utils.BaseFileHandler import BaseFileHandler
 import datetime
+import os
 
 class FileHandler(BaseFileHandler):
     def __init__(self, agent_type):
@@ -34,6 +34,15 @@ class FileHandler(BaseFileHandler):
     def get_timestamp_str(self):
         return datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
 
+    @staticmethod
+    def ensure_dir_exists(path):
+        Path(str(path)).mkdir(parents=True, exist_ok=True)
+
+    def _ensure_analytical_dir_exists(self):
+        Path(str(self.path_to_analytical)).mkdir(parents=True, exist_ok=True)
+        Path(str(self.path_to_analytical_bin)).mkdir(parents=True, exist_ok=True)
+        Path(str(self.path_to_analytical_json)).mkdir(parents=True, exist_ok=True)
+
     def _ensure_data_dir_exists(self):
         self.ensure_dir_exists(self.path_to_data_dir)
 
@@ -61,3 +70,14 @@ class FileHandler(BaseFileHandler):
         self.write(abs_path_to_file, data)
 
 
+    def write_to_file(self, file_extension, json):
+        self._write_to_file(self.file_name, file_extension, json)
+
+    
+    @staticmethod
+    def get_data_dir(dir_name): 
+        return Path.joinpath(Path().resolve(), dir_name)
+
+    @staticmethod
+    def get_data_files(data_dir):
+        return os.listdir(data_dir)

@@ -1,1 +1,2 @@
-data/*
+data/**/*
+selected_models/**/*
