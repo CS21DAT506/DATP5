@@ -1,4 +1,4 @@
-import file_util as fu
+import util as Util
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -39,7 +39,7 @@ def loss_plot(file_folder, smooth=False):
     fig = plt.figure()
     axe = fig.gca(projection='3d')
 
-    files = fu.get_data_files(file_folder)
+    files = Util.get_data_files(file_folder)
 
     dicts = []
 
@@ -74,7 +74,6 @@ def loss_plot(file_folder, smooth=False):
 def format(string):
     new_string = string.replace("_", " ")
     return new_string[0:1].upper() + new_string[1:]
-
 
 if __name__ == '__main__':
     #loss_plot("rhomb_val_finalists", smooth=False)

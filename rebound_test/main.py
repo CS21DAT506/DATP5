@@ -37,7 +37,7 @@ def check_collision(agent, particles, intial_agent_mass, is_testing):
 
 def run(archive_fname, model_path, is_testing, config=None):
     if config is None :
-        config = get_valid_environment()
+        config = gen_valid_environment()
 
     target_pos = config["target_pos"]
     particles = config["particles"]

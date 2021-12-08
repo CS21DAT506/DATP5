@@ -5,13 +5,46 @@ from matplotlib import cm
 from matplotlib.ticker import FuncFormatter
 import pandas as pd
 import util as Util
+from pathlib import Path
+from progress.bar import IncrementalBar
 
 
-def plot_2d(self, x, y, sim):
-        COLOR = cm.rainbow(np.linspace(0, 1, len(sim.particles)))
+def plot_all_508_cost():
+    COLOR = cm.rainbow(np.linspace(0, 1, 9))
+    data_dir = Util.get_data_dir("testing_data")
 
-        for i in range(len(x)):
-            plt.plot(x, y, color=COLOR[i])
+    model = "nn_grav_vec_63_127_255_63"
+    folder = Path.joinpath(data_dir, model)
+
+    num_of_environments = int(len(Util.get_data_files(folder))/2)
+
+    costs = []
+
+    for i in range(num_of_environments):
+        metrics = Util.load_json(f"{folder}/archive_{i}.json")
+        costs.append(metrics["dist_to_target"][-1])
+        if i % 100 == 0: 
+            print(f"{i}, ", end="")
+    
+    amounts = [0] * 9
+
+    for cost in costs:
+        amounts[int(np.floor(np.log10(cost)))] += 1
+
+    x = range(9)
+    plt.bar(x, amounts, color=COLOR, capsize=4)
+
+    fig = plt.subplot()
+
+    box = fig.get_position()
+    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
+
+    plt.ylim(0, 1000)
+    plt.ylabel("Amount")
+    plt.xlabel("Log_10(Cost)")
+    plt.title("Amount of simulations with cost in each order of magnitude")
+
+    plt.show()
 
 def plot_with_formatting(plot_setups, title, save_plot = False):
     setup = plot_setups[title]
@@ -26,7 +59,6 @@ def plot_stacked_bars(save_plot=False):
                 data = json.loads(json_file)
 
     COLOR = cm.rainbow(np.linspace(0, 1, 5))
-    plot_design = ["-o", "-d"]
 
     collisions = [model["collisions_m"] for model in data.values()] #P(Collision)
     reaches_target  = [model["reaches_target_m"]  * (1 - model["collisions_m"]) for model in data.values()] #P(reach \/ stay | !Collision) * (1 - P(Collision))
@@ -129,13 +161,9 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_mod
 
 def time_plot(save_plot = False):
 
-    data = None
-    with open("extracted_data.json", "r") as file:
-                json_file = file.read()
-                data = json.loads(json_file)
+    data = Util.load_json("extracted_data.json")
 
     COLOR = cm.rainbow(np.linspace(0, 1, len(data)))
-    plot_design = ["-o", "-d"]
 
     mean = [model["agent_time_m"] for model in data.values()]
     h = [model["agent_time_h"] for model in data.values()]

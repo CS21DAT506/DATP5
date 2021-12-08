@@ -174,6 +174,6 @@ if __name__ == "__main__":
     #merge_data("data/extracted_data.json", "data/additional_data.json", "data/merged_data.json")
     #extract_data()
     #extract_additional_data()
-    plot_all(save_plots=True)
-
+    #plot_all(save_plots=True)
+    plot_all_508_cost()
     ...

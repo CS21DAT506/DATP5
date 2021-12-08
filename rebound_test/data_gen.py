@@ -22,10 +22,10 @@ def gen_unsimulated_gcpd_data(save_path):
 
     for i in range(settings.num_of_iterations):
         print(f"Iteration {i}")
-        agent = get_agent(use_random_pos=True)
+        agent = gen_agent(use_random_pos=True)
         gcpd_agent = GCPDAgent(target_pos)
 
-        bodies, target_pos = get_environment(settings.num_of_planets)
+        bodies, target_pos = gen_environment(settings.num_of_planets)
         grav_vector = np.array([0, 0, 0]) if settings.num_of_planets <= 0 else get_agent_gravity(agent['pos'][:2], bodies[1:])
 
         input_data_array.append([ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ])
@@ -42,7 +42,7 @@ def environment_gen():
     environments = []
     num_of_environments = 10000
     for i in range(num_of_environments):
-        environments.append(get_valid_environment())
+        environments.append(gen_valid_environment())
         if i % 100 == 0:
             print(str(i / 100) + " %")
 
