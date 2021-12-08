@@ -39,10 +39,10 @@ def plot_all_508_cost():
     box = fig.get_position()
     fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
 
-    plt.ylim(0, 1000)
+    plt.ylim(0, 5000)
     plt.ylabel("Amount")
     plt.xlabel("Log_10(Cost)")
-    plt.title("Amount of simulations with cost in each order of magnitude")
+    plt.title("Amount of simulations with cost of each order of magnitude")
 
     plt.show()
 
