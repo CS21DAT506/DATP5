@@ -1,35 +1,38 @@
 from agent.AgentType import AgentType
 from exceptions.InvalidAgentType import InvalidAgentType
 from settings.settings_access import settings
-import datetime
-import pathlib
 from pathlib import Path
+from utils.BaseFileHandler import BaseFileHandler
+import datetime
 import os
 
-
-class FileHandler():
+class FileHandler(BaseFileHandler):
     def __init__(self, agent_type):
+        super().__init__()
         self.agent_type = agent_type
 
-        self.cwd_path = pathlib.Path().resolve()
-        self.path_to_data_dir = Path.joinpath(self.cwd_path, settings.data_dir_name)
-
-        self.path_to_analytical = Path.joinpath(self.path_to_data_dir, settings.data_dir_analytical_agent)
-        self.path_to_analytical_bin = Path.joinpath(self.path_to_analytical, settings.data_dir_bin)
-        self.path_to_analytical_json = Path.joinpath(self.path_to_analytical, settings.data_dir_json)
-
-        self.path_to_gcpd = Path.joinpath(self.path_to_data_dir, settings.data_dir_gcpd_agent)
-        self.path_to_gcpd_bin = Path.joinpath(self.path_to_gcpd, settings.data_dir_bin)
-        self.path_to_gcpd_json = Path.joinpath(self.path_to_gcpd, settings.data_dir_json)
-
-        self.path_to_nn = Path.joinpath(self.path_to_data_dir, settings.data_dir_nn_agent)
-        self.path_to_nn_bin = Path.joinpath(self.path_to_nn, settings.data_dir_bin)
-
+        self.path_to_data_dir = self.join(self.project_dir, settings.data_dir_name)
         self._ensure_data_dir_exists()
-        self.file_name = self.get_timestamp_str()
 
-    def _ensure_data_dir_exists(self):
-        Path(str(self.path_to_data_dir)).mkdir(parents=True, exist_ok=True)
+        self.agent_path = self.join(self.path_to_data_dir, settings.agent_type)
+        self.agent_path_bin = self.join(self.agent_path, settings.data_dir_bin)
+        if (agent_type == AgentType.ANALYTICAL.value or agent_type == AgentType.GCPD.value):
+            self.agent_path_json = self.join(self.agent_path, settings.data_dir_json)
+        self._ensure_agent_dirs_exists()
+
+        self.default_file_name = self.get_timestamp_str()
+
+    def get_default_file_path(self, extension, file_name=None):
+        path_to_dir = self._get_path_to_dir(extension) # relative path
+        file_name = self.default_file_name if file_name is None else file_name
+        return str( self.join(path_to_dir, file_name + extension) )
+
+    def write_to_file(self, file_extension, json, file_name=None):
+        file_name = self.default_file_name if file_name is None else file_name
+        self._write_to_file(file_name, file_extension, json)
+
+    def get_timestamp_str(self):
+        return datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
 
     @staticmethod
     def ensure_dir_exists(path):
@@ -40,29 +43,18 @@ class FileHandler():
         Path(str(self.path_to_analytical_bin)).mkdir(parents=True, exist_ok=True)
         Path(str(self.path_to_analytical_json)).mkdir(parents=True, exist_ok=True)
 
-    def _ensure_gcpd_dir_exists(self):
-        Path(str(self.path_to_gcpd)).mkdir(parents=True, exist_ok=True)
-        Path(str(self.path_to_gcpd_bin)).mkdir(parents=True, exist_ok=True)
-        Path(str(self.path_to_gcpd_json)).mkdir(parents=True, exist_ok=True)
+    def _ensure_data_dir_exists(self):
+        self.ensure_dir_exists(self.path_to_data_dir)
 
-    def _ensure_nn_dir_exists(self):
-        Path(str(self.path_to_nn)).mkdir(parents=True, exist_ok=True)
-        Path(str(self.path_to_nn_bin)).mkdir(parents=True, exist_ok=True)
+    def _ensure_agent_dirs_exists(self):
+        self.ensure_dir_exists(self.agent_path)
+        self.ensure_dir_exists(self.agent_path_bin)
+        if (self.agent_type == AgentType.ANALYTICAL.value 
+         or self.agent_type == AgentType.GCPD.value):
+            self.ensure_dir_exists(self.agent_path_json)
 
-    def _get_path_to_agent_dir(self):
-        if (self.agent_type == AgentType.ANALYTICAL.value):
-            self._ensure_analytical_dir_exists()
-            path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_analytical_agent)
-        elif(self.agent_type == AgentType.GCPD.value):
-            self._ensure_gcpd_dir_exists()
-            path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_gcpd_agent)
-        elif(self.agent_type == AgentType.NN.value 
-          or self.agent_type == AgentType.NN_NOP.value 
-          or self.agent_type == AgentType.NN_GRAV.value):
-            self._ensure_nn_dir_exists()
-            path_to_dir = Path.joinpath(self.path_to_data_dir, settings.data_dir_nn_agent)
-        else:
-            raise InvalidAgentType("The given agent type is not recognized. Please provide a valid agent type.")
+    def _get_path_to_dir(self, extension):
+        path_to_dir = self._get_path_based_on(self.agent_path, extension)
         return path_to_dir
 
     def _get_path_based_on(self, path_to_agent_dir, extension):
@@ -72,28 +64,11 @@ class FileHandler():
             path_to_dir = Path.joinpath(path_to_agent_dir, settings.data_dir_json)
         return path_to_dir if path_to_dir is not None else path_to_agent_dir
 
-    def _get_path_to_dir(self, extension):
-        path_to_dir = self._get_path_to_agent_dir()
-        path_to_dir = self._get_path_based_on(path_to_dir, extension)
-        return path_to_dir 
-
-    def get_abs_path_of_file(self, extension, file_name=None):
-        path_to_dir = self._get_path_to_dir(extension)
-        if file_name is None:
-            file_name = self.file_name
-        return str( Path.joinpath(path_to_dir, file_name + extension ) )
-
-    def get_timestamp_str(self):
-        return datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
-
     def _write_to_file(self, file_name, file_extension, data):
-        abs_path_to_file = self.get_abs_path_of_file(file_extension, file_name)
-        f_handle = open(abs_path_to_file , 'w')
-        f_handle.write(data)
-        f_handle.close()
+        relative_path = self._get_path_to_dir(file_extension)
+        abs_path_to_file = self.get_abs_path(relative_path, file_name, file_extension)
+        self.write(abs_path_to_file, data)
 
-    def write_to_file(self, file_name, file_extension, json):
-        self._write_to_file(file_name, file_extension, json)
 
     def write_to_file(self, file_extension, json):
         self._write_to_file(self.file_name, file_extension, json)

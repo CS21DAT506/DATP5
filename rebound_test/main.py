@@ -129,15 +129,14 @@ def do_normal_run():
     successful_runs = 0
     for i in range(settings.num_of_iterations):
         file_handler = FileHandler(settings.agent_type)
-        archive_fname = file_handler.get_abs_path_of_file(settings.bin_file_ext)
-
+        archive_fname = file_handler.get_default_file_path(settings.bin_file_ext)
         run_data, status = handle_run(archive_fname, settings.nn_model_path)
         info_str = get_info_str(i, status)
 
         print(f"\n{info_str}\n")
 
         if status['run_succeeded']:
-            successful_runs += 1 
+            successful_runs += 1
             (target_pos, archive, agent) = run_data
             performance = calculate_run_performance(archive, target_pos)
             if (settings.write_data_to_files):
@@ -163,7 +162,7 @@ def do_infinite_run():
         run_count += 1
 
         if status['run_succeeded']:
-            successful_runs += 1 
+            successful_runs += 1
             batch.append(run_data)
             if len(batch) >= settings.batch_size and settings.write_data_to_files:
                 archive_as_json = get_batch_as_json_str(batch)
@@ -181,7 +180,7 @@ def simple_data_gen():
         gcpd_agent = GCPDAgent(target_pos)
 
         input_data_array.append( [ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ] )
-    
+
         acc = gcpd_agent._get_agent_acceleration(agent['pos'], agent['vel'], np.array( [0, 0, 0] ))
         ouput_data_array.append( [ *acc[:2] ] )
 

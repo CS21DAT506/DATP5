@@ -20,7 +20,7 @@ class TFTrainer:
         self.cp_callbacks = []
 
     def _initialize_paths(self, save_name, save_path):
-        save_path = Path.joinpath( Path().resolve(), save_path ) 
+        save_path = Path.joinpath( Path().resolve(), save_path )
         self.model_save_path = Path.joinpath( save_path, save_name )
 
         self.save_path = str(save_path)
@@ -66,7 +66,7 @@ class TFTrainer:
         save_instance_path = str( Path.joinpath( self.model_save_path, datetime.datetime.now().strftime("%Y_%m_%d_%H_%M") ) )
 
         if (not os.path.exists(save_instance_path)):
-            os.mkdir(save_instance_path)        
+            os.mkdir(save_instance_path)
 
         return self.model.save(save_instance_path)
 
@@ -87,17 +87,17 @@ class TFTrainer:
         """
         temp_path = Path.joinpath(Path().resolve(), save_dir)
         save_path = str( Path.joinpath( temp_path, save_name ) )
-        
+
         model = tf.keras.models.load_model(save_path)
 
 
         cls = TFTrainer(model,  save_name, save_dir, batch_size)
         return cls
-    
+
 
 
 if __name__ == "__main__":
-    
+
         # model = tf.keras.models.Sequential()
 
         # model.add(Dense(4, activation="relu"))
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         #               loss='categorical_crossentropy',
         #               metrics=['accuracy'])
 
-        # trainer = TFTrainer(model, "model_3")    
+        # trainer = TFTrainer(model, "model_3")
         # trainer.predict([[[0,1,2,3]]])
         # trainer.save_model()
 
