@@ -24,9 +24,9 @@ Each of these folders contain a main and some util either as a subfolder or as a
 
 This project is written in python 3 (either 3.8.10 or 3.9) and uses a number of different packages and frameworks all of which can be found in [requirements.txt](./requirements.txt). 
 These can be installed globally or inside a venv. 
-Installing and setting up the code in a venv, which is most likely the easiest and most convenient approach, is described below in [venv section](#venv)) below. 
+Installing and setting up the code in a venv, which is most likely the easiest and most convenient approach, is described below in [venv section](#venv) below. 
 
-## Venv
+## [Venv](https://docs.python.org/3/library/venv.html)
 
 Can be used to run the program with all project dependencies.
 
