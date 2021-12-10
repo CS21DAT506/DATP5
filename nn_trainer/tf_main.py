@@ -63,7 +63,7 @@ def train_multiple():
         print(" "*30, f"\rRuns trained: {counter}")
 
         counter += 1
-        factor, layer_nums = Util.update_layers(factor, layer_nums, settings.is_funnel_shaped)
+        factor, layer_nums = Util.get_updated_layers(factor, layer_nums, settings.is_funnel_shaped)
 
 if __name__ == '__main__':
     train_multiple()
