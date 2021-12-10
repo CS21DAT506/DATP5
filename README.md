@@ -28,7 +28,7 @@ Installing and setting up the code in a venv, which is most likely the easiest a
 
 ## [Venv](https://docs.python.org/3/library/venv.html)
 
-Can be used to run the program with all project dependencies.
+Can be used to conveniently run the program with all project dependencies.
 
 ### Create a venv
 
