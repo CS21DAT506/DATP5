@@ -12,7 +12,7 @@ The repository is divided into the folders: `rebound_test`, `nn_trainer`, `testi
 Each of these folders contain a main and some util either as a subfolder or as a file.
 
 - [rebound_test](./rebound_test)
-  - Contains source code for running a simulation setup in the framework Rebound 
+  - Contains source code for running a simulation in the framework Rebound 
 - [nn_trainer](./nn_trainer)
   - Contains source code for setup and training of neural networks using the framework Tensorflow.  
 - [testing_data_handling](./testing_data_handling)
@@ -20,25 +20,35 @@ Each of these folders contain a main and some util either as a subfolder or as a
   
     Note however that there is no data supplied as part of this repository, though it can be generated from the environment in [rebound_test](./rebound_test).
 
-## Requirements
+## General requirements 
 
-This project is written in python [version_num] and uses a number of different packages and frameworks. The required frameworks and the version used in development of this repository can be found in [requirements.txt](./requirements.txt).
-
-The requirements can all be install using this command:
-
-    pip install -r requirements.txt
+This project is written in python 3 (either 3.8.10 or 3.9) and uses a number of different packages and frameworks all of which can be found in [requirements.txt](./requirements.txt). 
+These can be installed globally or inside a venv. 
+Installing and setting up the code in a venv, which is most likely the easiest and most convenient approach, is described below in [venv section](#venv)) below. 
 
 ## Venv
 
 Can be used to run the program with all project dependencies.
 
-### Guide
+### Create a venv
 
-Create a venv
+Assuming current working directory is the root of this repository:
 
     python3 -m venv ./venv
 
-Activate the venv
+This will create a folder named `venv` in .
+
+### Activate the venv
 
     source venv/bin/activate
+
+Now you have access to pip and can this install packages into the venv.
+
+### Installing requirements
+
+    pip install wheel
+
+Install dependencies:
+
+    pip install -r requirements.txt
 
