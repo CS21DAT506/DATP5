@@ -26,6 +26,9 @@ def get_vector_with_circular_bound(max_radius):
     return np.array( [x, y, 0] )
 
 def add_particle(sim, pos=None, vel=None, mass=None, radius=None, three_dimension=True):
+    """
+        This does not check if particles are placed on top of each other. Please fix
+    """
     pos = pos if pos is not None else get_distribution(10, three_dimension)
     vel = vel if vel is not None else get_distribution(0.1, three_dimension)
     mass = mass if mass is not None else random.random() * 50 + 0.5
