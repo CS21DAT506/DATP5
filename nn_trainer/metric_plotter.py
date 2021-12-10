@@ -5,7 +5,7 @@ import math
 import matplotlib as mpl
 import json 
 import matplotlib.cm as cm
-
+from util import join_path_strs
 
 def plot(file_name, first_axis, second_axis, val=False):
     metrics = None
@@ -44,7 +44,7 @@ def loss_plot(file_folder, smooth=False):
     dicts = []
 
     for loss_file in files:
-        with open(file_folder + "\\" + loss_file, "rb") as file:
+        with open(join_path_strs(file_folder, loss_file), "rb") as file:
             json_file = file.read()
             dicts.append(json.loads(json_file))
 

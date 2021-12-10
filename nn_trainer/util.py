@@ -3,12 +3,19 @@ import os
 import json
 import numpy as np
 import pickle
+from os import sep                                                            
 
 def load_nn_data(json_path):
     data = None
     with open(json_path) as file:
         data = json.load(file)
     return np.array(data["input"]), np.array(data["output"])
+
+def join_path_strs(*path_strs):                                               
+    res = ""                                                                  
+    for path_str in path_strs:                                                
+        res += sep + path_str                                                 
+    return res     
 
 def load_byte_file(path):
     with open(path, "rb") as filename:

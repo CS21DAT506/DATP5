@@ -12,6 +12,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 import numpy as np
 import pickle
 from settings.settings_access import settings
+from util import join_path_strs
 
 def train_nn_from_layers(settings, layer_nums, X, y, model_save_name):
     tf.compat.v1.disable_eager_execution()
@@ -31,7 +32,7 @@ def train_nn_from_layers(settings, layer_nums, X, y, model_save_name):
         trainer.cp_callbacks.append(es)
 
     hist = trainer.fit(X, y, batch_size=settings.batch_size, epochs=settings.epochs, verbose=settings.verbose, validation_split=0.3)
-    hist_folder = trainer.save_path_str + "\\" + model_save_name + "\\history"
+    hist_folder = join_path_strs(trainer.save_path_str, model_save_name, "history")
 
     if settings.do_save_model:
         trainer.save_model()
@@ -39,7 +40,8 @@ def train_nn_from_layers(settings, layer_nums, X, y, model_save_name):
         os.mkdir(hist_folder)
     
     #Save history as byte file with pickle 
-    with open(hist_folder + "\\" + datetime.now().strftime("%Y_%m_%d_%H_%M"), 'wb') as file:
+    file_path = join_path_strs(hist_folder, datetime.now().strftime("%Y_%m_%d_%H_%M")
+    with open(file_path, 'wb') as file:
         pickle.dump(hist.history, file)
 
 def train_multiple():

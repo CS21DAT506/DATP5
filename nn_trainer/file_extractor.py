@@ -1,6 +1,7 @@
 import util as Util
 from pathlib import Path
 import json 
+from util import join_path_strs
 
 def extract(path, save_metrics, save_epochs_for_best_models): 
 
@@ -23,10 +24,10 @@ def extract(path, save_metrics, save_epochs_for_best_models):
     all_val_losses = []
 
     for model in data:
-        hist_files = Util.get_data_files(Path.joinpath(data_dir, model + "\\history"))
+        hist_files = Util.get_data_files(Path.joinpath(data_dir, join_path_strs(model, "history")))
 
         for file in hist_files:
-            hist = Util.load_byte_file(Path.joinpath(data_dir, model + "\\history\\" + file))
+            hist = Util.load_byte_file(Path.joinpath(data_dir, join_path_strs(model, "history", file)))
             
             losses = hist["loss"]
             val_losses = hist["val_loss"]
@@ -64,7 +65,7 @@ def save_epochs_for_best_models(num_of_epochs, last_val_loss, layer_sizes, all_l
                 "val_loss": all_val_losses[i]
             }
 
-            with open("fun_w_val_finalists\\" + config + ".json", "w") as file:
+            with open(join_path_strs("fun_w_val_finalists", config + ".json"), "w") as file:
                 jsonstr = json.dumps(losses, indent=4)
                 file.write(jsonstr)
 
