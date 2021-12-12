@@ -7,42 +7,42 @@ import pandas as pd
 import util as Util
 from pathlib import Path
 from progress.bar import IncrementalBar
+import util as Util
 
 
 def plot_all_508_cost():
-    COLOR = cm.rainbow(np.linspace(0, 1, 9))
     data_dir = Util.get_data_dir("testing_data")
 
-    model = "nn_grav_vec_63_127_255_63"
-    folder = Path.joinpath(data_dir, model)
-
-    num_of_environments = int(len(Util.get_data_files(folder))/2)
-
-    costs = []
-
-    for i in range(num_of_environments):
-        metrics = Util.load_json(f"{folder}/archive_{i}.json")
-        costs.append(metrics["dist_to_target"][-1])
-        if i % 100 == 0: 
-            print(f"{i}, ", end="")
+    costs = Util.load_json("cost_508_data.json")
     
     amounts = [0] * 9
+    accumulated = [0] * 9
 
     for cost in costs:
-        amounts[int(np.floor(np.log10(cost)))] += 1
+        index = int(np.floor(np.log10(cost)))
+        amounts[index] += 1
+        accumulated[index] += cost
+
+    print(amounts)
 
     x = range(9)
-    plt.bar(x, amounts, color=COLOR, capsize=4)
+    simple_plot(x, amounts, "Amount", "⎿Log_10(Cost)⏌", "Amount of simulations with cost of each order of magnitude", max = 4000)
+    simple_plot(x, accumulated, "Accumulated Cost", "⎿Log_10(Cost)⏌", "Accumulated cost within each order of magnitude", max = 100000)
+    
+
+def simple_plot(x, y, ylabel, xlabel, title, min=0, max=1000):
+    COLOR = cm.rainbow(np.linspace(0, 1, len(x)))
+    plt.bar(x, y, color=COLOR, capsize=4)
 
     fig = plt.subplot()
 
     box = fig.get_position()
     fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
 
-    plt.ylim(0, 5000)
-    plt.ylabel("Amount")
-    plt.xlabel("Log_10(Cost)")
-    plt.title("Amount of simulations with cost of each order of magnitude")
+    plt.ylim(min, max)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    plt.title(title)
 
     plt.show()
 
