@@ -52,15 +52,16 @@ def extract_cost_data():
     all_costs = {}
 
     model_508 = "nn_grav_vec_63_127_255_63"
-
-    Util.save_json(list_cost(model_508, data_dir), "cost_508_data.json")
+    costs_for_508 = list_cost(model_508, data_dir)
+    all_costs[model_508] = costs_for_508
+    Util.save_json(costs_for_508, "cost_508_data.json")
 
     for model in data:
         if not (model is model_508):
             all_costs[model] = list_cost(model, data_dir)
             print( f"{model} " + " " * (30 - len(model)) + "\n Processesing complete")
 
-    Util.save_json(all_costs, "all_cost_data.json")
+    Util.save_json(all_costs, "all_costs_data.json")
 
 def list_cost(model, data_dir):
     costs =  []
@@ -206,9 +207,13 @@ def plot_all(save_plots):
 
 if __name__ == "__main__":
     extract_cost_data()
+    #plot_all_508_cost()
+    #plot_outlierless_cost()
+    #plot_geometric_mean_cost()
+
     #merge_data("data/extracted_data.json", "data/additional_data.json", "data/merged_data.json")
     #extract_data()
     #extract_additional_data()
     #plot_all(save_plots=True)
-    #plot_all_508_cost()
+    
     ...
