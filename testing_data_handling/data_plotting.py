@@ -7,42 +7,41 @@ import pandas as pd
 import util as Util
 from pathlib import Path
 from progress.bar import IncrementalBar
+import util as Util
 
 
 def plot_all_508_cost():
-    COLOR = cm.rainbow(np.linspace(0, 1, 9))
     data_dir = Util.get_data_dir("testing_data")
 
-    model = "nn_grav_vec_63_127_255_63"
-    folder = Path.joinpath(data_dir, model)
-
-    num_of_environments = int(len(Util.get_data_files(folder))/2)
-
-    costs = []
-
-    for i in range(num_of_environments):
-        metrics = Util.load_json(f"{folder}/archive_{i}.json")
-        costs.append(metrics["dist_to_target"][-1])
-        if i % 100 == 0: 
-            print(f"{i}, ", end="")
+    costs = Util.load_json("cost_508_data.json")
     
     amounts = [0] * 9
+    accumulated = [0] * 9
 
     for cost in costs:
-        amounts[int(np.floor(np.log10(cost)))] += 1
+        index = int(np.floor(np.log10(cost)))
+        amounts[index] += 1
+        accumulated[index] += cost
+
+    print(amounts)
 
     x = range(9)
-    plt.bar(x, amounts, color=COLOR, capsize=4)
+    simple_plot(x, amounts, "Amount", "⎿Log_10(Cost)⏌", "Amount of simulations with cost of each order of magnitude", max = 4000)
+    simple_plot(x, accumulated, "Accumulated Cost", "⎿Log_10(Cost)⏌", "Accumulated cost within each order of magnitude", max = 100000)
+    
+def simple_plot(x, y, ylabel, xlabel, title, min=0, max=1000):
+    COLOR = cm.rainbow(np.linspace(0, 1, len(x)))
+    plt.bar(x, y, color=COLOR, capsize=4)
 
     fig = plt.subplot()
 
     box = fig.get_position()
     fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
 
-    plt.ylim(0, 5000)
-    plt.ylabel("Amount")
-    plt.xlabel("Log_10(Cost)")
-    plt.title("Amount of simulations with cost of each order of magnitude")
+    plt.ylim(min, max)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    plt.title(title)
 
     plt.show()
 
@@ -108,10 +107,7 @@ def plot_stacked_bars(save_plot=False):
 
 def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_models = [], save_plot = False):
 
-    data = None
-    with open("extracted_data.json", "r") as file:
-                json_file = file.read()
-                data = json.loads(json_file)
+    data = Util.load_json("extracted_data.json")
 
     COLOR = cm.rainbow(np.linspace(0, 1, len(data)))
     plot_design = ["-o", "-d"]
@@ -152,6 +148,104 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_mod
 
     if(max < 1):
         plt.gca().get_yaxis().set_major_formatter(FuncFormatter(Util.Sci_Formatter)) #plt.LogFormatter(10, labelOnlyBase = False))
+
+    if(save_plot):
+        plt.savefig("plots/" + title.replace(" ", "_") + ".png")
+        plt.clf()
+    else:
+        plt.show()
+
+def plot_geometric_mean_cost(save_plot = False):
+
+    data = Util.load_json("all_costs_data.json")
+
+    COLOR = cm.rainbow(np.linspace(0, 1, len(data)))
+    plot_design = ["-o", "-d"]
+    means = []
+    erros=[]
+
+    for model_costs in data.values():
+        m, h = Util.geometric_mean_confidence_interval(model_costs)
+        means.append(m)
+        erros.append([m*h,m/h])
+   
+    labels = [Util.compute_label(s) for s in data.keys()]
+
+    data = pd.DataFrame({
+        "labels": labels,
+        "h": erros,
+        "mean": means
+    })
+
+    sorted_data = data.sort_values(by=["labels"])
+    labels = sorted_data["labels"]
+    
+    x = range(len(labels))
+
+    plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
+
+    fig = plt.subplot()
+
+    box = fig.get_position()
+    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
+
+    title = "Geometric mean of cost given as final distance to target"
+
+    plt.xticks(x, labels)
+    plt.ylim(0, 20000)
+    plt.ylabel("Geometric mean of cost")
+    plt.xlabel("Model")
+    plt.title(title)
+
+    if(save_plot):
+        plt.savefig("plots/" + title.replace(" ", "_") + ".png")
+        plt.clf()
+    else:
+        plt.show()
+
+def plot_outlierless_cost(save_plot = False):
+
+    data = Util.load_json("all_costs_data.json")
+
+    COLOR = cm.rainbow(np.linspace(0, 1, len(data)))
+    means = []
+    erros = []
+
+    for model, model_costs in data.items():
+        non_outliers = [x for x in model_costs if x < 10**8]
+
+        print(f"{model}: {len(model_costs) - len(non_outliers)} outliers removed")
+        m, h = Util.geometric_mean_confidence_interval(model_costs)
+        means.append(m)
+        erros.append(h)
+   
+    labels = [Util.compute_label(s) for s in data.keys()]
+
+    data = pd.DataFrame({
+        "labels": labels,
+        "h": erros,
+        "mean": means
+    })
+
+    sorted_data = data.sort_values(by=["labels"])
+    labels = sorted_data["labels"]
+    
+    x = range(len(labels))
+
+    plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
+
+    fig = plt.subplot()
+
+    box = fig.get_position()
+    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
+
+    title = "Geometric mean of cost given as final distance to target"
+
+    plt.xticks(x, labels)
+    plt.ylim(0, 20000)
+    plt.ylabel("Geometric mean of cost")
+    plt.xlabel("Model")
+    plt.title(title)
 
     if(save_plot):
         plt.savefig("plots/" + title.replace(" ", "_") + ".png")

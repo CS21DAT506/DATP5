@@ -46,6 +46,41 @@ def extract_additional_data():
 
     Util.save_json(processed_data, "data/additional_data.json")
 
+def extract_cost_data():
+    data_dir = Util.get_data_dir("testing_data")
+    data = Util.get_data_files(data_dir)
+    all_costs = {}
+
+    model_508 = "nn_grav_vec_63_127_255_63"
+    costs_for_508 = list_cost(model_508, data_dir)
+    all_costs[model_508] = costs_for_508
+    Util.save_json(costs_for_508, "cost_508_data.json")
+
+    for model in data:
+        if not (model is model_508):
+            all_costs[model] = list_cost(model, data_dir)
+            print( f"{model} " + " " * (30 - len(model)) + "\n Processesing complete")
+
+    Util.save_json(all_costs, "all_costs_data.json")
+
+def list_cost(model, data_dir):
+    costs =  []
+
+    folder = Path.joinpath(data_dir, model)
+
+    num_of_environments = int(len(Util.get_data_files(folder))/2)
+    bar = IncrementalBar('Files loaded: ', max=num_of_environments//10, suffix='%(percent)d%%')
+
+    for i in range(num_of_environments):
+        metrics = Util.load_json(str(folder) + "/archive_" + str(i) + ".json")
+
+        if not metrics["collision"]:
+            costs.append(metrics["dist_to_target"][-1])
+
+        if i % 10 == 0: 
+            bar.next()
+    return costs
+
 def extract_data():
     data_dir = Util.get_data_dir("testing_data")
 
@@ -171,9 +206,14 @@ def plot_all(save_plots):
     time_plot(save_plots)
 
 if __name__ == "__main__":
+    extract_cost_data()
+    #plot_all_508_cost()
+    #plot_outlierless_cost()
+    #plot_geometric_mean_cost()
+
     #merge_data("data/extracted_data.json", "data/additional_data.json", "data/merged_data.json")
     #extract_data()
     #extract_additional_data()
     #plot_all(save_plots=True)
-    plot_all_508_cost()
+    
     ...

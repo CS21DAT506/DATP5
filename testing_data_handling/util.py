@@ -20,6 +20,11 @@ def cap_vector_length(vec, max_length):
         return vec / length * max_length
     return vec
 
+def geometric_mean_confidence_interval(data, confidence=0.95):
+    log_data = np.log(data)
+    m, h = mean_confidence_interval(log_data, confidence)
+    return np.exp(m), np.exp(h)
+
 def mean_confidence_interval(data, confidence=0.95):
     """Stolen from stack-overflow"""
     a = np.array(data, dtype=np.float32)
