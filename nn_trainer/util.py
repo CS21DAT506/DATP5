@@ -4,6 +4,7 @@ import json
 import numpy as np
 import pickle
 from os import sep                                                            
+import datetime
 
 def load_nn_data(json_path):
     data = None
@@ -51,3 +52,11 @@ def file_name_from_layers(layer_nums):
     for layer_size in layer_nums:
         out += "_" + str(int(layer_size))
     return out
+
+def save_history_as_byte_file(hist_folder, hist):
+    if not os.path.exists(hist_folder):
+        os.mkdir(hist_folder)
+    
+    file_path = join_path_strs(hist_folder, datetime.now().strftime("%Y_%m_%d_%H_%M"))
+    with open(file_path, 'wb') as file:
+        pickle.dump(hist.history, file)
