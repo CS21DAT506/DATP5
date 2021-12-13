@@ -2,7 +2,7 @@
 
 Project made by group d506, AAU Computer Science - 5th semester.
 
-Authors: Magnus S. Andersen, Nikolai A. Bonderup, Jakob B. Hyldgaard, Christian B. Larsen, Sebastian Lassen & Simon Olsen.
+Authors: Magnus S. Andersen, Nikolai A. Bonderup, Jakob B. Hyldgaard, Christian B. Larsen, Sebastian Lassen & Simon B. Olsen.
 
 Hand in date: 22/12-2021
 
