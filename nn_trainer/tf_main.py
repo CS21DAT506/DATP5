@@ -40,7 +40,7 @@ def train_nn_from_layers(settings, layer_nums, X, y, model_save_name):
         os.mkdir(hist_folder)
     
     #Save history as byte file with pickle 
-    file_path = join_path_strs(hist_folder, datetime.now().strftime("%Y_%m_%d_%H_%M")
+    file_path = join_path_strs(hist_folder, datetime.now().strftime("%Y_%m_%d_%H_%M"))
     with open(file_path, 'wb') as file:
         pickle.dump(hist.history, file)
 

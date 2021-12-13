@@ -1,6 +1,7 @@
 
 import numpy as np
 import json
+from constants import *
 import util as Util
 from pathlib import Path
 from progress.bar import IncrementalBar
@@ -27,7 +28,7 @@ def extract_additional_data():
         bar = IncrementalBar('Files loaded: ', max=num_of_environments//10, suffix='%(percent)d%%')
 
         for i in range(num_of_environments):
-            metrics = Util.load_json(str(folder) + "/archive_" + str(i) + ".json")
+            metrics = Util.load_json(f"{folder}/archive_{i}.json")
 
             if not metrics["collision"]:
                 dist_to_target = metrics["dist_to_target"]
@@ -38,7 +39,7 @@ def extract_additional_data():
 
             if i % 10 == 0: 
                 bar.next()
-        print( f"{model} " + " " * (30 - len(model)) + "\n Processesing complete")
+        print(f"{model}{' ' * (30 - len(model))}\n Processesing complete")
 
         processed_data[model] = {}
 
@@ -52,14 +53,14 @@ def extract_cost_data():
     all_costs = {}
 
     model_508 = "nn_grav_vec_63_127_255_63"
-    costs_for_508 = list_cost(model_508, data_dir)
-    all_costs[model_508] = costs_for_508
-    Util.save_json(costs_for_508, "cost_508_data.json")
+    # costs_for_508 = list_cost(model_508, data_dir)
+    # all_costs[model_508] = costs_for_508
+    # Util.save_json(costs_for_508, "cost_508_data.json")
 
     for model in data:
         if not (model is model_508):
             all_costs[model] = list_cost(model, data_dir)
-            print( f"{model} " + " " * (30 - len(model)) + "\n Processesing complete")
+            print(f"{model}{' ' * (30 - len(model))}\n Processesing complete")
 
     Util.save_json(all_costs, "all_costs_data.json")
 
@@ -72,7 +73,7 @@ def list_cost(model, data_dir):
     bar = IncrementalBar('Files loaded: ', max=num_of_environments//10, suffix='%(percent)d%%')
 
     for i in range(num_of_environments):
-        metrics = Util.load_json(str(folder) + "/archive_" + str(i) + ".json")
+        metrics = Util.load_json(f"{folder}/archive_{i}.json")
 
         if not metrics["collision"]:
             costs.append(metrics["dist_to_target"][-1])
@@ -125,9 +126,7 @@ def extract_data():
                 for key in ["agent_time", "gcpd_time", "overhead_time"]:
                     extracted_data[key].extend(metrics[key])
 
-                agent_fuel = 0
-                for acc in metrics["agent_acceleration"]:
-                    agent_fuel += min(10, np.linalg.norm(acc))
+                agent_fuel = Util.get_fuel(metrics["agent_acceleration"])
                 extracted_data["fuel"].append(agent_fuel)
 
                 dist_to_target = metrics["dist_to_target"]
@@ -149,36 +148,13 @@ def extract_data():
                     extracted_data["grav_length_stay_at_target"].extend(grav_lengths)
                     extracted_data["max_grav_stays_at_target"].append(max_grav)
 
-                agent_fuel = 0
-                target_reached = 0
-                grav_lengths = []
-                for ii in range(len(dist_to_target)):
-                    agent_fuel += min(10, np.linalg.norm(metrics["agent_acceleration"][ii]))
-                    grav_lengths.append(np.linalg.norm(metrics["grav_acceleration"][ii]))
-                    if dist_to_target[ii] < dist_to_target[0] * 0.05:
-                        extracted_data["time_to_5p_to_target"].append(ii * 0.01)
-                        extracted_data["fuel_to_5p_to_target"].append(agent_fuel)
-                        extracted_data["grav_length_reach_target"].extend(grav_lengths)
-                        target_reached = 1
-                        break
+                agent_fuel, target_reached, grav_lengths = Util.reach_target_stats(metrics, extracted_data, dist_to_target)
                 extracted_data["reaches_target"].append(target_reached)
 
                 extracted_data["end_cost"].append(dist_to_target[-1])
                 extracted_data["min_cost"].append(min(dist_to_target))
 
-                for ii in range(len(metrics["agent_acceleration"])):
-                    model_to_gcpd_diff = np.array(metrics["agent_acceleration"][ii]) - np.array(metrics["gcpd_acceleration"][ii])
-                    capped_model_to_gcpd_diff = np.array(Util.cap_vector_length(metrics["agent_acceleration"][ii], 10)) - np.array(metrics["gcpd_acceleration"][ii])
-
-                    for value in capped_model_to_gcpd_diff[:2]:
-                        extracted_data["capped_acc_se"].append(value**2)
-                        extracted_data["capped_acc_ae"].append(abs(value))
-
-                    for value in model_to_gcpd_diff[:2]:
-                        extracted_data["acc_se"].append(value**2)
-                        extracted_data["acc_ae"].append(abs(value))
-
-                ...
+                Util.handle_loss(metrics, extracted_data)
 
             if i % 10 == 0: 
                 bar.next()
@@ -206,14 +182,12 @@ def plot_all(save_plots):
     time_plot(save_plots)
 
 if __name__ == "__main__":
-    extract_cost_data()
-    #plot_all_508_cost()
+    #extract_cost_data()
     #plot_outlierless_cost()
-    #plot_geometric_mean_cost()
+    #plot_stacked_bars(save_plot=True)
+    #time_plot()
 
     #merge_data("data/extracted_data.json", "data/additional_data.json", "data/merged_data.json")
     #extract_data()
     #extract_additional_data()
-    #plot_all(save_plots=True)
-    
-    ...
+    plot_all(save_plots=True)

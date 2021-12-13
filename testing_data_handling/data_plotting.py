@@ -8,29 +8,36 @@ import util as Util
 from pathlib import Path
 from progress.bar import IncrementalBar
 import util as Util
-
+import matplotlib.ticker as ticker
 
 def plot_all_508_cost():
-    data_dir = Util.get_data_dir("testing_data")
-
     costs = Util.load_json("cost_508_data.json")
     
-    amounts = [0] * 9
-    accumulated = [0] * 9
+    amounts = [0] * 10
+    accumulated = [0] * 10
+    sum_accumulated = 0
+
+    print(len(costs))
 
     for cost in costs:
-        index = int(np.floor(np.log10(cost)))
+        index = 1 + int(np.floor(np.log10(cost)))
+        if index < 0:
+            raise Exception("index too low")
         amounts[index] += 1
         accumulated[index] += cost
+        sum_accumulated += cost
 
-    print(amounts)
+    print((accumulated[8] / sum_accumulated) * 100)
 
-    x = range(9)
-    simple_plot(x, amounts, "Amount", "⎿Log_10(Cost)⏌", "Amount of simulations with cost of each order of magnitude", max = 4000)
-    simple_plot(x, accumulated, "Accumulated Cost", "⎿Log_10(Cost)⏌", "Accumulated cost within each order of magnitude", max = 100000)
+    x = range(-1, 9)
+    simple_plot(x, amounts, "Amount", "$\lfloor Log_{10}(Cost) \\rfloor$", "Amount of simulations with cost of each order of magnitude", max = 3500)
+    simple_plot(x, accumulated, "Accumulated Cost", "$\lfloor Log_{10}(Cost) \\rfloor$", "Accumulated cost within each order of magnitude", max = 500000000)
     
 def simple_plot(x, y, ylabel, xlabel, title, min=0, max=1000):
     COLOR = cm.rainbow(np.linspace(0, 1, len(x)))
+
+    x = [ str(value) for value in x]
+
     plt.bar(x, y, color=COLOR, capsize=4)
 
     fig = plt.subplot()
@@ -42,6 +49,7 @@ def simple_plot(x, y, ylabel, xlabel, title, min=0, max=1000):
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     plt.title(title)
+
 
     plt.show()
 
@@ -95,9 +103,11 @@ def plot_stacked_bars(save_plot=False):
     box = ax.get_position()
     ax.set_position([box.x0, box.y0 + box.height * 0.3, box.width, box.height * 0.7])
 
+    plt.xticks(sorted_data["labels"], rotation = 30)
+
     ax.set_ylabel("Likelihood")
     ax.set_title("Outcomes and their likelihoods")
-    ax.legend(loc='center left', bbox_to_anchor=(0.2, -0.3))
+    ax.legend(loc='center left', bbox_to_anchor=(0.2, -0.4))
     
     if(save_plot):
         plt.savefig("plots/Outcomes.png")
@@ -138,9 +148,9 @@ def plot_data_2d(data_key, title, label = "y", min = 0, max = 1000, unwanted_mod
     fig = plt.subplot()
 
     box = fig.get_position()
-    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
+    fig.set_position([box.x0 + box.width * 0.02, box.y0 + box.height * 0.1, box.width, box.height * 0.95])
 
-    plt.xticks(x, labels)
+    plt.xticks(x, labels, rotation = 30)
     plt.ylim(min, max)
     plt.ylabel(label)
     plt.xlabel("Model")
@@ -160,20 +170,20 @@ def plot_geometric_mean_cost(save_plot = False):
     data = Util.load_json("all_costs_data.json")
 
     COLOR = cm.rainbow(np.linspace(0, 1, len(data)))
-    plot_design = ["-o", "-d"]
     means = []
-    erros=[]
+    errors=[]
 
     for model_costs in data.values():
         m, h = Util.geometric_mean_confidence_interval(model_costs)
         means.append(m)
-        erros.append([m*h,m/h])
+        errors.append([m*h,m/h])
    
     labels = [Util.compute_label(s) for s in data.keys()]
 
+    #Pandas is used to sort items by labels
     data = pd.DataFrame({
         "labels": labels,
-        "h": erros,
+        "h": errors,
         "mean": means
     })
 
@@ -182,7 +192,7 @@ def plot_geometric_mean_cost(save_plot = False):
     
     x = range(len(labels))
 
-    plt.bar(x, sorted_data["mean"], yerr=sorted_data["h"], color=COLOR, capsize=4)
+    plt.bar(x, sorted_data["mean"], color=COLOR, capsize=4)
 
     fig = plt.subplot()
 
@@ -192,7 +202,7 @@ def plot_geometric_mean_cost(save_plot = False):
     title = "Geometric mean of cost given as final distance to target"
 
     plt.xticks(x, labels)
-    plt.ylim(0, 20000)
+    plt.ylim(0, 100)
     plt.ylabel("Geometric mean of cost")
     plt.xlabel("Model")
     plt.title(title)
@@ -211,14 +221,23 @@ def plot_outlierless_cost(save_plot = False):
     means = []
     erros = []
 
-    for model, model_costs in data.items():
-        non_outliers = [x for x in model_costs if x < 10**8]
+    sum = 0
+    outlier_sum = 0
 
-        print(f"{model}: {len(model_costs) - len(non_outliers)} outliers removed")
-        m, h = Util.geometric_mean_confidence_interval(model_costs)
+    for model, model_costs in data.items():
+        non_outliers = [x for x in model_costs if np.log10(x) < 7]
+        diff = len(model_costs) - len(non_outliers)
+        print(f"{model}: {diff} outliers removed")
+        m, h = Util.mean_confidence_interval(non_outliers)
         means.append(m)
         erros.append(h)
+
+        sum_for_model = np.sum(model_costs)
+        sum += sum_for_model
+        outlier_sum +=  sum_for_model - np.sum(non_outliers)
    
+    print(f"{outlier_sum / sum * 100}")
+
     labels = [Util.compute_label(s) for s in data.keys()]
 
     data = pd.DataFrame({
@@ -237,13 +256,13 @@ def plot_outlierless_cost(save_plot = False):
     fig = plt.subplot()
 
     box = fig.get_position()
-    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width, box.height])
+    fig.set_position([box.x0 + box.width * 0.02, box.y0 + box.height * 0.1, box.width, box.height * 0.9])
 
-    title = "Geometric mean of cost given as final distance to target"
+    title = "Cost given as final distance to target (costs over $10^7$ removed)"
 
-    plt.xticks(x, labels)
-    plt.ylim(0, 20000)
-    plt.ylabel("Geometric mean of cost")
+    plt.xticks(x, labels, rotation = 30)
+    plt.ylim(0, 6000)
+    plt.ylabel("Cost")
     plt.xlabel("Model")
     plt.title(title)
 
@@ -283,7 +302,7 @@ def time_plot(save_plot = False):
 
     title = "Time of computations"
 
-    plt.xticks(x, labels)
+    plt.xticks(x, labels, rotation = 30)
     plt.ylim(0, 0.002)
     plt.ylabel("Time [s]")
     plt.xlabel("Model")
@@ -294,7 +313,7 @@ def time_plot(save_plot = False):
     fig = plt.subplot()
 
     box = fig.get_position()
-    fig.set_position([box.x0 + box.width * 0.02, box.y0, box.width * 1.08, box.height])
+    fig.set_position([box.x0 + box.width * 0.02, box.y0 + box.width * 0.05, box.width * 1.08, box.height])
 
     if(save_plot):
         plt.savefig("plots/" + title.replace(" ", "_") + ".png")

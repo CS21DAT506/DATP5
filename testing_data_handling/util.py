@@ -7,6 +7,7 @@ from pathlib import Path
 from progress.bar import IncrementalBar
 from data_plotting import *
 from scipy import stats
+from constants import *
 
 def get_data_dir(dir_name): 
     return Path.joinpath(Path().resolve(), dir_name)
@@ -51,7 +52,7 @@ def compute_label(model_name):
     is_rhombic = numbers[0] < numbers[1]
 
     postfix = (("R" if is_rhombic else "F") if is_grav_vec else "S")
-    return str(np.sum(numbers)) + postfix
+    return f"{len(numbers)}:{np.sum(numbers)}{postfix}"
 
 def save_json(content, path):
     with open(path, "w") as file:
@@ -68,3 +69,40 @@ def compute_statistics(statistics, raw_data) :
             m, h = Util.mean_confidence_interval(raw_data[key])
             statistics[key + "_m"] = float(m)
             statistics[key + "_h"] = float(h)
+
+def get_fuel(agent_acceleration):
+    agent_fuel = 0
+    for acc in agent_acceleration:
+        agent_fuel += cap_acceleration_length(acc)
+    return agent_fuel
+
+def cap_acceleration_length(vec):
+    return min(MAX_ACCELERATION, np.linalg.norm(vec))
+
+def reach_target_stats(metrics, extracted_data, dist_to_target):
+    agent_fuel = 0
+    target_reached = 0
+    grav_lengths = []
+    for i in range(len(dist_to_target)):
+        agent_fuel += Util.cap_acceleration_length(metrics["agent_acceleration"][i])
+        grav_lengths.append(np.linalg.norm(metrics["grav_acceleration"][i]))
+        if dist_to_target[i] < dist_to_target[0] * DISTANCE_ERROR_MARGIN:
+            extracted_data["time_to_5p_to_target"].append(i * TIME_STEP_SIZE)
+            extracted_data["fuel_to_5p_to_target"].append(agent_fuel)
+            extracted_data["grav_length_reach_target"].extend(grav_lengths)
+            target_reached = 1
+            break
+    return agent_fuel, target_reached, grav_lengths
+
+def handle_loss(metrics, extracted_data):
+    for ii in range(len(metrics["agent_acceleration"])):
+        model_to_gcpd_diff = np.array(metrics["agent_acceleration"][ii]) - np.array(metrics["gcpd_acceleration"][ii])
+        capped_model_to_gcpd_diff = np.array(Util.cap_vector_length(metrics["agent_acceleration"][ii], 10)) - np.array(metrics["gcpd_acceleration"][ii])
+
+        for value in capped_model_to_gcpd_diff[:2]:
+            extracted_data["capped_acc_se"].append(value**2)
+            extracted_data["capped_acc_ae"].append(abs(value))
+
+        for value in model_to_gcpd_diff[:2]:
+            extracted_data["acc_se"].append(value**2)
+            extracted_data["acc_ae"].append(abs(value))
