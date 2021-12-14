@@ -183,11 +183,11 @@ def plot_all(save_plots):
 
 if __name__ == "__main__":
     #extract_cost_data()
-    #plot_outlierless_cost()
+    plot_outlierless_cost()
     #plot_stacked_bars(save_plot=True)
     #time_plot()
 
     #merge_data("data/extracted_data.json", "data/additional_data.json", "data/merged_data.json")
     #extract_data()
     #extract_additional_data()
-    plot_all(save_plots=True)
+    #plot_all(save_plots=True)

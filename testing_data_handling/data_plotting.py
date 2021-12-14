@@ -227,10 +227,12 @@ def plot_outlierless_cost(save_plot = False):
     for model, model_costs in data.items():
         non_outliers = [x for x in model_costs if np.log10(x) < 7]
         diff = len(model_costs) - len(non_outliers)
-        print(f"{model}: {diff} outliers removed")
         m, h = Util.mean_confidence_interval(non_outliers)
         means.append(m)
         erros.append(h)
+
+        conf_int_str = f"{int(m)} +- {int(h)}"
+        print(f"{model}:{' ' * (30 - len(model))} {conf_int_str}{' ' * (15 - len(conf_int_str))} | {diff} outliers removed")
 
         sum_for_model = np.sum(model_costs)
         sum += sum_for_model
