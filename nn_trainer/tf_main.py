@@ -32,12 +32,12 @@ def train_nn_from_layers(settings, layer_nums, X, y, model_save_name):
         trainer.cp_callbacks.append(es)
 
     hist = trainer.fit(X, y, batch_size=settings.batch_size, epochs=settings.epochs, verbose=settings.verbose, validation_split=0.3)
+    hist_folder = join_path_strs(trainer.save_path_str, model_save_name, "history")
+    save_history_as_byte_file(hist_folder, hist)
 
     if settings.do_save_model:
         trainer.save_model()
 
-    hist_folder = join_path_strs(trainer.save_path_str, model_save_name, "history")
-    save_history_as_byte_file(hist_folder, hist)
 
 def train_multiple():
     data_dir = Util.get_dir(settings.data_dir_name)
