@@ -1,5 +1,5 @@
-from agent.gcpd_agent import GCPDAgent
-from settings.SettingsAccess import settings
+from agent.controllers.gcpd_agent import GCPDAgent
+from settings.settings_access import settings
 from sim_setup.bodies import *
 from utils.FileHandler import FileHandler
 import json
@@ -15,39 +15,41 @@ def get_agent_gravity(agent_pos, planets, G=6.646596924499661e-05):
 
     return agent_acc * G
 
-if __name__ == "__main__":
+def gen_unsimulated_gcpd_data(save_path):
+    """Generates data from GCPD without simulating in Rebound"""
     input_data_array = []
     ouput_data_array = []
 
     for i in range(settings.num_of_iterations):
         print(f"Iteration {i}")
-        agent = get_agent(use_random_pos=True)
-        target_pos = get_target_pos()
+        agent = gen_agent(use_random_pos=True)
         gcpd_agent = GCPDAgent(target_pos)
 
-        bodies = get_particles(settings.num_of_planets)
+        bodies, target_pos = gen_environment(settings.num_of_planets)
+        grav_vector = np.array([0, 0, 0]) if settings.num_of_planets <= 0 else get_agent_gravity(agent['pos'][:2], bodies[1:])
 
-        grav_vector = get_agent_gravity(agent['pos'][:2], bodies[1:])
-
-        input_data_array.append( [ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ] )
+        input_data_array.append([ *target_pos[:2], *agent['pos'][:2], *agent['vel'][:2] ])
 
         acc = gcpd_agent._get_agent_acceleration(agent['pos'], agent['vel'], grav_vector)
-        ouput_data_array.append( [ *acc[:2] ] )
+        ouput_data_array.append([ *acc[:2] ]) #TODO Please check <----------------------------------------------------------------------
 
     data_points = { 'input': input_data_array, 'output': ouput_data_array }
-    json_str = json.dumps( data_points, indent=4 )
     
-    with open("validation_data.json", "w") as file:
-                file.write(json_str)
+    FileHandler.write_json(save_path, data_points)
 
-    # for _ in range(settings.num_of_iterations):
-    #     bodies = get_particles(settings.num_of_planets)
-    #     target_pos = get_target_pos()
-    #     agent = GCPDAgent(target_pos)
+def environment_gen():
 
-    #     agent_pos = bodies[0]
+    environments = []
+    num_of_environments = 10000
+    for i in range(num_of_environments):
+        environments.append(gen_valid_environment())
+        if i % 100 == 0:
+            print(str(i / 100) + " %")
 
-    #     grav_vector = agent._get_agent_gravity(agent_pos, bodies[1:])
-        
-    #     input = [target_pos[0], target_pos[1], agent_pos[0], agent_pos[1], ]
-    # ...
+    data_dir = FileHandler.get_data_dir("rebound_test/environments")
+
+    print("Environments generated!")
+    FileHandler.write_json(str(data_dir) + "/environments.json", environments)
+
+if __name__ == "__main__":
+    ...

@@ -1,11 +1,11 @@
-import file_util as fu
+import util as Util
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 import matplotlib as mpl
 import json 
 import matplotlib.cm as cm
-
+from util import join_path_strs
 
 def plot(file_name, first_axis, second_axis, val=False):
     metrics = None
@@ -39,12 +39,12 @@ def loss_plot(file_folder, smooth=False):
     fig = plt.figure()
     axe = fig.gca(projection='3d')
 
-    files = fu.get_data_files(file_folder)
+    files = Util.get_data_files(file_folder)
 
     dicts = []
 
     for loss_file in files:
-        with open(file_folder + "\\" + loss_file, "rb") as file:
+        with open(join_path_strs(file_folder, loss_file), "rb") as file:
             json_file = file.read()
             dicts.append(json.loads(json_file))
 
@@ -74,7 +74,6 @@ def loss_plot(file_folder, smooth=False):
 def format(string):
     new_string = string.replace("_", " ")
     return new_string[0:1].upper() + new_string[1:]
-
 
 if __name__ == '__main__':
     #loss_plot("rhomb_val_finalists", smooth=False)

@@ -18,20 +18,12 @@ class Settings():
         return self._config_obj["training_settings"][name].get()
 
     @property
-    def data_in_single_file(self):
-         return self._get_entry('data_in_single_file')
-
-    @property
     def data_dir_name(self):
          return self._get_entry('data_dir_name')
 
     @property
     def data_file_name(self):
         return self._get_entry('data_file_name')
-
-    @property
-    def do_evaluation(self):
-        return self._get_entry('do_evaluation')
 
     @property
     def do_early_stopping(self):
@@ -42,16 +34,20 @@ class Settings():
         return self._get_entry('do_save_model')
 
     @property
-    def evaluation_size(self):
-        return self._get_entry('evaluation_size')
-
-    @property
     def early_stopping_patience(self):
         return self._get_entry('early_stopping_patience')
 
     @property
-    def shuffle_data_in_batch(self):
-        return self._get_entry('shuffle_data_in_batch')
+    def max_layers(self):
+        return self._get_entry('max_layers')
+
+    @property
+    def is_funnel_shaped(self):
+        return self._get_entry('is_funnel_shaped')
+
+    @property
+    def initial_layers(self):
+        return self._get_entry('initial_layers')
 
     @property
     def batch_size(self):
