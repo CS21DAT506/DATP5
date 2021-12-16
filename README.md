@@ -34,17 +34,26 @@ Can be used to run the program with all project dependencies.
 
 Assuming current working directory is the root of this repository:
 
-    python3 -m venv ./venv
+    python3 -m venv <venv>
 
-This will create a folder named `venv` in .
+`<venv>` could just be `./venv` which will cause the above command to create a venv folder named `venv` in cwd.
 
 ### Activate the venv
 
-    source venv/bin/activate
+|     Platform      |      Shell         |      Command to activate virtual environment       |
+|:------------------|:-------------------|:---------------------------------------------------|
+|     POSIX         |      bash/zsh      |      $ source <venv>/bin/activate                  |
+|                   |      fish          |      $ source <venv>/bin/activate.fish             |
+|                   |      csh           |      $ source <venv>/bin/activate.csh              |
+|     Windows       |      cmd.exe       |      C:\> <venv>\Scripts\activate.bat              |
+|                   |      PowerShell    |      PS C:\> <venv>\Scripts\Activate.ps1           |
 
-Now you have access to pip and can this install packages into the venv.
+
+After having activated the venv, you now have access to pip and can install packages into the venv.
 
 ### Installing requirements
+
+You may need to install [wheel](https://pypi.org/project/wheel/) before proceeding to install the requirements.
 
     pip install wheel
 
@@ -52,3 +61,5 @@ Install dependencies:
 
     pip install -r requirements.txt
 
+
+Need more information about virtual environments? Take a loook at [venv — Creation of virtual environments](https://docs.python.org/3/library/venv.html).
