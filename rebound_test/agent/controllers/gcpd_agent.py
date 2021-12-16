@@ -9,9 +9,9 @@ class GCPDAgent(AgentBase):
     def _speed_coefficient(self):
         return -np.log(1 - self._progression_const)
 
-    def _get_velocity_change(self, agent_pos, agent_velocity):
+    def _get_normalized_velocity_change(self, agent_pos, agent_velocity):
         distance_to_target = self.target_pos - agent_pos
-        return self._speed_coefficient() * distance_to_target - agent_velocity
+        return self._normalize(self._speed_coefficient() * distance_to_target - agent_velocity)
     
     def _get_u_value(self, normalized_velocity_change, agent_gravity):
         cross_length = np.linalg.norm(np.cross(normalized_velocity_change, agent_gravity))
@@ -21,7 +21,7 @@ class GCPDAgent(AgentBase):
         return np.dot(normalized_velocity_change, agent_gravity) + np.sqrt(MAX_ACCELERATION**2 - cross_length**2)
 
     def get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
-        normalized_velocity_change = self._normalize(self._get_velocity_change(agent_pos, agent_velocity))
+        normalized_velocity_change = self._get_normalized_velocity_change(agent_pos, agent_velocity)
         
         u = self._get_u_value(normalized_velocity_change, agent_gravity)
         if (u < 0):
