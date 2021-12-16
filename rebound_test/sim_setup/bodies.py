@@ -54,7 +54,6 @@ def gen_planet(relative_pos):
 
 def gen_environment(num_of_planets):
     particles = [gen_agent()]
-
     relative_pos = gen_relative_pos()
 
     for _ in range(num_of_planets):
