@@ -5,16 +5,12 @@ import matplotlib as mpl
 import matplotlib.cm as cm
 
 def get_time(archive):
-    time = []
-    for a in archive:
-        time.append(a.t)
-    return time
+    return [a.t for a in archive]
 
 class Plotter():
 
     def plot_2d(self, particle_plot, sim):
         COLOR = cm.rainbow(np.linspace(0, 1, len(sim.particles)))
-        plot_design = ["-o", "-d"]
 
         for i in range(len(particle_plot)):
             particle = particle_plot[i]
@@ -37,8 +33,6 @@ class Plotter():
             x = [pos[0] for pos in  particle]
             y = [pos[1] for pos in  particle]
 
-            # if(i == 0):
-            #     axe.set_box_aspect( (np.ptp(x), np.ptp(y), np.ptp(time)) )
             obj_label = "Planet" if i > 0 else "Agent"
             axe.plot(x, y, time[:len(x)], "o", label=obj_label)
 
@@ -56,16 +50,9 @@ class Plotter():
 
         num_of_particles = len(archive[0].particles)
         for i in range(num_of_particles):
-            x = []
-            y = []
-            for a in archive:
-                if i < len(a.particles):
-                    particle = a.particles[i]
-                    x.append(particle.x)
-                    y.append(particle.y)
+            x = [a.particles[i].x for a in archive if i < len(a.particles)]
+            y = [a.particles[i].y for a in archive if i < len(a.particles)]
 
-            # if(i == 0):
-            #     axe.set_box_aspect( (np.ptp(x), np.ptp(y), np.ptp(time)) )
             obj_label = "Planet" if i > 0 else "Agent"
             axe.plot(x, y, time[:len(x)], "o", label=obj_label)
 

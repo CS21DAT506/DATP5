@@ -1,5 +1,5 @@
-import pathlib
 from pathlib import Path
+import json
 
 class BaseFileHandler():
     def __init__(self):
@@ -51,7 +51,8 @@ class BaseFileHandler():
         """
         return str( self.join(relative_path_to_dir, file_name + extension ) )
 
-    def write(self, abs_path_to_file, data):
+    @staticmethod
+    def write(abs_path_to_file, data):
         """
         Writes data to location abs_path_to_file
 
@@ -66,6 +67,20 @@ class BaseFileHandler():
         f_handle.write(data)
         f_handle.close()
 
+    @staticmethod
+    def read(abs_path_to_file): 
+        file = open(abs_path_to_file, "r")
+        data = file.read()
+        file.close()
+        return data
+            
+    @staticmethod
+    def write_json(abs_path_to_file, data_obj):
+        BaseFileHandler.write(abs_path_to_file, json.dumps(data_obj, indent=4))
+
+    @staticmethod
+    def read_json(abs_path_to_file):
+        return json.loads(BaseFileHandler.read(abs_path_to_file))
 
 if __name__ == "__main__":
     bfh = BaseFileHandler()
