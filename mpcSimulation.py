@@ -128,37 +128,3 @@ def plot3DGraph():
 plot3DGraph()
 
 plt.show()
-
-"""
-fig = plt.figure(figsize=(5, 4))
-ax = fig.add_subplot(autoscale_on=False)
-ax.set_aspect('equal')
-ax.grid()
-
-line, = ax.plot([], [], 'o-', lw=2)
-trace, = ax.plot([], [], ',-', lw=1)
-time_template = 'time = %.1fs'
-time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
-history_x, history_y = deque(maxlen=len(ax.value)), deque(maxlen=len(ay.value))
-
-
-def animate(i):
-    thisx = [0, ax.value[i], ax.value[i+1]]
-    thisy = [0, ay.value[i], ay.value[i+1]]
-
-    if i == 0:
-        history_x.clear()
-        history_y.clear()
-
-    history_x.appendleft(thisx[2])
-    history_y.appendleft(thisy[2])
-
-    line.set_data(thisx, thisy)
-    trace.set_data(history_x, history_y)
-    time_text.set_text(time_template % (i*m.dt))
-    return line, trace, time_text
-
-
-ani = animation.FuncAnimation(
-    fig, animate, len(ay.value), interval=m.dt*1000, blit=True)
-plt.show()"""
