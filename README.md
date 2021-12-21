@@ -26,6 +26,12 @@ This project is written in python 3 (either 3.8.10 or 3.9) and uses a number of 
 These can be installed globally or inside a venv. 
 Installing and setting up the code in a venv, which is most likely the easiest and most convenient approach, is described below in [venv section](#venv) below. 
 
+## Configuration
+It is possible to give the program an invalid configuration which will make the program fail. If the program crashes, first check the project configuration. 
+
+## Data
+It is required to have training data before running the program, othervise it will not work. 
+
 ## [Venv](https://docs.python.org/3/library/venv.html)
 
 Can be used to conveniently run the program with all project dependencies.
