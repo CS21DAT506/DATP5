@@ -20,7 +20,7 @@ class GCPDAgent(AgentBase):
 
         return np.dot(normalized_velocity_change, agent_gravity) + np.sqrt(MAX_ACCELERATION**2 - cross_length**2)
 
-    def get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
+    def _get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
         normalized_velocity_change = self._get_normalized_velocity_change(agent_pos, agent_velocity)
         
         u = self._get_u_value(normalized_velocity_change, agent_gravity)
@@ -28,6 +28,9 @@ class GCPDAgent(AgentBase):
             return - self._normalize(agent_gravity) * MAX_ACCELERATION
         
         return u * normalized_velocity_change - agent_gravity
+
+    def get_agent_acceleration(self, agent_pos, agent_velocity, agent_gravity):
+        return self._get_agent_acceleration(agent_pos, agent_velocity, agent_gravity)
 
     def _normalize(self, vec):
         return vec / np.linalg.norm(vec)

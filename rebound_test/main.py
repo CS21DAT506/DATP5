@@ -4,6 +4,7 @@ from plotter import Plotter
 from agent.controllers.gcpd_agent import GCPDAgent
 from agent.nn_agents.nn_agent import NNAgent
 from agent.nn_agents.nn_nop_agent import NopAgent
+from agent.nn_agents.nn_testing_agent import NNTestingAgent
 from settings.ExecutionMode import ExecutionMode
 from sim_setup.setup import *
 from sim_setup.bodies import *
@@ -15,13 +16,13 @@ from settings.settings_access import settings
 import time
 from agent.AgentType import AgentType
 from pathlib import Path
-import os
 from utils.progresbar import resetBar
 
 agent_type = {
     AgentType.ANALYTICAL.value: lambda target_pos, _          : AnalyticalAgent(target_pos),
     AgentType.GCPD.value:       lambda target_pos, _          : GCPDAgent(target_pos),
     AgentType.NN.value:         lambda target_pos, model_path : NNAgent(target_pos, model_path),
+    AgentType.NN_TESTING.value: lambda target_pos, model_path : NNTestingAgent(target_pos, model_path),
     AgentType.NN_NOP.value:     lambda target_pos, model_path : NopAgent(target_pos, model_path),
     AgentType.NN_GRAV.value:    lambda target_pos, model_path : NNGravityAgent(target_pos, model_path),
 }
@@ -113,9 +114,10 @@ def do_normal_run():
         if status['run_succeeded']:
             successful_runs += 1
             (target_pos, archive, agent) = run_data
-            if (settings.write_data_to_files):
+            if  (settings.write_data_to_files and
+                (agent_type == AgentType.ANALYTICAL.value or agent_type == AgentType.GCPD.value)):
                 archive_as_json = get_archive_as_json_str(archive, agent, target_pos)
-                file_handler.write_to_file(settings.json_file_ext, archive_as_json)
+                file_handler.write_to_file(settings.json_file_ext, archive_as_json, file_handler.agent_path_json)
 
     if (successful_runs > 0):
         plotter = Plotter()

@@ -8,7 +8,7 @@ class NNGravityAgent(NNAgent):
     def _get_agent_acceleration(self, sim):
         particle = sim.particles[0]
 
-        agent_pos = np.array( (particle.x, particle.y) )
+        agent_pos = np.array( (particle.x, particle.y, 0) )
         grav = self._get_agent_gravity(agent_pos, sim )
         nn_input_data = [self.target_pos[0], self.target_pos[1], particle.x, particle.y, particle.vx, particle.vy, grav[0], grav[1]]
 

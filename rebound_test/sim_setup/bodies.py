@@ -59,14 +59,14 @@ def gen_environment(num_of_planets):
     for _ in range(num_of_planets):
         particles.append( gen_planet(relative_pos) )
 
-    return particles, gen_target_pos(relative_pos).toList()
+    return particles, list(gen_target_pos(relative_pos))
 
 def gen_particle(mass, pos, radius, vel):
     return {
         "mass": mass,
-        "pos": pos.toList(),
+        "pos": list(pos),
         "radius": radius,
-        "vel": vel.toList()
+        "vel": list(vel)
     }
 
 def gen_target_pos(relative_pos):
