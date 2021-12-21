@@ -36,7 +36,6 @@ def train_nn_from_layers(settings, layer_nums, X, y, model_save_name):
 
     if settings.do_save_model:
         trainer.save_model()
-
     save_history_as_byte_file(hist_folder, hist)
 
 def train_multiple():
