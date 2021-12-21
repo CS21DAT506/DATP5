@@ -27,7 +27,7 @@ These can be installed globally or inside a venv.
 Installing and setting up the code in a venv, which is most likely the easiest and most convenient approach, is described below in [venv section](#venv) below. 
 
 ## Configuration
-It is possible to give the program an invalid configuration which will make the program fail. If the program crashes, first check the project configuration. 
+It is possible to give the program an invalid configuration which will make the program fail. If the program crashes, first check the project configuration. Each of the files containing a main function has to be called within the directory in which they are defined. 
 
 ## Data
 It is required to have training data before running the program, othervise it will not work. 
