@@ -13,8 +13,8 @@ def load_nn_data(json_path):
     return np.array(data["input"]), np.array(data["output"])
 
 def join_path_strs(*path_strs):                                               
-    res = ""                                                                  
-    for path_str in path_strs:                                                
+    res = path_strs[0]                                                                  
+    for path_str in path_strs[1:]:                                                
         res += sep + path_str                                                 
     return res     
 
