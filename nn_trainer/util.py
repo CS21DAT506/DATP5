@@ -57,6 +57,6 @@ def save_history_as_byte_file(hist_folder, hist):
     if not os.path.exists(hist_folder):
         os.mkdir(hist_folder)
     
-    file_path = join_path_strs(hist_folder, datetime.now().strftime("%Y_%m_%d_%H_%M"))
+    file_path = join_path_strs(hist_folder, datetime.datetime.now().strftime("%Y_%m_%d_%H_%M"))
     with open(file_path, 'wb') as file:
         pickle.dump(hist.history, file)

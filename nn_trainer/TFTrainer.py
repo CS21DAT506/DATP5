@@ -13,6 +13,7 @@ class TFTrainer:
 
         self.batch_size = batch_size
         self.model = model
+        self.model.tmp = self.model.layers
         self.cp_callbacks = []
 
     def _initialize_paths(self, save_name, save_path_str):
